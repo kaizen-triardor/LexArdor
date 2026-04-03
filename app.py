@@ -17,14 +17,23 @@ async def lifespan(app: FastAPI):
     # Detect which model is already loaded in llama-server (started by start.sh)
     from llm.model_router import detect_loaded_model
     detect_loaded_model()
-    # Build BM25 lexical search index (loads from disk if available, else builds in background)
+    # Build BM25 lexical search index — load from disk synchronously on startup
+    # so search works immediately. Disk load takes ~20-25s for 1.35 GB index.
+    # If no persisted index exists, build in background (takes ~3 min).
     try:
-        from rag.bm25 import build_bm25_index
-        result = build_bm25_index(background=True)
+        from rag.bm25 import build_bm25_index, get_bm25_index
         import logging
-        logging.getLogger("lexardor").info("BM25 init: %s", result)
-    except Exception:
-        pass  # BM25 is optional — app works without it
+        _log = logging.getLogger("lexardor")
+        result = build_bm25_index(background=False)  # sync: block until loaded
+        if result.get("ok"):
+            _log.info("BM25 ready: %d docs (source: %s)", result.get("doc_count", 0), result.get("source", "built"))
+        else:
+            # Disk load failed — rebuild in background so app doesn't block forever
+            _log.warning("BM25 disk load failed, rebuilding in background...")
+            build_bm25_index(background=True)
+    except Exception as e:
+        import logging
+        logging.getLogger("lexardor").warning("BM25 init skipped: %s", e)
     yield
 
 
