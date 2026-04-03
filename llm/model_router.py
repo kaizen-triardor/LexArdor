@@ -1,13 +1,14 @@
 """Model Router — manages multiple local LLM models for different pipeline stages.
 
-LexArdor uses a 3-model architecture:
-1. Fast model (Qwen 9B Q8) — query classification, simple questions
-2. Reasoning model (DeepSeek-R1 32B or Qwen 27B) — legal analysis, chain-of-thought
-3. Verifier model (Saul-7B or Gemma 12B) — citation check, consistency verification
+LexArdor uses a multi-model architecture:
+1. Fast model (Qwen 9B Q8, Gemma 4 E4B) — query classification, simple questions
+2. Reasoning model (DeepSeek-R1 32B, Qwen 27B, Gemma 4 31B) — legal analysis, chain-of-thought
+3. Verifier model (Saul-7B, Gemma 12B) — citation check, consistency verification
+4. Agent model (Gemma 4 E2B) — AI agent, runs concurrently on separate port
 
-On a single GPU, only one model runs at a time via llama-server.
+The main pipeline runs one model at a time via llama-server (port 8081).
+The agent model can run concurrently on a separate port for parallel processing.
 The router handles model switching by restarting llama-server with the correct model.
-On Mac (Apple Silicon), unified memory allows larger models.
 """
 from __future__ import annotations
 import logging
@@ -67,6 +68,27 @@ MODELS = {
         "role": "verifier",
         "ctx_size": 8192,
         "description": "Google generalist — dobar za proveru konzistentnosti",
+    },
+    "gemma4_2b": {
+        "name": "Gemma 4 E2B Q8",
+        "path": settings.model_gemma4_2b,
+        "role": "agent",
+        "ctx_size": 8192,
+        "description": "Gemma 4 najmanji — AI agent, može raditi paralelno sa glavnim modelom",
+    },
+    "gemma4_4b": {
+        "name": "Gemma 4 E4B Q8",
+        "path": settings.model_gemma4_4b,
+        "role": "fast",
+        "ctx_size": 16384,
+        "description": "Gemma 4 mali model — brz, za klasifikaciju i jednostavna pitanja",
+    },
+    "gemma4_31b": {
+        "name": "Gemma 4 31B Q4",
+        "path": settings.model_gemma4_31b,
+        "role": "reasoning",
+        "ctx_size": 16384,
+        "description": "Gemma 4 veliki model — napredna pravna analiza i reasoning",
     },
 }
 

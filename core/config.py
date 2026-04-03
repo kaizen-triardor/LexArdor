@@ -35,10 +35,14 @@ class Settings(BaseSettings):
     model_reasoning_qwen27b: str = str(Path.home() / "models/lexardor/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled.i1-Q4_K_M.gguf")
     model_verifier_saul: str = str(Path.home() / "models/lexardor/Saul-7B-Instruct-v1.i1-Q4_K_M.gguf")
     model_verifier_gemma: str = str(Path.home() / "models/lexardor/gemma-3-12b-it.Q4_K_M.gguf")
+    model_gemma4_2b: str = str(Path.home() / "models/lexardor/gemma-4-e2b-it-Q8_0.gguf")
+    model_gemma4_4b: str = str(Path.home() / "models/lexardor/gemma-4-E4B-it-Q8_0.gguf")
+    model_gemma4_31b: str = str(Path.home() / "models/lexardor/gemma-4-31B-it-Q4_K_M.gguf")
 
     # Active model selection (changeable via settings)
-    active_reasoning_model: str = "deepseek"  # deepseek | qwen27b
-    active_verifier_model: str = "gemma"       # gemma (saul unavailable as GGUF)
+    active_reasoning_model: str = "deepseek"  # deepseek | qwen27b | gemma4_31b
+    active_verifier_model: str = "gemma"       # gemma | saul | gemma4_4b
+    agent_model: str = "gemma4_2b"             # model for AI agent (runs concurrently on separate port)
 
     class Config:
         env_file = str(BASE_DIR / ".env")

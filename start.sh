@@ -9,6 +9,9 @@
 #   ./start.sh --qwen27b    # Start with Qwen 27B Opus
 #   ./start.sh --gemma      # Start with Gemma 12B (verifier)
 #   ./start.sh --saul       # Start with SaulLM 7B (legal verifier)
+#   ./start.sh --gemma4-2b  # Start with Gemma 4 E2B Q8 (agent)
+#   ./start.sh --gemma4     # Start with Gemma 4 E4B Q8 (fast)
+#   ./start.sh --gemma4-31b # Start with Gemma 4 31B Q4 (reasoning)
 #   ./start.sh --api-only   # Start only FastAPI (llama-server managed by model_router)
 set -e
 
@@ -25,6 +28,9 @@ MODEL_DEEPSEEK="$HOME/models/lexardor/DeepSeek-R1-Distill-Qwen-32B-Q4_K_M.gguf"
 MODEL_QWEN27B="$HOME/models/lexardor/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled.i1-Q4_K_M.gguf"
 MODEL_GEMMA="$HOME/models/lexardor/gemma-3-12b-it.Q4_K_M.gguf"
 MODEL_SAUL="$HOME/models/lexardor/Saul-7B-Instruct-v1.i1-Q4_K_M.gguf"
+MODEL_GEMMA4_2B="$HOME/models/lexardor/gemma-4-e2b-it-Q8_0.gguf"
+MODEL_GEMMA4_4B="$HOME/models/lexardor/gemma-4-E4B-it-Q8_0.gguf"
+MODEL_GEMMA4_31B="$HOME/models/lexardor/gemma-4-31B-it-Q4_K_M.gguf"
 
 # KV cache — FP16 (quantized cache requires Flash Attention which
 # isn't supported for Qwen3.5 hybrid attention layers on this GPU)
@@ -59,6 +65,22 @@ case "${1:-}" in
         MODEL="$MODEL_SAUL"
         MODEL_NAME="SaulLM 7B Q4 (Legal Verifier)"
         MODEL_KEY="saul"
+        ;;
+    --gemma4-2b)
+        MODEL="$MODEL_GEMMA4_2B"
+        MODEL_NAME="Gemma 4 E2B Q8 (Agent)"
+        MODEL_KEY="gemma4_2b"
+        CTX_SIZE=8192
+        ;;
+    --gemma4|--gemma4-4b)
+        MODEL="$MODEL_GEMMA4_4B"
+        MODEL_NAME="Gemma 4 E4B Q8 (Fast)"
+        MODEL_KEY="gemma4_4b"
+        ;;
+    --gemma4-31b)
+        MODEL="$MODEL_GEMMA4_31B"
+        MODEL_NAME="Gemma 4 31B Q4 (Reasoning)"
+        MODEL_KEY="gemma4_31b"
         ;;
     --api-only)
         API_ONLY=true
