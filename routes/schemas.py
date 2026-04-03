@@ -32,7 +32,7 @@ class SupportReport(BaseModel):
 
 
 class ExternalAIRequest(BaseModel):
-    provider: str  # openai, anthropic, google, xai
+    provider: str  # openai, anthropic, google, xai, perplexity, deepseek, mistral, groq
     api_key: str
     prompt: str
     model: str | None = None
@@ -68,7 +68,7 @@ class DraftUpdate(BaseModel):
 
 class VerifyConversationRequest(BaseModel):
     chat_id: int
-    provider: str  # openai, anthropic, google, xai
+    provider: str  # openai, anthropic, google, xai, perplexity, deepseek, mistral, groq
     api_key: str
     model: str | None = None
     anonymize: bool = True

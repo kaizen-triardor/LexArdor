@@ -99,6 +99,30 @@ PROVIDERS = {
         "models": ["grok-3", "grok-3-mini"],
         "default_model": "grok-3-mini",
     },
+    "perplexity": {
+        "name": "Perplexity",
+        "base_url": "https://api.perplexity.ai",
+        "models": ["sonar-pro", "sonar", "sonar-deep-research"],
+        "default_model": "sonar",
+    },
+    "deepseek": {
+        "name": "DeepSeek",
+        "base_url": "https://api.deepseek.com/v1",
+        "models": ["deepseek-chat", "deepseek-reasoner"],
+        "default_model": "deepseek-chat",
+    },
+    "mistral": {
+        "name": "Mistral AI",
+        "base_url": "https://api.mistral.ai/v1",
+        "models": ["mistral-large-latest", "mistral-medium-latest", "mistral-small-latest"],
+        "default_model": "mistral-small-latest",
+    },
+    "groq": {
+        "name": "Groq",
+        "base_url": "https://api.groq.com/openai/v1",
+        "models": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "gemma2-9b-it", "mixtral-8x7b-32768"],
+        "default_model": "llama-3.3-70b-versatile",
+    },
 }
 
 
