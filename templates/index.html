@@ -553,17 +553,17 @@ a:hover { text-decoration: underline; }
     <div class="nav-item" data-page="templates" onclick="showPage('templates')">
       <i class="fa-solid fa-file-contract"></i> <span data-i18n="Šabloni">Šabloni</span>
     </div>
+    <div class="nav-item" data-page="workspace" onclick="showPage('workspace')">
+      <i class="fa-solid fa-briefcase"></i> <span data-i18n="Radni prostor">Radni prostor</span>
+    </div>
     <div class="nav-item" data-page="external" onclick="showPage('external')">
-      <i class="fa-solid fa-robot"></i> <span data-i18n="Spoljni AI">Spoljni AI</span>
+      <i class="fa-solid fa-key"></i> <span data-i18n="Spoljni AI">Spoljni AI</span>
     </div>
     <div class="nav-item" data-page="settings" onclick="showPage('settings')">
       <i class="fa-solid fa-gear"></i> <span data-i18n="Podešavanja">Podešavanja</span>
     </div>
     <div class="nav-item" data-page="help" onclick="showPage('help')">
       <i class="fa-solid fa-circle-question"></i> <span data-i18n="Pomoć i podrška">Pomoć i podrška</span>
-    </div>
-    <div class="nav-item" data-page="workspace" onclick="showPage('workspace')">
-      <i class="fa-solid fa-briefcase"></i> <span data-i18n="Radni prostor">Radni prostor</span>
     </div>
   </nav>
 
@@ -796,38 +796,46 @@ a:hover { text-decoration: underline; }
 
 <!-- ═══ PAGE: External AI ═══════════════════════════ -->
 <div class="page" id="page-external">
-  <h1 class="page-header" data-i18n="Spoljni AI">Spoljni AI</h1>
+  <h1 class="page-header"><i class="fa-solid fa-key" style="color:var(--accent);"></i> <span data-i18n="Spoljni AI — API ključevi">Spoljni AI — API ključevi</span></h1>
   <div class="page-content">
-    <p class="text-sm text-muted mb-16" data-i18n="Pošaljite upit spoljnom AI provajderu sa opcijom anonimizacije ličnih podataka.">Pošaljite upit spoljnom AI provajderu sa opcijom anonimizacije licnih podataka.</p>
-    <div class="ext-config">
-      <div class="field-group">
-        <label data-i18n="Provajder">Provajder</label>
-        <select class="select" id="extProvider" onchange="updateExtModels()"></select>
+    <p class="text-sm text-muted mb-16" data-i18n="ext_key_desc">Povežite spoljne AI provajdere unosom API ključeva. Povezani AI modeli su dostupni kroz dugme "Online AI Provera" u razgovoru.</p>
+
+    <!-- Add new provider form -->
+    <div class="card-static mb-16" style="padding:16px;">
+      <h4 class="mb-12"><i class="fa-solid fa-plus-circle" style="color:var(--accent);"></i> <span data-i18n="Dodaj provajdera">Dodaj provajdera</span></h4>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="field-group">
+          <label style="font-size:12px;" data-i18n="Provajder">Provajder</label>
+          <select class="select" id="extProvider" onchange="updateExtModels()"></select>
+        </div>
+        <div class="field-group">
+          <label style="font-size:12px;" data-i18n="Model">Model</label>
+          <select class="select" id="extModel"></select>
+        </div>
       </div>
-      <div class="field-group">
-        <label data-i18n="Model">Model</label>
-        <select class="select" id="extModel"></select>
+      <div class="field-group mt-8">
+        <label style="font-size:12px;">API Key</label>
+        <input class="input" id="extApiKey" type="password" placeholder="sk-..." style="font-family:monospace;">
       </div>
-      <div class="field-group">
-        <label>API Key</label>
-        <input class="input" id="extApiKey" type="password" placeholder="sk-...">
+      <div class="flex items-center gap-12 mt-8">
+        <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;">
+          <input type="checkbox" id="extAnon" checked style="accent-color:var(--accent);">
+          <i class="fa-solid fa-shield-halved" style="color:var(--success);"></i>
+          <span data-i18n="Automatska anonimizacija">Automatska anonimizacija</span>
+        </label>
+        <span class="text-sm text-muted" data-i18n="ext_anon_hint">(AI će automatski anonimizovati sva lična imena i podatke u promptu)</span>
       </div>
-      <div class="field-group">
-        <label><input type="checkbox" id="extAnon" checked style="accent-color:var(--accent)"> <span data-i18n="Anonimizuj podatke">Anonimizuj podatke</span></label>
-        <input class="input mt-8" id="extNames" data-i18n-placeholder="Imena za anonimizaciju (opciono)" placeholder="Imena za anonimizaciju (opciono)">
-      </div>
+      <button class="btn btn-primary mt-12" onclick="saveExtProvider()" style="width:100%;">
+        <i class="fa-solid fa-floppy-disk"></i> <span data-i18n="Sačuvaj provajdera">Sačuvaj provajdera</span>
+      </button>
     </div>
-    <div class="field-group mb-16">
-      <label data-i18n="Upit">Upit</label>
-      <textarea class="textarea" id="extPrompt" rows="4" data-i18n-placeholder="Unesite upit za spoljni AI..." placeholder="Unesite upit za spoljni AI..."></textarea>
-    </div>
-    <div class="flex gap-8 mb-16">
-      <button class="btn" onclick="anonymizeOnly()"><i class="fa-solid fa-mask"></i> <span data-i18n="Samo anonimizuj">Samo anonimizuj</span></button>
-      <button class="btn btn-primary" onclick="queryExternal()"><i class="fa-solid fa-paper-plane"></i> <span data-i18n="Pošalji upit">Pošalji upit</span></button>
-    </div>
-    <div id="extResult" class="card-static hidden">
-      <h4 class="mb-12" data-i18n="Rezultat">Rezultat</h4>
-      <div id="extResultContent" class="ext-result"></div>
+
+    <!-- Saved providers list -->
+    <h4 class="mb-8"><i class="fa-solid fa-list" style="color:var(--accent);"></i> <span data-i18n="Povezani provajderi">Povezani provajderi</span></h4>
+    <div id="extSavedList"></div>
+    <div id="extEmptyState" class="hidden" style="text-align:center;padding:24px;color:var(--text-muted);">
+      <i class="fa-solid fa-plug-circle-xmark" style="font-size:32px;margin-bottom:8px;display:block;"></i>
+      <p data-i18n="Nemate povezanih provajdera. Dodajte API ključ iznad.">Nemate povezanih provajdera. Dodajte API ključ iznad.</p>
     </div>
   </div>
 </div>
@@ -1416,6 +1424,17 @@ const EN = {
   'Proverava tačnost citata i konzistentnost odgovora.': 'Verifies citation accuracy and answer consistency.',
   'Model koji je trenutno aktivan u GPU memoriji. Zamena traje 30-60s.': 'Model currently active in GPU memory. Swap takes 30-60s.',
   'Učitani model (u memoriji)': 'Loaded model (in memory)',
+  'Spoljni AI — API ključevi': 'External AI — API Keys',
+  'ext_key_desc': 'Connect external AI providers by entering API keys. Connected models are available through the "Online AI Check" button in conversations.',
+  'Dodaj provajdera': 'Add provider',
+  'Automatska anonimizacija': 'Automatic anonymization',
+  'ext_anon_hint': '(AI will automatically anonymize all personal names and data in the prompt)',
+  'Sačuvaj provajdera': 'Save provider',
+  'Povezani provajderi': 'Connected providers',
+  'Nemate povezanih provajdera. Dodajte API ključ iznad.': 'No connected providers. Add an API key above.',
+  'Provajder sačuvan!': 'Provider saved!',
+  'Ukloniti ovog provajdera?': 'Remove this provider?',
+  'Provajder uklonjen': 'Provider removed',
   'Tema istraživanja': 'Research topic',
   'Pokreni istraživanje': 'Start research',
   'Unesite temu': 'Enter a topic',
@@ -2773,7 +2792,6 @@ async function exportDraft(format) {
 
 // ── External AI ──────────────────────────────────────
 async function loadExtProviders() {
-  if (Object.keys(S.extProviders).length) return;
   try {
     S.extProviders = await apiFetch('/api/external/providers');
     const sel = document.getElementById('extProvider');
@@ -2781,6 +2799,7 @@ async function loadExtProviders() {
       `<option value="${k}">${escHtml(v.name || k)}</option>`
     ).join('');
     updateExtModels();
+    renderSavedProviders();
   } catch (e) { /* toast */ }
 }
 
@@ -2794,45 +2813,95 @@ function updateExtModels() {
   ).join('');
 }
 
-async function anonymizeOnly() {
-  const prompt = document.getElementById('extPrompt').value.trim();
-  if (!prompt) return;
-  try {
-    const r = await apiFetch('/api/external/anonymize', {
-      method: 'POST',
-      body: JSON.stringify({
-        provider: document.getElementById('extProvider').value,
-        api_key: document.getElementById('extApiKey').value,
-        prompt,
-        anonymize: true,
-        names_to_hide: document.getElementById('extNames').value.split(',').map(s => s.trim()).filter(Boolean)
-      })
-    });
-    const el = document.getElementById('extResult');
-    el.classList.remove('hidden');
-    document.getElementById('extResultContent').innerHTML = `<pre style="white-space:pre-wrap;">${escHtml(r.anonymized_text || r.text || JSON.stringify(r, null, 2))}</pre>`;
-  } catch (e) { /* toast */ }
+function getSavedExtProviders() {
+  try { return JSON.parse(localStorage.getItem('lexardor_ext_providers') || '[]'); }
+  catch { return []; }
 }
 
+function saveExtProvider() {
+  const provider = document.getElementById('extProvider').value;
+  const model = document.getElementById('extModel').value;
+  const apiKey = document.getElementById('extApiKey').value.trim();
+  const anonymize = document.getElementById('extAnon').checked;
+  if (!apiKey) { toast(t('Unesite API ključ'), 'error'); return; }
+
+  const saved = getSavedExtProviders();
+  // Update or add
+  const existing = saved.findIndex(s => s.provider === provider);
+  const entry = { provider, model, apiKey, anonymize, name: (S.extProviders[provider] || {}).name || provider, addedAt: new Date().toISOString().slice(0,10) };
+  if (existing >= 0) saved[existing] = entry;
+  else saved.push(entry);
+
+  localStorage.setItem('lexardor_ext_providers', JSON.stringify(saved));
+  // Also save for verify one-click flow
+  localStorage.setItem('lexardor_verify_key_' + provider, apiKey);
+  localStorage.setItem('lexardor_verify_last_provider', provider);
+
+  document.getElementById('extApiKey').value = '';
+  toast(t('Provajder sačuvan!') + ' — ' + entry.name, 'success');
+  renderSavedProviders();
+}
+
+function removeExtProvider(provider) {
+  if (!confirm(t('Ukloniti ovog provajdera?'))) return;
+  const saved = getSavedExtProviders().filter(s => s.provider !== provider);
+  localStorage.setItem('lexardor_ext_providers', JSON.stringify(saved));
+  localStorage.removeItem('lexardor_verify_key_' + provider);
+  renderSavedProviders();
+  toast(t('Provajder uklonjen'), 'info');
+}
+
+function renderSavedProviders() {
+  const saved = getSavedExtProviders();
+  const el = document.getElementById('extSavedList');
+  const empty = document.getElementById('extEmptyState');
+
+  if (!saved.length) {
+    el.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  const iconMap = {openai:'fa-brands fa-openai', anthropic:'fa-solid fa-brain', google:'fa-brands fa-google', xai:'fa-solid fa-bolt', perplexity:'fa-solid fa-search', deepseek:'fa-solid fa-water', mistral:'fa-solid fa-wind', groq:'fa-solid fa-gauge-high'};
+
+  el.innerHTML = saved.map(s => {
+    const icon = iconMap[s.provider] || 'fa-solid fa-robot';
+    const keyMask = s.apiKey ? s.apiKey.substring(0,6) + '••••••' + s.apiKey.slice(-4) : '???';
+    return `
+    <div class="card-static mb-8" style="padding:12px 16px;display:flex;align-items:center;gap:12px;">
+      <div style="width:40px;height:40px;border-radius:8px;background:var(--accent-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i class="${icon}" style="font-size:18px;color:var(--accent);"></i>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:14px;">${escHtml(s.name)}</div>
+        <div class="text-sm text-muted">${escHtml(s.model)} · <code style="font-size:11px;">${escHtml(keyMask)}</code></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        ${s.anonymize ? '<span style="font-size:11px;color:var(--success);"><i class="fa-solid fa-shield-halved"></i> Anon</span>' : ''}
+        <span class="text-sm text-dim">${s.addedAt || ''}</span>
+        <button class="btn btn-danger btn-sm" onclick="removeExtProvider('${s.provider}')" style="padding:4px 8px;"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Update the verify bar dropdown to only show saved providers
+function updateVerifyProviderDropdown() {
+  const saved = getSavedExtProviders();
+  const sel = document.getElementById('verifyProvider');
+  if (!saved.length) return;
+  // Keep existing options but mark saved ones
+  Array.from(sel.options).forEach(opt => {
+    const hasSaved = saved.find(s => s.provider === opt.value);
+    if (hasSaved) opt.textContent = hasSaved.name + ' ✓';
+  });
+}
+
+// Legacy compatibility — these functions are no longer on the page but may be referenced
+async function anonymizeOnly() { toast(t('Koristite Razgovor → Online AI Provera'), 'info'); }
 async function queryExternal() {
-  const prompt = document.getElementById('extPrompt').value.trim();
-  if (!prompt) return;
-  try {
-    const r = await apiFetch('/api/external/query', {
-      method: 'POST',
-      body: JSON.stringify({
-        provider: document.getElementById('extProvider').value,
-        api_key: document.getElementById('extApiKey').value,
-        model: document.getElementById('extModel').value,
-        prompt,
-        anonymize: document.getElementById('extAnon').checked,
-        names_to_hide: document.getElementById('extNames').value.split(',').map(s => s.trim()).filter(Boolean)
-      })
-    });
-    const el = document.getElementById('extResult');
-    el.classList.remove('hidden');
-    document.getElementById('extResultContent').innerHTML = renderMarkdown(r.answer || r.response || JSON.stringify(r));
-  } catch (e) { /* toast */ }
+  toast(t('Koristite Razgovor → Online AI Provera'), 'info');
 }
 
 // ── Settings ─────────────────────────────────────────
@@ -3323,7 +3392,7 @@ async function linkChatToMatter(matterId) {
   const chatId = parseInt(choice);
   if (!chatId) return;
   try {
-    await apiFetch(`/api/matters/${matterId}/link-chat`, {method:'POST', body: JSON.stringify({chat_id: chatId})});
+    await apiFetch(`/api/matters/${matterId}/link-chat`, {method:'POST', body: JSON.stringify({item_id: chatId})});
     toast(t('Razgovor povezan!'), 'success');
     openMatter(matterId);
   } catch(e) { toast(e.message, 'error'); }
@@ -3333,7 +3402,7 @@ async function linkDocToMatter(matterId) {
   const choice = prompt(t('Unesite ID dokumenta za povezivanje:'));
   if (!choice) return;
   try {
-    await apiFetch(`/api/matters/${matterId}/link-doc`, {method:'POST', body: JSON.stringify({doc_id: choice.trim()})});
+    await apiFetch(`/api/matters/${matterId}/link-doc`, {method:'POST', body: JSON.stringify({item_id: choice.trim()})});
     toast(t('Dokument povezan!'), 'success');
     openMatter(matterId);
   } catch(e) { toast(e.message, 'error'); }
