@@ -269,7 +269,7 @@ def list_client_documents(include_preview: bool = False) -> list[dict]:
 
 
 def _keyword_boost(query: str, text: str) -> float:
-    """Calculate keyword overlap bonus. Returns 0.0 to 0.15 boost."""
+    """Calculate keyword overlap bonus. Returns 0.0 to 0.25 boost."""
     from core.tokenizer import extract_query_keywords
     query_words = extract_query_keywords(query)
     if not query_words:
@@ -277,7 +277,40 @@ def _keyword_boost(query: str, text: str) -> float:
     text_lower = text.lower()
     matches = sum(1 for w in query_words if w in text_lower)
     ratio = matches / len(query_words)
-    return ratio * 0.15  # max 0.15 boost
+    return ratio * 0.25  # max 0.25 boost (increased from 0.15)
+
+
+def expand_query(query: str) -> str:
+    """Expand a legal query with synonyms and related terms for better retrieval.
+
+    Rule-based expansion — fast, no LLM needed.
+    Maps common legal terms to their formal/informal variants.
+    """
+    expansions = {
+        "trudnic": "trudnoća trudnica porodiljsko odsustvo nege deteta zaštita materinstvo",
+        "otkaz": "prestanak radnog odnosa otkazivanje raskid ugovora o radu",
+        "plata": "zarada naknada zarade primanja minimalna zarada",
+        "odmor": "godišnji odmor odsustvo slobodni dani bolovanje",
+        "diskriminacij": "diskriminacija nejednako postupanje zlostavljanje mobing",
+        "stečaj": "stečaj likvidacija bankrot insolventnost",
+        "nasledstv": "nasledstvo ostavina testament nasleđivanje",
+        "razvod": "razvod braka rastava bračni spor",
+        "alimenta": "alimentacija izdržavanje dece izdržavanje",
+        "zakup": "zakup najam iznajmljivanje",
+        "šteta": "šteta naknada štete odgovornost za štetu",
+        "žalb": "žalba pravni lek prigovor tužba",
+        "penzij": "penzija starosna invalidska porodična penzija PIO",
+        "porez": "porez poreska obaveza PDV doprinos",
+        "registracij": "registracija osnivanje privrednog društva APR",
+    }
+    q_lower = query.lower()
+    extra_terms = []
+    for trigger, terms in expansions.items():
+        if trigger in q_lower:
+            extra_terms.append(terms)
+    if extra_terms:
+        return query + " " + " ".join(extra_terms)
+    return query
 
 
 def search(
@@ -378,7 +411,10 @@ def search_with_filters(
             laws valid on that date (valid_from <= date AND valid_to >= date or empty).
     Returns candidates ready for cross-encoder reranking.
     """
-    query_embedding = embed_query(query)
+    # Expand query for BM25 (adds synonyms/related terms)
+    expanded_query = expand_query(query)
+
+    query_embedding = embed_query(query)  # Vector search uses original query
     results = []
 
     # Build ChromaDB where filter
@@ -470,7 +506,7 @@ def search_with_filters(
     # Merge BM25 lexical scores with vector scores using RRF
     try:
         from rag.bm25 import bm25_search
-        bm25_results = bm25_search(query, top_k=fetch_k)
+        bm25_results = bm25_search(expanded_query, top_k=fetch_k)
         if bm25_results:
             # Build rank maps
             vec_rank = {r["id"]: i for i, r in enumerate(
@@ -479,15 +515,17 @@ def search_with_filters(
             bm25_rank = {doc_id: i for i, (doc_id, _score) in enumerate(bm25_results)}
             bm25_score_map = {doc_id: score for doc_id, score in bm25_results}
 
-            # RRF fusion: score = 1/(k+rank_vec) + 1/(k+rank_bm25)
-            k = 60  # Standard RRF constant
+            # RRF fusion: score = 1/(k+rank_vec) + α/(k+rank_bm25)
+            # Lower k = more weight to top results; α=1.5 boosts BM25 for keyword-heavy legal queries
+            k = 30
+            bm25_weight = 1.5
             all_ids = set(vec_rank.keys()) | set(bm25_rank.keys())
 
             for r in results:
                 rid = r["id"]
                 v_rank = vec_rank.get(rid, len(results))
                 b_rank = bm25_rank.get(rid, len(bm25_results) + 100)
-                rrf = 1.0 / (k + v_rank) + 1.0 / (k + b_rank)
+                rrf = 1.0 / (k + v_rank) + bm25_weight / (k + b_rank)
                 r["rrf_score"] = round(rrf, 6)
                 r["bm25_score"] = round(bm25_score_map.get(rid, 0.0), 4)
 
@@ -510,7 +548,7 @@ def search_with_filters(
                             if min_authority is not None and meta.get("authority_level", 5) > min_authority:
                                 continue
                             b_rank = bm25_rank.get(doc_id, 100)
-                            rrf = 1.0 / (k + len(results)) + 1.0 / (k + b_rank)
+                            rrf = 1.0 / (k + len(results)) + bm25_weight / (k + b_rank)
                             results.append({
                                 "id": doc_id,
                                 "text": text,
