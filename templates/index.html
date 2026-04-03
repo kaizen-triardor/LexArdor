@@ -849,25 +849,32 @@ a:hover { text-decoration: underline; }
       <dl class="info-grid" id="engineInfo">
         <dt data-i18n="Status">Status</dt><dd data-i18n="Učitavanje...">Učitavanje...</dd>
       </dl>
-      <div id="currentModelInfo" style="margin-top:10px;padding:8px 12px;background:var(--bg-alt);border-radius:6px;font-size:13px;">
-        <span style="color:var(--text-muted)" data-i18n="Učitani model:">Učitani model:</span>
-        <strong id="currentModelName">...</strong>
-        <span id="currentModelSwapSpinner" style="display:none;margin-left:8px;font-size:11px;color:var(--text-muted);">Menja se...</span>
+      <div id="currentModelInfo" style="margin-top:10px;padding:10px 14px;background:var(--bg-alt);border-radius:8px;font-size:13px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--success);display:inline-block;"></span>
+          <span style="color:var(--text-muted)" data-i18n="Učitani model:">Učitani model:</span>
+          <strong id="currentModelName">...</strong>
+        </div>
       </div>
       <div id="modelSelectors" style="margin-top:12px;display:none">
         <div style="margin-bottom:10px">
           <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px" data-i18n="Reasoning model">Reasoning model</label>
-          <select class="select" id="reasoningModelSelect" onchange="setModel('reasoning', this.value)" style="width:100%;padding:6px 10px;font-size:13px;"></select>
+          <select class="select" id="reasoningModelSelect" onchange="onModelSelectorChange()" style="width:100%;padding:6px 10px;font-size:13px;"></select>
+          <p class="text-sm text-muted" style="margin-top:2px;font-size:11px;" data-i18n="Koristi se za složena pravna pitanja i chain-of-thought analizu.">Koristi se za složena pravna pitanja i chain-of-thought analizu.</p>
         </div>
         <div style="margin-bottom:10px">
           <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px" data-i18n="Verifikator model">Verifikator model</label>
-          <select class="select" id="verifierModelSelect" onchange="setModel('verifier', this.value)" style="width:100%;padding:6px 10px;font-size:13px;"></select>
+          <select class="select" id="verifierModelSelect" onchange="onModelSelectorChange()" style="width:100%;padding:6px 10px;font-size:13px;"></select>
+          <p class="text-sm text-muted" style="margin-top:2px;font-size:11px;" data-i18n="Proverava tačnost citata i konzistentnost odgovora.">Proverava tačnost citata i konzistentnost odgovora.</p>
         </div>
-        <div>
-          <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px" data-i18n="Swap učitani model">Swap učitani model</label>
-          <select class="select" id="swapModelSelect" style="width:calc(100% - 90px);padding:6px 10px;font-size:13px;display:inline-block;"></select>
-          <button class="btn btn-sm" onclick="swapLoadedModel()" style="margin-left:6px;vertical-align:top;" data-i18n="Učitaj">Učitaj</button>
+        <div style="margin-bottom:14px">
+          <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px" data-i18n="Učitani model (u memoriji)">Učitani model (u memoriji)</label>
+          <select class="select" id="swapModelSelect" onchange="onModelSelectorChange()" style="width:100%;padding:6px 10px;font-size:13px;"></select>
+          <p class="text-sm text-muted" style="margin-top:2px;font-size:11px;" data-i18n="Model koji je trenutno aktivan u GPU memoriji. Zamena traje 30-60s.">Model koji je trenutno aktivan u GPU memoriji. Zamena traje 30-60s.</p>
         </div>
+        <button class="btn btn-primary" id="btnApplyModelChanges" onclick="applyModelChanges()" style="display:none;width:100%;padding:10px;font-size:14px;font-weight:700;background:linear-gradient(135deg,#d97706,#f59e0b);border:none;">
+          <i class="fa-solid fa-bolt"></i> <span data-i18n="PRIMENI PROMENU">PRIMENI PROMENU</span>
+        </button>
       </div>
     </div>
     <div class="settings-section">
@@ -1164,6 +1171,31 @@ a:hover { text-decoration: underline; }
   </div>
 </div>
 
+<!-- Model Swap Progress Modal -->
+<div class="modal-overlay" id="modalModelSwap" style="z-index:9999;">
+  <div class="modal" style="max-width:460px;text-align:center;">
+    <div id="swapModalContent">
+      <div style="font-size:48px;margin-bottom:12px;" id="swapModalIcon">
+        <i class="fa-solid fa-gear fa-spin" style="color:var(--accent);"></i>
+      </div>
+      <h3 id="swapModalTitle" data-i18n="Zamena AI modela u toku">Zamena AI modela u toku</h3>
+      <p class="text-sm text-muted mb-12" id="swapModalDesc">Učitava se novi model u memoriju...</p>
+      <div id="swapModelName" style="font-weight:700;font-size:15px;margin-bottom:16px;color:var(--accent);"></div>
+      <div style="background:var(--bg-alt);border-radius:8px;overflow:hidden;height:8px;margin-bottom:8px;">
+        <div id="swapProgressBar" style="height:100%;background:linear-gradient(90deg,var(--accent),var(--success));width:0%;transition:width 1s ease;border-radius:8px;"></div>
+      </div>
+      <p class="text-sm text-muted mb-16" id="swapProgressText">0%</p>
+      <div style="background:var(--accent-glow);border-radius:var(--radius);padding:10px 14px;margin-bottom:16px;text-align:left;">
+        <p class="text-sm" style="margin:0;"><i class="fa-solid fa-clock" style="color:var(--accent);"></i> <span data-i18n="Ovo obično traje 30-60 sekundi.">Ovo obično traje 30-60 sekundi.</span></p>
+        <p class="text-sm" style="margin:4px 0 0;"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> <span data-i18n="Vaši podaci i konverzacije su bezbedni.">Vaši podaci i konverzacije su bezbedni.</span></p>
+      </div>
+      <button class="btn btn-primary" id="swapModalContinueBtn" disabled style="min-width:160px;padding:10px 24px;font-size:14px;" onclick="closeSwapModal()">
+        <i class="fa-solid fa-check"></i> <span data-i18n="Nastavi">Nastavi</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <div id="toast-container"></div>
 
 <script>
@@ -1371,6 +1403,19 @@ const EN = {
   'Pretraži dokumente...': 'Search documents...',
   'Pitaj AI o dokumentu': 'Ask AI about document',
   'Nema rezultata pretrage': 'No search results',
+  'Zamena AI modela u toku': 'AI model swap in progress',
+  'Učitava se novi model u memoriju...': 'Loading new model into memory...',
+  'Ovo obično traje 30-60 sekundi.': 'This usually takes 30-60 seconds.',
+  'Vaši podaci i konverzacije su bezbedni.': 'Your data and conversations are safe.',
+  'Model uspešno učitan!': 'Model loaded successfully!',
+  'spreman za korišćenje': 'ready for use',
+  'Greška pri zameni modela': 'Error swapping model',
+  'PRIMENI PROMENU': 'APPLY CHANGE',
+  'Konfiguracija modela ažurirana!': 'Model configuration updated!',
+  'Koristi se za složena pravna pitanja i chain-of-thought analizu.': 'Used for complex legal questions and chain-of-thought analysis.',
+  'Proverava tačnost citata i konzistentnost odgovora.': 'Verifies citation accuracy and answer consistency.',
+  'Model koji je trenutno aktivan u GPU memoriji. Zamena traje 30-60s.': 'Model currently active in GPU memory. Swap takes 30-60s.',
+  'Učitani model (u memoriji)': 'Loaded model (in memory)',
   'Tema istraživanja': 'Research topic',
   'Pokreni istraživanje': 'Start research',
   'Unesite temu': 'Enter a topic',
@@ -2854,6 +2899,14 @@ async function loadEngineInfo() {
       }
     }
 
+    // Track initial state for change detection
+    _initialModels = {
+      reasoning: rSelect.value,
+      verifier: vSelect.value,
+      swap: sSelect.value,
+    };
+    document.getElementById('btnApplyModelChanges').style.display = 'none';
+
     // Show current loaded model
     loadCurrentModel();
 
@@ -2875,27 +2928,90 @@ async function loadEngineInfo() {
   }
 }
 
-async function setModel(role, modelKey) {
-  try {
-    await apiFetch('/api/admin/set-model?role=' + role + '&model_key=' + modelKey, { method: 'POST' });
-    toast(t('Model promenjen'), 'success');
-    loadEngineInfo();
-  } catch (e) { toast(e.message, 'error'); }
+// ── Model change tracking (pending state) ──
+let _initialModels = { reasoning: '', verifier: '', swap: '' };
+
+function onModelSelectorChange() {
+  // Check if any selector differs from initial state
+  const rCur = document.getElementById('reasoningModelSelect').value;
+  const vCur = document.getElementById('verifierModelSelect').value;
+  const sCur = document.getElementById('swapModelSelect').value;
+  const hasChange = rCur !== _initialModels.reasoning || vCur !== _initialModels.verifier || sCur !== _initialModels.swap;
+  document.getElementById('btnApplyModelChanges').style.display = hasChange ? '' : 'none';
 }
 
-async function swapLoadedModel() {
-  const sel = document.getElementById('swapModelSelect');
-  const key = sel.value;
-  if (!key) return;
-  const spinner = document.getElementById('currentModelSwapSpinner');
-  spinner.style.display = '';
-  toast(t('Menja se model... (~30-60s)'), 'info');
+async function applyModelChanges() {
+  const rSel = document.getElementById('reasoningModelSelect');
+  const vSel = document.getElementById('verifierModelSelect');
+  const sSel = document.getElementById('swapModelSelect');
+  const rChanged = rSel.value !== _initialModels.reasoning;
+  const vChanged = vSel.value !== _initialModels.verifier;
+  const sChanged = sSel.value !== _initialModels.swap;
+
+  // Apply config changes (reasoning/verifier) first — these are instant
   try {
-    const r = await apiFetch('/api/admin/swap-model?model_key=' + key, { method: 'POST' });
-    toast(t('Model učitan: ') + (r.name || key), 'success');
+    if (rChanged) await apiFetch('/api/admin/set-model?role=reasoning&model_key=' + rSel.value, { method: 'POST' });
+    if (vChanged) await apiFetch('/api/admin/set-model?role=verifier&model_key=' + vSel.value, { method: 'POST' });
+  } catch (e) { toast(e.message, 'error'); return; }
+
+  // If swap model changed — show progress modal (this takes 30-60s)
+  if (sChanged) {
+    const modelName = sSel.options[sSel.selectedIndex].textContent;
+    openSwapModal(sSel.value, modelName);
+  } else {
+    // Only config changes, no swap needed
+    toast(t('Konfiguracija modela ažurirana!'), 'success');
+    document.getElementById('btnApplyModelChanges').style.display = 'none';
     loadEngineInfo();
-  } catch (e) { toast(e.message, 'error'); }
-  spinner.style.display = 'none';
+  }
+}
+
+function openSwapModal(modelKey, modelName) {
+  document.getElementById('modalModelSwap').style.display = 'flex';
+  document.getElementById('swapModelName').textContent = modelName;
+  document.getElementById('swapModalIcon').innerHTML = '<i class="fa-solid fa-gear fa-spin" style="color:var(--accent);"></i>';
+  document.getElementById('swapModalTitle').textContent = t('Zamena AI modela u toku');
+  document.getElementById('swapModalDesc').textContent = t('Učitava se novi model u memoriju...');
+  document.getElementById('swapProgressBar').style.width = '0%';
+  document.getElementById('swapProgressText').textContent = '0%';
+  document.getElementById('swapModalContinueBtn').disabled = true;
+
+  // Start the swap and simulate progress
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    progress = Math.min(progress + Math.random() * 8 + 2, 90);
+    document.getElementById('swapProgressBar').style.width = progress + '%';
+    document.getElementById('swapProgressText').textContent = Math.round(progress) + '%';
+  }, 1500);
+
+  apiFetch('/api/admin/swap-model?model_key=' + modelKey, { method: 'POST' })
+    .then(r => {
+      clearInterval(progressInterval);
+      document.getElementById('swapProgressBar').style.width = '100%';
+      document.getElementById('swapProgressText').textContent = '100%';
+      document.getElementById('swapModalIcon').innerHTML = '<i class="fa-solid fa-circle-check" style="color:var(--success);"></i>';
+      document.getElementById('swapModalTitle').textContent = t('Model uspešno učitan!');
+      document.getElementById('swapModalDesc').textContent = (r.name || modelKey) + ' — ' + t('spreman za korišćenje');
+      document.getElementById('swapModalContinueBtn').disabled = false;
+    })
+    .catch(e => {
+      clearInterval(progressInterval);
+      document.getElementById('swapProgressBar').style.background = 'var(--danger)';
+      document.getElementById('swapProgressBar').style.width = '100%';
+      document.getElementById('swapModalIcon').innerHTML = '<i class="fa-solid fa-circle-xmark" style="color:var(--danger);"></i>';
+      document.getElementById('swapModalTitle').textContent = t('Greška pri zameni modela');
+      document.getElementById('swapModalDesc').textContent = e.message || t('Pokušajte ponovo');
+      document.getElementById('swapModalContinueBtn').disabled = false;
+      document.getElementById('swapModalContinueBtn').textContent = t('Zatvori');
+    });
+}
+
+function closeSwapModal() {
+  document.getElementById('modalModelSwap').style.display = 'none';
+  document.getElementById('btnApplyModelChanges').style.display = 'none';
+  // Reset progress bar color
+  document.getElementById('swapProgressBar').style.background = 'linear-gradient(90deg,var(--accent),var(--success))';
+  loadEngineInfo();
 }
 
 async function loadCurrentModel() {
