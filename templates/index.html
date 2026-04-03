@@ -688,22 +688,32 @@ a:hover { text-decoration: underline; }
     <!-- Document stats bar -->
     <div id="docStats" class="doc-stats mb-16" style="display:none;"></div>
 
+    <!-- Search bar -->
+    <div class="flex gap-8 mb-16" id="docSearchBar">
+      <input class="input" id="docSearchInput" placeholder="Pretraži dokumente..." data-i18n-placeholder="Pretraži dokumente..." style="flex:1;" oninput="filterDocsBySearch()">
+    </div>
+
     <!-- Document list -->
     <div id="docList" class="grid-2"></div>
 
     <!-- Document viewer (hidden by default) -->
     <div id="docViewer" class="hidden">
-      <div class="breadcrumb mb-16">
+      <div class="breadcrumb mb-12">
         <a onclick="closeDocViewer()" data-i18n="Moji dokumenti">Moji dokumenti</a>
         <i class="fa-solid fa-chevron-right" style="font-size:10px;"></i>
         <span id="docViewerTitle"></span>
       </div>
+      <div id="docViewerMeta" class="flex gap-8 mb-8" style="font-size:12px;color:var(--text-muted);"></div>
       <div class="card-static">
         <div id="docViewerContent" style="white-space:pre-wrap;font-family:'Lora',serif;line-height:1.7;max-height:60vh;overflow-y:auto;padding:16px;"></div>
       </div>
-      <div class="flex gap-8 mt-12">
+      <div class="flex gap-8 mt-12" style="flex-wrap:wrap;">
+        <button class="btn btn-sm" id="docAskAIBtn" style="background:linear-gradient(135deg,#059669,#10b981);color:#fff;border:none;">
+          <i class="fa-solid fa-robot"></i> <span data-i18n="Pitaj AI o dokumentu">Pitaj AI o dokumentu</span>
+        </button>
         <button class="btn btn-danger btn-sm" id="docViewerDeleteBtn"><i class="fa-solid fa-trash"></i> <span data-i18n="Obrisi">Obrisi</span></button>
       </div>
+      <div id="docAIAnswer" class="hidden" style="margin-top:12px;background:var(--accent-glow);border-radius:var(--radius);padding:14px 16px;font-size:14px;line-height:1.7;"></div>
     </div>
 
     <!-- Empty state -->
@@ -1350,6 +1360,17 @@ const EN = {
   'Proveravam...': 'Checking...',
   'Online provera završena': 'Online check complete',
   'Izaberite provajdera i unesite API ključ za Online AI Proveru': 'Select a provider and enter API key for Online AI Check',
+  'nije u lokalnoj bazi': 'not in local database',
+  'Ovaj član nije uvezen u LexArdor bazu. Možete ga proveriti na zvaničnom sajtu.': 'This article is not imported into LexArdor. You can check it on the official website.',
+  'Otvori na Paragraf.rs': 'Open on Paragraf.rs',
+  'Nazad na članke': 'Back to articles',
+  'Proveri online': 'Check online',
+  'Ovaj propis nema raščlanjene članke u LexArdor bazi. Pogledajte pun tekst online.': 'This regulation has no parsed articles in LexArdor. View the full text online.',
+  'Izlazne reference': 'Outgoing references',
+  'Ulazne reference': 'Incoming references',
+  'Pretraži dokumente...': 'Search documents...',
+  'Pitaj AI o dokumentu': 'Ask AI about document',
+  'Nema rezultata pretrage': 'No search results',
   'Tema istraživanja': 'Research topic',
   'Pokreni istraživanje': 'Start research',
   'Unesite temu': 'Enter a topic',
@@ -2007,30 +2028,47 @@ function filterDocs(cat) {
   renderDocList();
 }
 
+function filterDocsBySearch() {
+  renderDocList();
+}
+
 function renderDocList() {
   const el = document.getElementById('docList');
   const empty = document.getElementById('docEmpty');
   const viewer = document.getElementById('docViewer');
   viewer.classList.add('hidden');
 
-  const filtered = docFilter === 'all' ? allDocs : allDocs.filter(d => (d.category || 'ostalo') === docFilter);
+  const searchQ = (document.getElementById('docSearchInput').value || '').toLowerCase().trim();
+  let filtered = docFilter === 'all' ? allDocs : allDocs.filter(d => (d.category || 'ostalo') === docFilter);
+  if (searchQ) {
+    filtered = filtered.filter(d =>
+      (d.title || '').toLowerCase().includes(searchQ) ||
+      (d.content || d.preview || '').toLowerCase().includes(searchQ)
+    );
+  }
   if (!filtered.length) {
     el.innerHTML = '';
     empty.classList.remove('hidden');
+    if (searchQ) {
+      empty.innerHTML = `<i class="fa-solid fa-search" style="font-size:36px;color:var(--accent-dim);margin-bottom:12px;"></i><p>${t('Nema rezultata pretrage')}</p>`;
+    }
     return;
   }
   empty.classList.add('hidden');
-  el.innerHTML = filtered.map(d => `
+  el.innerHTML = filtered.map(d => {
+    const catLabel = d.category || 'ostalo';
+    const chunks = d.chunks || d.chunk_count || 0;
+    return `
     <div class="doc-card" onclick="viewDoc('${escHtml(d.id || d.doc_id)}')">
-      <div class="doc-card-cat ${escHtml(d.category || 'ostalo')}">${escHtml(d.category || 'ostalo')}</div>
+      <div class="doc-card-cat ${escHtml(catLabel)}">${escHtml(catLabel).toUpperCase()}</div>
       <h4 style="font-size:14px;margin-bottom:4px;">${escHtml(d.title)}</h4>
       <p class="text-sm text-muted" style="max-height:48px;overflow:hidden;line-height:1.5;">${escHtml((d.content || d.preview || '').substring(0, 150))}</p>
       <div class="flex items-center justify-between mt-8">
-        <span class="text-sm text-dim">${d.chunks || d.chunk_count || '?'} chunks</span>
+        <span class="text-sm text-dim">${chunks} ${t('delova')}</span>
         <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteDoc('${escHtml(d.id || d.doc_id)}')"><i class="fa-solid fa-trash"></i></button>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 async function viewDoc(docId) {
@@ -2038,29 +2076,69 @@ async function viewDoc(docId) {
   if (!d) return;
   document.getElementById('docList').classList.add('hidden');
   document.getElementById('docEmpty').classList.add('hidden');
+  document.getElementById('docSearchBar').style.display = 'none';
   const stats = document.getElementById('docStats');
   if (stats) stats.style.display = 'none';
-  // Hide category tabs and action buttons
   document.querySelectorAll('.doc-category-tabs').forEach(el => el.style.display = 'none');
   const viewer = document.getElementById('docViewer');
   viewer.classList.remove('hidden');
   document.getElementById('docViewerTitle').textContent = d.title;
   document.getElementById('docViewerContent').textContent = t('Učitavanje sadržaja...');
   document.getElementById('docViewerDeleteBtn').onclick = () => { deleteDoc(docId); closeDocViewer(); };
+  document.getElementById('docAIAnswer').classList.add('hidden');
+
+  // Show metadata
+  const catLabel = (d.category || 'ostalo').toUpperCase();
+  const chunks = d.chunks || d.chunk_count || 0;
+  document.getElementById('docViewerMeta').innerHTML = `
+    <span class="doc-card-cat ${d.category || 'ostalo'}" style="font-size:10px;padding:2px 8px;">${catLabel}</span>
+    <span><i class="fa-solid fa-puzzle-piece"></i> ${chunks} ${t('delova')}</span>
+  `;
+
+  // "Ask AI" button
+  document.getElementById('docAskAIBtn').onclick = () => askAIAboutDoc(docId, d.title);
 
   // Fetch full content from API
   try {
     const full = await apiFetch(`/api/documents/${encodeURIComponent(docId)}`);
     document.getElementById('docViewerContent').textContent = full.content || d.content_preview || 'Sadržaj nije dostupan';
   } catch (e) {
-    // Fallback to preview
     document.getElementById('docViewerContent').textContent = d.content_preview || d.content || 'Sadržaj nije dostupan';
+  }
+}
+
+async function askAIAboutDoc(docId, title) {
+  const question = prompt(t('Šta želite da saznate o ovom dokumentu?'));
+  if (!question) return;
+  const el = document.getElementById('docAIAnswer');
+  el.classList.remove('hidden');
+  el.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${t('AI analizira dokument...')}`;
+  try {
+    // Get the document content
+    const doc = await apiFetch(`/api/documents/${encodeURIComponent(docId)}`);
+    const docText = (doc.content || '').substring(0, 6000);
+    // Create a focused chat query including doc context
+    const enrichedQuery = `Na osnovu sledećeg dokumenta "${title}":\n\n${docText}\n\nPITANJE: ${question}`;
+    const result = await apiFetch('/api/query', {
+      method: 'POST',
+      body: JSON.stringify({ query: enrichedQuery, top_k: 3, answer_mode: 'balanced', short_answer: true }),
+    });
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <i class="fa-solid fa-robot" style="color:var(--accent);"></i>
+        <strong style="font-size:13px;">${t('AI odgovor o dokumentu')}</strong>
+      </div>
+      ${renderMarkdown(result.answer)}
+    `;
+  } catch(e) {
+    el.innerHTML = `<p class="text-muted">${e.message || t('Greška')}</p>`;
   }
 }
 
 function closeDocViewer() {
   document.getElementById('docViewer').classList.add('hidden');
   document.getElementById('docList').classList.remove('hidden');
+  document.getElementById('docSearchBar').style.display = '';
   document.querySelectorAll('.doc-category-tabs').forEach(el => el.style.display = '');
   renderDocStats();
   renderDocList();
@@ -2240,7 +2318,21 @@ async function openLawArticles(slug, title) {
       </div>
       ${articlesHtml}
     `;
-    if (!articles.length && !chapters.length) el.innerHTML += `<div class="empty-state"><p>${t('Nema rezultata')}</p></div>`;
+    if (!articles.length && !chapters.length) {
+      const doc = data.document || {};
+      const sourceUrl = doc.source_url || `https://www.paragraf.rs/propisi/${slug}.html`;
+      const gazette = doc.gazette_ref || doc.latest_gazette || '';
+      el.innerHTML += `
+        <div style="background:var(--accent-glow);border-radius:var(--radius);padding:20px;text-align:center;margin-top:12px;">
+          <i class="fa-solid fa-file-lines" style="font-size:28px;color:var(--accent);margin-bottom:8px;display:block;"></i>
+          <p class="text-sm mb-4"><strong>${escHtml(title)}</strong></p>
+          ${gazette ? `<p class="text-sm text-muted mb-8">${escHtml(gazette)}</p>` : ''}
+          <p class="text-sm text-muted mb-12">${t('Ovaj propis nema raščlanjene članke u LexArdor bazi. Pogledajte pun tekst online.')}</p>
+          <a class="btn btn-primary" href="${sourceUrl}" target="_blank" rel="noopener" style="text-decoration:none;">
+            <i class="fa-solid fa-external-link-alt"></i> ${t('Otvori na Paragraf.rs')}
+          </a>
+        </div>`;
+    }
   } catch (e) { el.innerHTML += `<p class="text-muted">${t('Greška pri ucitavanju')}</p>`; }
 }
 
@@ -2250,18 +2342,21 @@ async function openArticleDetail(slug, num, lawTitle) {
   el.classList.remove('hidden');
   el.innerHTML = `<p class="text-muted">${t('Učitavanje...')}</p>`;
 
+  const breadcrumb = `<div class="breadcrumb mb-12">
+    <a onclick="backToLaws()">${t('Baza propisa')}</a>
+    <i class="fa-solid fa-chevron-right" style="font-size:10px;"></i>
+    <a onclick="openLawArticles('${slug}','${escHtml(lawTitle)}')">${escHtml(lawTitle)}</a>
+    <i class="fa-solid fa-chevron-right" style="font-size:10px;"></i>
+    <span>${t('Clan')} ${num}</span>
+  </div>`;
+
   try {
     const data = await apiFetch(`/api/corpus/laws/${slug}/articles/${num}`);
     const a = data.article || data;
     const artText = a.full_text || a.text || a.content || '';
+    const sourceUrl = a.source_url || `https://www.paragraf.rs/propisi/${slug}.html`;
     el.innerHTML = `
-      <div class="breadcrumb">
-        <a onclick="backToLaws()">${t('Baza propisa')}</a>
-        <i class="fa-solid fa-chevron-right" style="font-size:10px;"></i>
-        <a onclick="openLawArticles('${slug}','${escHtml(lawTitle)}')">${escHtml(lawTitle)}</a>
-        <i class="fa-solid fa-chevron-right" style="font-size:10px;"></i>
-        <span>${t('Clan')} ${num}</span>
-      </div>
+      ${breadcrumb}
       <div class="article-detail">
         <h2>${t('Clan')} ${a.article_number || num}${a.title ? ' - ' + escHtml(a.title) : ''}</h2>
         <div class="article-text" style="font-family:'Lora',serif;line-height:1.8;">${escHtml(artText)}</div>
@@ -2270,7 +2365,7 @@ async function openArticleDetail(slug, num, lawTitle) {
             ${a.sub_articles.map(s => `<div class="sub-article"><strong>${escHtml(s.type || 'Stav')} ${s.number || ''}:</strong> ${escHtml(s.text || '')}</div>`).join('')}
           </div>
         ` : ''}
-        <div class="flex gap-8 mt-16 mb-12">
+        <div class="flex gap-8 mt-16 mb-12" style="flex-wrap:wrap;">
           <button class="btn btn-sm" onclick="explainArticle('${escHtml(lawTitle)}','${num}',this,'citizen')">
             <i class="fa-solid fa-comments"></i> ${t('Objasni jednostavno')}
           </button>
@@ -2280,24 +2375,46 @@ async function openArticleDetail(slug, num, lawTitle) {
           <button class="btn btn-sm" onclick="showCitationGraph('${slug}')">
             <i class="fa-solid fa-diagram-project"></i> ${t('Graf citiranja')}
           </button>
+          <a class="btn btn-sm" href="${sourceUrl}" target="_blank" rel="noopener" style="text-decoration:none;">
+            <i class="fa-solid fa-external-link-alt"></i> ${t('Proveri online')}
+          </a>
         </div>
         <div id="articleExplanation" class="hidden" style="background:var(--accent-glow);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;font-size:14px;line-height:1.7;"></div>
         <div id="citationGraphContainer" class="hidden" style="margin-top:16px;border:1px solid var(--border);border-radius:var(--radius);height:400px;background:var(--bg-card);"></div>
         ${(a.cross_references && a.cross_references.length) ? `
           <div class="xref-section">
-            <h4><i class="fa-solid fa-arrow-right"></i> ${t('Izlazne reference')}</h4>
-            ${a.cross_references.map(x => `<div class="xref-item" onclick="openArticleDetail('${x.target_slug || slug}','${x.target_article}','${escHtml(lawTitle)}')">${escHtml(x.target_document || '')} - ${t('Clan')} ${x.target_article || ''}</div>`).join('')}
+            <h4><i class="fa-solid fa-arrow-right"></i> ${t('Izlazne reference')} (${a.cross_references.length})</h4>
+            ${a.cross_references.map(x => `<div class="xref-item" onclick="openArticleDetail('${x.target_document_slug || x.target_slug || slug}','${x.target_article_number || x.target_article}','${escHtml(x.target_document_slug || x.target_slug || lawTitle)}')">${escHtml(x.target_document_slug || x.target_document || slug)} — ${t('Clan')} ${x.target_article_number || x.target_article || ''}</div>`).join('')}
           </div>
         ` : ''}
         ${(a.inbound_references && a.inbound_references.length) ? `
           <div class="xref-section mt-12">
-            <h4><i class="fa-solid fa-arrow-left"></i> ${t('Ulazne reference')}</h4>
-            ${a.inbound_references.map(x => `<div class="xref-item" onclick="openArticleDetail('${x.source_slug || slug}','${x.source_article}','${escHtml(lawTitle)}')">${escHtml(x.source_document || '')} - ${t('Clan')} ${x.source_article || ''}</div>`).join('')}
+            <h4><i class="fa-solid fa-arrow-left"></i> ${t('Ulazne reference')} (${a.inbound_references.length})</h4>
+            ${a.inbound_references.map(x => `<div class="xref-item" onclick="openArticleDetail('${x.source_slug || slug}','${x.source_article}','${escHtml(x.source_title || x.source_slug || lawTitle)}')">${escHtml(x.source_title || x.source_slug || '')} — ${t('Clan')} ${x.source_article || ''}</div>`).join('')}
           </div>
         ` : ''}
       </div>
     `;
-  } catch (e) { el.innerHTML = `<p class="text-muted">${t('Greška pri ucitavanju')}</p>`; }
+  } catch (e) {
+    // Graceful fallback: article not found (broken cross-reference)
+    const sourceUrl = `https://www.paragraf.rs/propisi/${slug}.html`;
+    el.innerHTML = `
+      ${breadcrumb}
+      <div class="article-detail">
+        <div style="background:var(--accent-glow);border-radius:var(--radius);padding:20px;text-align:center;">
+          <i class="fa-solid fa-circle-info" style="font-size:24px;color:var(--accent);margin-bottom:8px;display:block;"></i>
+          <h3 style="margin-bottom:8px;">${t('Clan')} ${num} — ${t('nije u lokalnoj bazi')}</h3>
+          <p class="text-sm text-muted mb-12">${t('Ovaj član nije uvezen u LexArdor bazu. Možete ga proveriti na zvaničnom sajtu.')}</p>
+          <a class="btn btn-primary" href="${sourceUrl}" target="_blank" rel="noopener" style="text-decoration:none;">
+            <i class="fa-solid fa-external-link-alt"></i> ${t('Otvori na Paragraf.rs')}
+          </a>
+          <button class="btn btn-sm mt-8" onclick="openLawArticles('${slug}','${escHtml(lawTitle)}')">
+            <i class="fa-solid fa-arrow-left"></i> ${t('Nazad na članke')}
+          </button>
+        </div>
+      </div>
+    `;
+  }
 }
 
 function backToLaws() {

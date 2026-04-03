@@ -238,13 +238,17 @@ def get_law_articles(slug: str):
 @router.get("/corpus/laws/{slug}/articles/{article_number}")
 def get_law_article_detail(slug: str, article_number: str):
     """Get a single article with full sub-structure and cross-references."""
-    from db.legal_schema import get_article_detail, get_inbound_references
+    from db.legal_schema import get_article_detail, get_inbound_references, get_document_by_slug
     article = get_article_detail(slug, article_number)
     if not article:
         raise HTTPException(status_code=404, detail="Član nije pronađen")
     # Also get inbound references (who cites this article)
     inbound = get_inbound_references(slug, article_number)
     article["inbound_references"] = inbound
+    # Add source_url from document for "check online" link
+    doc = get_document_by_slug(slug)
+    if doc:
+        article["source_url"] = doc.get("source_url", "")
     return article
 
 
