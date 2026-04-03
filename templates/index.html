@@ -897,6 +897,38 @@ a:hover { text-decoration: underline; }
       <button class="btn btn-sm mt-8" onclick="loadDiagnostics()" data-i18n="Učitaj statistiku">Učitaj statistiku</button>
     </div>
     <div class="settings-section">
+      <h3><i class="fa-solid fa-trash-can" style="color:var(--danger);margin-right:4px;"></i> <span data-i18n="Čišćenje podataka">Čišćenje podataka</span></h3>
+      <div style="background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;">
+        <p class="text-sm" style="margin:0;color:var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="cleanup_warn">Oprez: Obrisani podaci se ne mogu vratiti. Ova akcija je trajna.</span></p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;" id="cleanupCards">
+        <div class="card-static" style="padding:14px;text-align:center;">
+          <i class="fa-solid fa-comments" style="font-size:22px;color:var(--accent);"></i>
+          <div style="font-weight:700;margin:6px 0 2px;" data-i18n="Razgovori">Razgovori</div>
+          <div class="text-sm text-muted" id="cleanupCountChats">...</div>
+          <button class="btn btn-sm mt-8" onclick="openCleanup('chats')" style="border-color:var(--danger);color:var(--danger);"><i class="fa-solid fa-trash"></i> <span data-i18n="Obriši...">Obriši...</span></button>
+        </div>
+        <div class="card-static" style="padding:14px;text-align:center;">
+          <i class="fa-solid fa-file-lines" style="font-size:22px;color:var(--accent);"></i>
+          <div style="font-weight:700;margin:6px 0 2px;" data-i18n="Dokumenti">Dokumenti</div>
+          <div class="text-sm text-muted" id="cleanupCountDocs">...</div>
+          <button class="btn btn-sm mt-8" onclick="openCleanup('documents')" style="border-color:var(--danger);color:var(--danger);"><i class="fa-solid fa-trash"></i> <span data-i18n="Obriši...">Obriši...</span></button>
+        </div>
+        <div class="card-static" style="padding:14px;text-align:center;">
+          <i class="fa-solid fa-file-contract" style="font-size:22px;color:var(--accent);"></i>
+          <div style="font-weight:700;margin:6px 0 2px;" data-i18n="Šabloni i nacrti">Šabloni i nacrti</div>
+          <div class="text-sm text-muted" id="cleanupCountTemplates">...</div>
+          <button class="btn btn-sm mt-8" onclick="openCleanup('templates')" style="border-color:var(--danger);color:var(--danger);"><i class="fa-solid fa-trash"></i> <span data-i18n="Obriši...">Obriši...</span></button>
+        </div>
+        <div class="card-static" style="padding:14px;text-align:center;">
+          <i class="fa-solid fa-briefcase" style="font-size:22px;color:var(--accent);"></i>
+          <div style="font-weight:700;margin:6px 0 2px;" data-i18n="Predmeti">Predmeti</div>
+          <div class="text-sm text-muted" id="cleanupCountMatters">...</div>
+          <button class="btn btn-sm mt-8" onclick="openCleanup('matters')" style="border-color:var(--danger);color:var(--danger);"><i class="fa-solid fa-trash"></i> <span data-i18n="Obriši...">Obriši...</span></button>
+        </div>
+      </div>
+    </div>
+    <div class="settings-section">
       <h3 data-i18n="Aplikacija">Aplikacija</h3>
       <dl class="info-grid" id="appInfo">
         <dt data-i18n="Učitavanje...">Učitavanje...</dt><dd>...</dd>
@@ -1180,6 +1212,30 @@ a:hover { text-decoration: underline; }
 </div>
 
 <!-- Model Swap Progress Modal -->
+<!-- Cleanup Modal -->
+<div class="modal-overlay" id="modalCleanup">
+  <div class="modal" style="max-width:520px;">
+    <h3 id="cleanupModalTitle"><i class="fa-solid fa-trash-can" style="color:var(--danger);"></i> <span>Obriši...</span></h3>
+    <div style="margin-bottom:12px;">
+      <label style="display:flex;align-items:center;gap:6px;font-weight:600;cursor:pointer;font-size:13px;" id="cleanupSelectAllLabel">
+        <input type="checkbox" id="cleanupSelectAll" onchange="toggleCleanupAll()" style="accent-color:var(--danger);">
+        <span data-i18n="Selektuj sve">Selektuj sve</span>
+        <span class="text-sm text-muted" id="cleanupTotalCount"></span>
+      </label>
+    </div>
+    <div id="cleanupItemList" style="max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius);padding:4px;margin-bottom:12px;"></div>
+    <div id="cleanupSummary" style="background:rgba(220,38,38,0.08);border-radius:var(--radius);padding:8px 12px;margin-bottom:12px;font-size:13px;color:var(--danger);">
+      <i class="fa-solid fa-triangle-exclamation"></i> <span id="cleanupSummaryText"></span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modalCleanup')" data-i18n="Otkaži">Otkaži</button>
+      <button class="btn btn-danger" id="cleanupConfirmBtn" onclick="executeCleanup()" disabled>
+        <i class="fa-solid fa-trash"></i> <span data-i18n="OBRIŠI IZABRANO">OBRIŠI IZABRANO</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modalModelSwap" style="z-index:9999;">
   <div class="modal" style="max-width:460px;text-align:center;">
     <div id="swapModalContent">
@@ -1435,6 +1491,26 @@ const EN = {
   'Provajder sačuvan!': 'Provider saved!',
   'Ukloniti ovog provajdera?': 'Remove this provider?',
   'Provajder uklonjen': 'Provider removed',
+  'Čišćenje podataka': 'Data cleanup',
+  'cleanup_warn': 'Warning: Deleted data cannot be recovered. This action is permanent.',
+  'stavki': 'items',
+  'nacrti': 'drafts',
+  'Šabloni i nacrti': 'Templates & drafts',
+  'Predmeti': 'Matters',
+  'Obriši...': 'Delete...',
+  'Obriši': 'Delete',
+  'Selektuj sve': 'Select all',
+  'Nema stavki za brisanje': 'No items to delete',
+  'Izaberite stavke za brisanje': 'Select items to delete',
+  'Biće trajno obrisano:': 'Will be permanently deleted:',
+  'sve': 'all',
+  'Da li ste POTPUNO sigurni?': 'Are you ABSOLUTELY sure?',
+  'Biće obrisano': 'Will be deleted',
+  'Ova akcija se NE MOŽE poništiti.': 'This action CANNOT be undone.',
+  'Brisanje...': 'Deleting...',
+  'Obrisano': 'Deleted',
+  'grešaka': 'errors',
+  'OBRIŠI IZABRANO': 'DELETE SELECTED',
   'Tema istraživanja': 'Research topic',
   'Pokreni istraživanje': 'Start research',
   'Unesite temu': 'Enter a topic',
@@ -2909,6 +2985,7 @@ async function loadSettings() {
   loadEngineInfo();
   loadCorpusSummary();
   loadAppInfo();
+  loadCleanupCounts();
 }
 
 async function loadEngineInfo() {
@@ -3565,6 +3642,132 @@ async function loadDiagnostics() {
       </dl>
     `;
   } catch(e) { document.getElementById('diagnosticsPanel').innerHTML = '<p class="text-sm text-muted">' + t('Nema podataka') + '</p>'; }
+}
+
+// ── Cleanup ─────────────────────────────────────────
+let _cleanupType = '';
+let _cleanupItems = [];
+
+async function loadCleanupCounts() {
+  try {
+    const [chats, docs, templates, drafts, matters] = await Promise.all([
+      apiFetch('/api/chats'), apiFetch('/api/documents'), apiFetch('/api/templates'),
+      apiFetch('/api/drafts'), apiFetch('/api/matters'),
+    ]);
+    document.getElementById('cleanupCountChats').textContent = chats.length + ' ' + t('stavki');
+    document.getElementById('cleanupCountDocs').textContent = docs.length + ' ' + t('stavki');
+    document.getElementById('cleanupCountTemplates').textContent = templates.length + ' šab. + ' + drafts.length + ' ' + t('nacrti');
+    document.getElementById('cleanupCountMatters').textContent = matters.length + ' ' + t('stavki');
+  } catch {}
+}
+
+async function openCleanup(type) {
+  _cleanupType = type;
+  _cleanupItems = [];
+  const modal = document.getElementById('modalCleanup');
+  const list = document.getElementById('cleanupItemList');
+  const titles = { chats: t('Razgovori'), documents: t('Dokumenti'), templates: t('Šabloni i nacrti'), matters: t('Predmeti') };
+  document.getElementById('cleanupModalTitle').innerHTML = `<i class="fa-solid fa-trash-can" style="color:var(--danger);"></i> ${t('Obriši')}: ${titles[type] || type}`;
+  list.innerHTML = '<p class="text-sm text-muted" style="text-align:center;padding:20px;">' + t('Učitavanje...') + '</p>';
+  document.getElementById('cleanupSelectAll').checked = false;
+  updateCleanupSummary();
+  openModal('modalCleanup');
+
+  try {
+    let items = [];
+    if (type === 'chats') {
+      const data = await apiFetch('/api/chats');
+      items = data.map(c => ({ id: c.id, label: c.title || t('Bez naslova'), sub: (c.created_at || '').substring(0,10) }));
+    } else if (type === 'documents') {
+      const data = await apiFetch('/api/documents');
+      items = data.map(d => ({ id: d.id || d.doc_id, label: d.title, sub: (d.category || 'ostalo') + ' · ' + (d.chunk_count || 0) + ' chunks' }));
+    } else if (type === 'templates') {
+      const tpls = await apiFetch('/api/templates');
+      const drafts = await apiFetch('/api/drafts');
+      items = tpls.map(t => ({ id: 'tpl_' + t.id, label: '📋 ' + t.name, sub: t.doc_type || '' }));
+      items.push(...drafts.map(d => ({ id: 'draft_' + d.id, label: '📝 ' + (d.name || 'Nacrt'), sub: d.status || '' })));
+    } else if (type === 'matters') {
+      const data = await apiFetch('/api/matters');
+      items = data.map(m => ({ id: m.id, label: m.name, sub: (m.description || '').substring(0, 50) }));
+    }
+    _cleanupItems = items;
+    document.getElementById('cleanupTotalCount').textContent = '(' + items.length + ')';
+    if (!items.length) {
+      list.innerHTML = '<p class="text-sm text-muted" style="text-align:center;padding:20px;">' + t('Nema stavki za brisanje') + '</p>';
+      return;
+    }
+    list.innerHTML = items.map((item, i) => `
+      <label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:4px;cursor:pointer;font-size:13px;" onmouseover="this.style.background='var(--accent-glow)'" onmouseout="this.style.background=''">
+        <input type="checkbox" class="cleanup-cb" data-idx="${i}" onchange="updateCleanupSummary()" style="accent-color:var(--danger);flex-shrink:0;">
+        <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(item.label)}</span>
+        <span class="text-sm text-dim" style="flex-shrink:0;">${escHtml(item.sub)}</span>
+      </label>
+    `).join('');
+  } catch(e) {
+    list.innerHTML = '<p class="text-sm" style="color:var(--danger);">' + (e.message || t('Greška')) + '</p>';
+  }
+}
+
+function toggleCleanupAll() {
+  const checked = document.getElementById('cleanupSelectAll').checked;
+  document.querySelectorAll('.cleanup-cb').forEach(cb => cb.checked = checked);
+  updateCleanupSummary();
+}
+
+function updateCleanupSummary() {
+  const selected = document.querySelectorAll('.cleanup-cb:checked').length;
+  const total = document.querySelectorAll('.cleanup-cb').length;
+  const summaryEl = document.getElementById('cleanupSummaryText');
+  const btn = document.getElementById('cleanupConfirmBtn');
+  if (selected === 0) {
+    summaryEl.textContent = t('Izaberite stavke za brisanje');
+    btn.disabled = true;
+  } else {
+    summaryEl.textContent = t('Biće trajno obrisano:') + ' ' + selected + ' ' + (selected === total ? '(' + t('sve') + ')' : '') + ' ' + t('stavki');
+    btn.disabled = false;
+  }
+}
+
+async function executeCleanup() {
+  const cbs = document.querySelectorAll('.cleanup-cb:checked');
+  if (!cbs.length) return;
+  const selectedIdxs = Array.from(cbs).map(cb => parseInt(cb.dataset.idx));
+  const selectedItems = selectedIdxs.map(i => _cleanupItems[i]);
+
+  const confirmMsg = t('Da li ste POTPUNO sigurni?') + '\n\n' + t('Biće obrisano') + ': ' + selectedItems.length + ' ' + t('stavki') + '\n' + t('Ova akcija se NE MOŽE poništiti.');
+  if (!confirm(confirmMsg)) return;
+
+  const btn = document.getElementById('cleanupConfirmBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ' + t('Brisanje...');
+
+  let deleted = 0;
+  let errors = 0;
+
+  for (const item of selectedItems) {
+    try {
+      if (_cleanupType === 'chats') {
+        await apiFetch(`/api/chats/${item.id}`, { method: 'DELETE' });
+      } else if (_cleanupType === 'documents') {
+        await apiFetch(`/api/documents/${encodeURIComponent(item.id)}`, { method: 'DELETE' });
+      } else if (_cleanupType === 'templates') {
+        const [prefix, id] = String(item.id).split('_');
+        if (prefix === 'tpl') await apiFetch(`/api/templates/${id}`, { method: 'DELETE' });
+        else if (prefix === 'draft') await apiFetch(`/api/drafts/${id}`, { method: 'DELETE' });
+      } else if (_cleanupType === 'matters') {
+        await apiFetch(`/api/matters/${item.id}`, { method: 'DELETE' });
+      }
+      deleted++;
+    } catch { errors++; }
+  }
+
+  closeModal('modalCleanup');
+  toast(t('Obrisano') + ': ' + deleted + ' ' + t('stavki') + (errors ? ' (' + errors + ' ' + t('grešaka') + ')' : ''), errors ? 'warning' : 'success');
+  loadCleanupCounts();
+  // Refresh affected pages
+  if (_cleanupType === 'chats') loadChats();
+  btn.innerHTML = '<i class="fa-solid fa-trash"></i> <span>' + t('OBRIŠI IZABRANO') + '</span>';
+  btn.disabled = true;
 }
 
 // ── Health check / status ────────────────────────────
