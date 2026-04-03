@@ -69,6 +69,13 @@ MODELS = {
         "ctx_size": 8192,
         "description": "Google generalist — dobar za proveru konzistentnosti",
     },
+    "fast_q4": {
+        "name": "Qwen 3.5 9B Q4",
+        "path": settings.model_fast_q4,
+        "role": "fast",
+        "ctx_size": 16384,
+        "description": "Brzi model za uređaje sa 8 GB VRAM (Q4 kvantizacija)",
+    },
     "gemma4_2b": {
         "name": "Gemma 4 E2B Q8",
         "path": settings.model_gemma4_2b,

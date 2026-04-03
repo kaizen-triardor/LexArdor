@@ -583,7 +583,8 @@ a:hover { text-decoration: underline; }
 <!-- ═══ PAGE: Chat ═══════════════════════════════════ -->
 <div class="page active" id="page-chat">
   <div style="display:flex;align-items:center;justify-content:flex-end;padding:8px 24px 0;">
-    <button class="btn btn-sm" id="chatExportBtn" onclick="exportChat()" style="display:none;" title="Izvezi"><i class="fa-solid fa-file-export"></i></button>
+    <button class="btn btn-sm" id="chatExportBtn" onclick="exportChat()" style="display:none;" title="Izvezi PDF"><i class="fa-solid fa-file-export"></i></button>
+    <button class="btn btn-sm" id="chatPrintBtn" onclick="printChat()" style="display:none;" title="Štampaj"><i class="fa-solid fa-print"></i></button>
   </div>
   <div class="chat-area" id="chatArea">
     <div class="chat-welcome" id="chatWelcome">
@@ -854,6 +855,7 @@ a:hover { text-decoration: underline; }
     </div>
     <div class="settings-section">
       <h3 data-i18n="AI motor">AI motor</h3>
+      <div id="hardwareTierBar" style="margin-bottom:12px;padding:10px 14px;border-radius:8px;font-size:13px;display:none;"></div>
       <dl class="info-grid" id="engineInfo">
         <dt data-i18n="Status">Status</dt><dd data-i18n="Učitavanje...">Učitavanje...</dd>
       </dl>
@@ -1708,7 +1710,7 @@ async function createNewChat() {
   S.currentChatId = null;
   document.getElementById('chatMessages').innerHTML = '';
   document.getElementById('chatWelcome').style.display = 'flex';
-  document.getElementById('chatExportBtn').style.display = 'none';
+  document.getElementById('chatExportBtn').style.display = 'none'; document.getElementById('chatPrintBtn').style.display = 'none';
   document.querySelectorAll('.chat-item').forEach(i => i.classList.remove('active'));
   showPage('chat');
 }
@@ -1716,7 +1718,7 @@ async function createNewChat() {
 async function openChat(id) {
   S.currentChatId = id;
   document.getElementById('chatWelcome').style.display = 'none';
-  document.getElementById('chatExportBtn').style.display = '';
+  document.getElementById('chatExportBtn').style.display = ''; document.getElementById('chatPrintBtn').style.display = '';
   renderChatHistory();
   try {
     const msgs = await apiFetch(`/api/chats/${id}/messages`);
@@ -1920,7 +1922,7 @@ async function sendMessage() {
     try {
       const chat = await apiFetch('/api/chats', { method: 'POST', body: JSON.stringify({ title: q.substring(0, 60) }) });
       S.currentChatId = chat.id;
-      document.getElementById('chatExportBtn').style.display = '';
+      document.getElementById('chatExportBtn').style.display = ''; document.getElementById('chatPrintBtn').style.display = '';
       await loadChats();
     } catch (e) { return; }
   }
@@ -2011,6 +2013,34 @@ async function exportChat() {
     URL.revokeObjectURL(url);
     toast(t('Izvezeno!'), 'success');
   } catch(e) { toast(e.message, 'error'); }
+}
+
+function printChat() {
+  const msgs = document.getElementById('chatMessages');
+  if (!msgs || !msgs.innerHTML.trim()) { toast(t('Nema poruka za štampanje'), 'warning'); return; }
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>LexArdor — Razgovor</title>
+    <style>body{font-family:'Lora',Georgia,serif;max-width:700px;margin:40px auto;line-height:1.7;color:#152626;}
+    h1{font-family:'Playfair Display',serif;color:#8C6A2B;font-size:20px;border-bottom:2px solid #8C6A2B;padding-bottom:8px;}
+    .msg{margin:16px 0;padding:12px 16px;border-radius:8px;}
+    .msg-user{background:#f5f0e8;border-left:3px solid #8C6A2B;}
+    .msg-assistant{background:#fafaf8;border-left:3px solid #2D6854;}
+    .msg-role{font-weight:700;font-size:12px;text-transform:uppercase;margin-bottom:4px;color:#666;}
+    @media print{body{margin:20px;} .no-print{display:none;}}</style></head><body>
+    <h1>LexArdor — Pravna analiza</h1>
+    <p style="font-size:12px;color:#666;">Datum: ${new Date().toLocaleDateString('sr-Latn-RS')}</p>`);
+  msgs.querySelectorAll('.msg').forEach(msg => {
+    const isUser = msg.classList.contains('msg-user');
+    const body = msg.querySelector('.msg-body');
+    win.document.write(`<div class="msg ${isUser ? 'msg-user' : 'msg-assistant'}">
+      <div class="msg-role">${isUser ? 'Pitanje' : 'LexArdor'}</div>
+      ${body ? body.innerHTML : msg.innerHTML}</div>`);
+  });
+  win.document.write(`<p style="font-size:11px;color:#999;margin-top:32px;border-top:1px solid #ddd;padding-top:8px;">
+    Generisano pomoću LexArdor AI pravnog asistenta. Odgovori zahtevaju proveru kvalifikovanog advokata.</p>
+    </body></html>`);
+  win.document.close();
+  setTimeout(() => win.print(), 500);
 }
 
 // ── External AI Verification ──────────────────────────
@@ -3055,6 +3085,25 @@ async function loadEngineInfo() {
 
     // Show current loaded model
     loadCurrentModel();
+
+    // Hardware tier info
+    if (e.hardware) {
+      const hw = e.hardware;
+      const tierColors = { high: 'var(--success)', mid: 'var(--accent)', low: 'var(--warning)' };
+      const tierIcons = { high: 'fa-rocket', mid: 'fa-laptop', low: 'fa-microchip' };
+      const bar = document.getElementById('hardwareTierBar');
+      bar.style.display = '';
+      bar.style.background = 'var(--accent-glow)';
+      bar.style.border = '1px solid var(--border)';
+      bar.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;">
+          <i class="fa-solid ${tierIcons[hw.tier] || 'fa-computer'}" style="color:${tierColors[hw.tier] || 'var(--text-muted)'};font-size:16px;"></i>
+          <span style="font-weight:700;">${escHtml(hw.tier_label)}</span>
+          <span class="text-muted">·</span>
+          <span class="text-muted">GPU: ${hw.gpu_vram_gb} GB VRAM</span>
+        </div>
+      `;
+    }
 
     // BM25 status (reuse element to avoid duplicates)
     try {

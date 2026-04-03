@@ -77,6 +77,22 @@ def get_engine_config():
         },
         "bm25": _get_bm25_status(),
         "corpus": corpus,
+        "hardware": _get_hardware_info(),
+    }
+
+
+def _get_hardware_info() -> dict:
+    from core.config import detect_hardware_tier, detect_gpu_vram, HARDWARE_TIERS
+    tier = detect_hardware_tier()
+    vram = detect_gpu_vram()
+    tier_info = HARDWARE_TIERS.get(tier, {})
+    return {
+        "tier": tier,
+        "tier_label": tier_info.get("label", tier),
+        "gpu_vram_gb": vram,
+        "recommended_fast": tier_info.get("fast", "fast"),
+        "recommended_reasoning": tier_info.get("reasoning", "fast"),
+        "recommended_verifier": tier_info.get("verifier", "fast"),
     }
 
 
