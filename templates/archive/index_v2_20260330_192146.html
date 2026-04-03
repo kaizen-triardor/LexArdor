@@ -1,0 +1,3659 @@
+<!DOCTYPE html>
+<html lang="sr" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LexArdor — AI pravni asistent</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Light mode (Parchment) — DEFAULT */
+  --bg: #FAF9F6;
+  --bg-card: #FFFFFF;
+  --bg-sidebar: #F5F3EF;
+  --primary: #FFFFFF;
+  --accent: #8C6A2B;
+  --accent-dim: #735624;
+  --accent-glow: rgba(140, 106, 43, 0.15);
+  --text: #152626;
+  --text-muted: #6B7280;
+  --text-dim: #9CA3AF;
+  --border: rgba(115, 86, 36, 0.12);
+  --success: #2D6854;
+  --warning: #D97706;
+  --danger: #DC2626;
+  --radius: 10px;
+  --sidebar-w: 260px;
+}
+
+[data-theme="dark"] {
+  --bg: #090B14;
+  --bg-card: #152626;
+  --bg-sidebar: #090B14;
+  --primary: #152626;
+  --accent: #F9D453;
+  --accent-dim: #8C6A2B;
+  --accent-glow: rgba(249, 212, 83, 0.15);
+  --text: #FFFFFF;
+  --text-muted: #A1A1AA;
+  --text-dim: #6B7280;
+  --border: rgba(140, 106, 43, 0.15);
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+}
+
+html, body { height: 100%; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  overflow: hidden;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ── Sidebar ───────────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  background: var(--bg-sidebar);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 16px 12px;
+  gap: 8px;
+  z-index: 100;
+}
+
+.sidebar-logo {
+  text-align: center;
+  padding: 16px 0 12px;
+  user-select: none;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+.sidebar-logo .brand {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+}
+.sidebar-logo .tagline {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+.btn-new-chat {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--accent-dim);
+  background: transparent;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.3px;
+}
+.btn-new-chat:hover {
+  background: var(--accent);
+  color: var(--bg);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.chat-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  max-height: 35vh;
+}
+
+.chat-item {
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+}
+.chat-item:hover { background: var(--accent-glow); border-color: var(--border); }
+.chat-item.active { background: var(--primary); border-color: var(--border); }
+.chat-item .chat-title {
+  font-size: 12.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+  padding-right: 20px;
+}
+.chat-item .chat-date {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.chat-item .chat-delete {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  padding: 2px 4px;
+}
+.chat-item:hover .chat-delete { opacity: 1; }
+.chat-item .chat-delete:hover { color: var(--danger); }
+
+.sidebar-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 4px 0;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.nav-item:hover { background: var(--accent-glow); color: var(--text); }
+.nav-item.active { background: var(--accent-glow); color: var(--accent); border-left: 3px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0; }
+.nav-item i { width: 18px; text-align: center; font-size: 14px; }
+
+.sidebar-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+  gap: 8px;
+}
+.status-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.btn-theme-toggle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+.btn-theme-toggle:hover {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--danger);
+  flex-shrink: 0;
+}
+.status-dot.online { background: var(--success); }
+.status-corpus { font-family: 'SF Mono', Consolas, monospace; font-size: 10px; }
+
+/* ── Main area ─────────────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ── Page containers ───────────────────────────────────────── */
+.page { display: none; flex-direction: column; height: 100%; overflow: hidden; }
+.page.active { display: flex; }
+
+/* ── Chat page ─────────────────────────────────────────────── */
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  gap: 24px;
+  position: relative;
+}
+.welcome::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+.welcome h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+  position: relative;
+  z-index: 1;
+}
+.welcome p {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 460px;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+}
+.example-queries {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  max-width: 540px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+.example-query {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  line-height: 1.4;
+}
+.example-query:hover {
+  border-color: var(--accent-dim);
+  border-left-color: var(--accent);
+  color: var(--text);
+  background: var(--accent-glow);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+[data-theme="dark"] .example-query:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.msg {
+  display: flex;
+  animation: msgIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.msg.user { justify-content: flex-end; }
+.msg.assistant { justify-content: flex-start; }
+
+.msg-bubble {
+  max-width: 72%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.65;
+  position: relative;
+}
+.msg.user .msg-bubble {
+  background: var(--accent-glow);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-bottom-right-radius: 4px;
+}
+.msg.assistant .msg-bubble {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-bottom-left-radius: 4px;
+}
+
+/* ── Assistant message text in Lora ──────────────────────────── */
+.msg.assistant .msg-text {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+/* ── Markdown in messages ──────────────────────────────────── */
+.msg-text h2 { font-size: 17px; font-weight: 700; margin: 12px 0 6px; font-family: 'Inter', sans-serif; }
+.msg-text h3 { font-size: 15px; font-weight: 600; margin: 10px 0 4px; font-family: 'Inter', sans-serif; }
+.msg-text h4 { font-size: 14px; font-weight: 600; margin: 8px 0 4px; color: var(--accent); font-family: 'Inter', sans-serif; }
+.msg-text p { margin-bottom: 8px; }
+.msg-text p:last-child { margin-bottom: 0; }
+.msg-text code {
+  background: var(--accent-glow);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Consolas, monospace;
+  font-size: 13px;
+  border: 1px solid var(--border);
+}
+.msg-text pre {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  margin: 8px 0;
+  font-size: 12px;
+  font-family: monospace;
+  line-height: 1.5;
+  border: 1px solid var(--border);
+}
+[data-theme="dark"] .msg-text pre {
+  background: rgba(0, 0, 0, 0.35);
+}
+.msg-text strong { font-weight: 600; }
+.msg-text em { font-style: italic; color: var(--text-muted); }
+.msg-text ul, .msg-text ol { margin: 4px 0 4px 20px; }
+.msg-text li { margin-bottom: 2px; }
+.msg-text hr { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+
+/* ── Confidence squares ────────────────────────────────────── */
+.confidence-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-family: 'Inter', sans-serif;
+}
+.confidence-squares {
+  display: flex;
+  gap: 3px;
+}
+.confidence-sq {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: var(--border);
+}
+.confidence-sq.filled.high { background: var(--success); }
+.confidence-sq.filled.medium { background: var(--warning); }
+.confidence-sq.filled.low { background: var(--danger); }
+.confidence-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.confidence-label.high { color: var(--success); }
+.confidence-label.medium { color: var(--warning); }
+.confidence-label.low { color: var(--danger); }
+
+/* ── Sources ───────────────────────────────────────────────── */
+.sources-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 0;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+}
+.sources-toggle:hover { text-decoration: underline; }
+
+.sources-list {
+  display: none;
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+}
+.sources-list.open { display: block; }
+
+.source-item {
+  background: var(--accent-glow);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  font-family: 'Inter', sans-serif;
+}
+.source-item .source-law { color: var(--accent); font-weight: 600; }
+.source-item .source-article { color: var(--text); }
+.source-item .source-gazette { color: var(--text-dim); font-size: 11px; }
+.source-item .source-score {
+  float: right;
+  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--accent-glow);
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-family: monospace;
+}
+
+/* ── Typing indicator (Thinking Ember) ────────────────────── */
+@keyframes thinking-ember {
+  0%, 100% { opacity: 0.4; box-shadow: 0 0 15px var(--accent-glow); }
+  50% { opacity: 1; box-shadow: 0 0 30px var(--accent-glow); }
+}
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+}
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: thinking-ember 1.8s ease-in-out infinite;
+}
+.typing-indicator span:nth-child(2) { animation-delay: 0.3s; }
+.typing-indicator span:nth-child(3) { animation-delay: 0.6s; }
+
+/* ── Input area ────────────────────────────────────────────── */
+.input-area {
+  padding: 12px 32px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
+}
+.input-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+.input-textarea {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-family: inherit;
+  resize: none;
+  min-height: 42px;
+  max-height: 160px;
+  line-height: 1.5;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+[data-theme="dark"] .input-textarea {
+  background: rgba(21, 38, 38, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.input-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+.input-textarea::placeholder { color: var(--text-dim); }
+
+.btn-send {
+  padding: 10px 20px;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+.btn-send:hover {
+  box-shadow: 0 0 20px var(--accent-glow);
+  transform: scale(1.02);
+}
+.btn-send:disabled { opacity: 0.4; cursor: not-allowed; filter: none; box-shadow: none; transform: none; }
+
+.input-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+.heavy-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.heavy-check input { accent-color: var(--accent); cursor: pointer; }
+
+.disclaimer {
+  font-size: 10px;
+  color: var(--text-dim);
+  opacity: 0.5;
+  max-width: 500px;
+  line-height: 1.5;
+}
+
+.mode-selector select {
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.mode-selector select:focus { border-color: var(--accent); }
+
+.citations-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 6px 0;
+  font-size: 11px;
+}
+.citations-label {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.citation-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.citation-badge.verified {
+  background: rgba(45, 104, 84, 0.12);
+  color: var(--success);
+  border: 1px solid rgba(45, 104, 84, 0.2);
+}
+.citation-badge.flagged {
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+.citation-badge i { font-size: 10px; }
+
+/* ── Documents page ────────────────────────────────────────── */
+.page-header {
+  padding: 24px 32px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.page-header h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.page-header .subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.page-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 32px;
+}
+
+.btn-primary {
+  padding: 8px 16px;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 20px var(--accent-glow);
+  transform: scale(1.02);
+}
+
+.btn-danger {
+  padding: 5px 10px;
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-danger:hover { background: var(--danger); color: #fff; }
+
+.btn-secondary {
+  padding: 8px 16px;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-secondary:hover { background: var(--accent-glow); color: var(--accent); }
+
+.doc-category-group {
+  margin-bottom: 20px;
+}
+.doc-category-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.doc-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 6px;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s;
+}
+.doc-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+  border-color: var(--accent-dim);
+}
+[data-theme="dark"] .doc-item:hover {
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3);
+}
+.doc-item-info { flex: 1; min-width: 0; }
+.doc-item-title {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.doc-item-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.doc-item-meta .tag {
+  background: var(--accent-glow);
+  color: var(--accent);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+.doc-empty {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+.doc-info-note {
+  font-size: 12px;
+  color: var(--text-dim);
+  background: var(--accent-glow);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+
+/* ── Settings page ─────────────────────────────────────────── */
+.settings-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  backdrop-filter: blur(4px);
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s;
+}
+.settings-section:hover {
+  border-color: var(--accent-dim);
+}
+.settings-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--accent);
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 13px;
+}
+.settings-label { color: var(--text-muted); }
+.settings-value { color: var(--text); font-weight: 500; }
+
+.script-toggle-settings {
+  display: flex;
+  gap: 4px;
+}
+.script-toggle-settings button {
+  padding: 6px 16px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.script-toggle-settings button.active {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+.script-toggle-settings button:hover:not(.active) {
+  background: var(--accent-glow);
+  border-color: var(--accent-dim);
+}
+
+/* ── Help page ─────────────────────────────────────────────── */
+.faq-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s;
+}
+.faq-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+  border-color: var(--accent-dim);
+}
+[data-theme="dark"] .faq-item:hover {
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3);
+}
+.faq-question {
+  width: 100%;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: inherit;
+}
+.faq-question:hover { background: var(--accent-glow); }
+.faq-question i { color: var(--accent-dim); font-size: 12px; transition: transform 0.2s; }
+.faq-item.open .faq-question i { transform: rotate(90deg); }
+.faq-answer {
+  padding: 0 16px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.faq-item.open .faq-answer {
+  padding: 0 16px 14px;
+  max-height: 300px;
+}
+
+.report-form {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-top: 20px;
+}
+.report-form h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.form-group {
+  margin-bottom: 12px;
+}
+.form-group label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+.form-select, .form-input, .form-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+[data-theme="dark"] .form-select,
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-textarea {
+  background: rgba(9, 11, 20, 0.5);
+}
+.form-textarea { min-height: 80px; resize: vertical; }
+.form-select:focus, .form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.form-check input { accent-color: var(--accent); cursor: pointer; }
+
+.report-history { margin-top: 20px; }
+.report-history h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+.report-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.report-item .report-type {
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.report-item .report-desc { margin-top: 4px; color: var(--text-muted); }
+.report-item .report-date { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+.contact-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-top: 20px;
+}
+.contact-section h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+
+/* ── Modal (generic) ───────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-overlay.hidden { display: none; }
+
+.modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px 24px;
+  width: 420px;
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+[data-theme="dark"] .modal-card {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+.modal-card h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+
+/* ── Toast ─────────────────────────────────────────────────── */
+.toast-container {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.toast {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  animation: toastIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 360px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+}
+[data-theme="dark"] .toast {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+.toast.error { border-color: var(--danger); }
+.toast.success { border-color: var(--success); }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ── External AI page ─────────────────────────────────────── */
+.provider-card { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+.provider-card:hover { border-color: var(--accent) !important; transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3); }
+.provider-card:hover i { color: var(--accent) !important; }
+
+/* ── Source full text expand ──────────────────────────────── */
+.source-full-text-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 0;
+  margin-top: 4px;
+  font-weight: 600;
+}
+.source-full-text-btn:hover { text-decoration: underline; }
+
+/* ── Magnetic Lift hover effects ─────────────────────────── */
+.template-card, .chat-item {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s, background 0.2s;
+}
+.template-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+  border-color: var(--accent-dim);
+}
+[data-theme="dark"] .template-card:hover {
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 150;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: -280px;
+    top: 0;
+    height: 100vh;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 200;
+  }
+  .sidebar.open { left: 0; }
+  .sidebar-toggle { display: flex; align-items: center; justify-content: center; }
+  .messages { padding: 24px 16px; padding-top: 56px; }
+  .input-area { padding: 12px 16px 16px; }
+  .page-header { padding: 24px 16px 16px; padding-top: 56px; }
+  .page-content { padding: 20px 16px; }
+  .msg-bubble { max-width: 88%; }
+  .example-queries { grid-template-columns: 1fr; }
+}
+
+/* ── Templates page ───────────────────────────────────────── */
+.template-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease-out;
+}
+.template-card:hover { border-color: var(--accent-dim); }
+.template-card .tpl-info { flex: 1; min-width: 0; }
+.template-card .tpl-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.template-card .tpl-meta { font-size: 12px; color: var(--text-muted); display: flex; gap: 10px; align-items: center; }
+.template-card .tpl-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: var(--accent-glow);
+  color: var(--accent);
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+}
+.template-card .tpl-actions { display: flex; gap: 6px; flex-shrink: 0; margin-left: 12px; }
+.tpl-group-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 16px 0 6px;
+  letter-spacing: 0.5px;
+}
+.tpl-group-label:first-child { margin-top: 0; }
+
+.field-form { display: flex; flex-direction: column; gap: 12px; }
+.field-form label { font-size: 13px; font-weight: 500; display: flex; flex-direction: column; gap: 4px; }
+.field-form label .field-type-hint { font-size: 11px; color: var(--text-dim); font-weight: 400; }
+.field-form .required-mark { color: var(--danger); }
+
+.validation-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  padding: 6px 0;
+}
+.validation-result.ok { color: var(--success); }
+.validation-result.warn { color: var(--warning); }
+.validation-result.err { color: var(--danger); }
+
+.doc-preview {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  font-size: 13px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 12px;
+}
+
+.script-choice {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  font-size: 13px;
+  margin: 12px 0;
+}
+.script-choice label { display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--text-muted); }
+.script-choice input[type="radio"] { accent-color: var(--accent); cursor: pointer; }
+
+.smart-fill-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.smart-fill-section h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+
+.tpl-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 16px 0;
+}
+.tpl-loading .spinner {
+  width: 18px; height: 18px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Selection highlight ─────────────────────────────────── */
+::selection {
+  background: var(--accent-glow);
+  color: var(--text);
+}
+
+/* ── Theme transitions ─────────────────────────────────────── */
+body, .sidebar, .input-area, .msg-bubble, .settings-section,
+.faq-item, .template-card, .doc-item, .modal-card, .toast,
+.form-select, .form-input, .form-textarea, .input-textarea,
+.btn-new-chat, .btn-theme-toggle, .nav-item {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+</style>
+</head>
+<body>
+
+<!-- Toast container -->
+<div class="toast-container" id="toasts"></div>
+
+<!-- Sidebar toggle (mobile) -->
+<button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+
+<!-- Upload document modal -->
+<div class="modal-overlay hidden" id="uploadModal">
+  <div class="modal-card">
+    <h2 data-i18n>Dodaj dokument</h2>
+    <div class="form-group">
+      <label data-i18n>Naslov</label>
+      <input class="form-input" id="docTitle" type="text" placeholder="Naziv dokumenta" data-i18n-placeholder>
+    </div>
+    <div class="form-group">
+      <label data-i18n>Kategorija</label>
+      <select class="form-select" id="docCategory">
+        <option value="Ugovor" data-i18n>Ugovor</option>
+        <option value="Presuda" data-i18n>Presuda</option>
+        <option value="Tužba" data-i18n>Tužba</option>
+        <option value="Rešenje" data-i18n>Rešenje</option>
+        <option value="Dopis" data-i18n>Dopis</option>
+        <option value="Ostalo" data-i18n>Ostalo</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label data-i18n>Sadržaj dokumenta</label>
+      <textarea class="form-textarea" id="docContent" rows="8" placeholder="Unesite ili zalepite tekst dokumenta ovde..." data-i18n-placeholder></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="btnCancelUpload" data-i18n>Otkaži</button>
+      <button class="btn-primary" id="btnSaveDoc" data-i18n>Sačuvaj</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">LexArdor</div>
+    <div class="tagline" data-i18n>AI pravni asistent</div>
+  </div>
+
+  <button class="btn-new-chat" id="btnNewChat" data-i18n>+ Nova konverzacija</button>
+
+  <div class="chat-list" id="chatList"></div>
+
+  <hr class="sidebar-divider">
+
+  <nav class="sidebar-nav">
+    <button class="nav-item active" data-page="chat"><i class="fa-solid fa-comments"></i> <span data-i18n>Razgovor</span></button>
+    <button class="nav-item" data-page="documents"><i class="fa-solid fa-folder-open"></i> <span data-i18n>Moji dokumenti</span></button>
+    <button class="nav-item" data-page="templates"><i class="fas fa-file-signature"></i> <span data-i18n>Šabloni</span></button>
+    <button class="nav-item" data-page="corpus"><i class="fa-solid fa-scale-balanced"></i> <span data-i18n>Baza propisa</span></button>
+    <button class="nav-item" data-page="external"><i class="fa-solid fa-cloud"></i> <span data-i18n>Spoljni AI</span></button>
+    <button class="nav-item" data-page="settings"><i class="fa-solid fa-gear"></i> <span data-i18n>Podešavanja</span></button>
+    <button class="nav-item" data-page="help"><i class="fa-solid fa-life-ring"></i> <span data-i18n>Pomoć i podrška</span></button>
+  </nav>
+
+  <div class="sidebar-status">
+    <div class="status-info">
+      <div class="status-row">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText" data-i18n>Provera...</span>
+      </div>
+      <div class="status-row status-corpus" id="corpusStatus" data-i18n>-- članaka</div>
+    </div>
+    <button class="btn-theme-toggle" id="btnThemeToggle" title="Dark / Light mode">
+      <i class="fa-solid fa-sun" id="themeIcon"></i>
+    </button>
+  </div>
+</aside>
+
+<!-- Main area -->
+<div class="main">
+
+  <!-- PAGE: Chat -->
+  <div class="page active" id="pageChatContainer">
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcomeScreen">
+        <h2 data-i18n>Postavite pitanje o srpskom pravu</h2>
+        <p data-i18n>Pretražite bazu od preko 79.000 pravnih članaka. Postavljajte pitanja o zakonima, uredbama i pravilnicima Republike Srbije.</p>
+        <div class="example-queries">
+          <button class="example-query" data-i18n>Koji su uslovi za otkaz ugovora o radu?</button>
+          <button class="example-query" data-i18n>Koja je kazna za krađu prema Krivičnom zakoniku?</button>
+          <button class="example-query" data-i18n>Koliko traje probni rad po Zakonu o radu?</button>
+          <button class="example-query" data-i18n>Šta reguliše Zakon o zaštiti potrošača?</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-row">
+        <textarea class="input-textarea" id="inputText" placeholder="Postavite pravno pitanje..." rows="1" data-i18n-placeholder></textarea>
+        <button class="btn-send" id="btnSend" data-i18n>Pošalji</button>
+      </div>
+      <div class="input-options">
+        <label class="heavy-check">
+          <input type="checkbox" id="heavyCheck"> <span data-i18n>Dublja analiza</span>
+        </label>
+        <div class="mode-selector">
+          <select id="answerMode" class="form-select" style="padding:4px 8px;font-size:11px;border-radius:6px;min-width:100px;">
+            <option value="balanced" data-i18n>Balansiran</option>
+            <option value="citizen" data-i18n>Za građane</option>
+            <option value="strict" data-i18n>Stručni</option>
+          </select>
+        </div>
+        <div class="disclaimer" data-i18n>LexArdor je AI asistent. Odgovori zahtevaju proveru od strane kvalifikovanog advokata.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Documents -->
+  <div class="page" id="pageDocuments">
+    <div class="page-header">
+      <h1 data-i18n>Moji dokumenti</h1>
+      <div class="subtitle" data-i18n>Upravljajte svojim pravnim dokumentima koje LexArdor koristi prilikom analize.</div>
+      <div class="page-header-actions">
+        <button class="btn-primary" id="btnAddDoc"><i class="fa-solid fa-plus"></i> <span data-i18n>Dodaj dokument</span></button>
+      </div>
+    </div>
+    <div class="page-content">
+      <div class="doc-info-note" data-i18n>Ovi dokumenti su dostupni samo vama. LexArdor ih koristi zajedno sa bazom propisa za preciznije odgovore.</div>
+      <div id="docList"></div>
+
+      <!-- Add law to corpus section -->
+      <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border)">
+        <h2 style="font-size:16px;margin-bottom:4px"><i class="fa-solid fa-scale-balanced" style="color:var(--accent);margin-right:6px"></i><span data-i18n>Dodaj zakon u bazu propisa</span></h2>
+        <div class="doc-info-note" data-i18n>Nedostaje zakon u bazi? Priložite PDF ili DOCX tekst zakona i LexArdor će ga dodati u svoju bazu propisa. AI će automatski prepoznati članove (Član 1, Član 2...) i koristiti ih za odgovore.</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0">
+          <label style="font-size:13px;font-weight:500">
+            <span data-i18n>Naziv zakona</span>
+            <input type="text" class="form-input" id="lawTitle" placeholder="npr. Zakon o porezu na dobit pravnih lica" data-i18n-placeholder>
+          </label>
+          <label style="font-size:13px;font-weight:500">
+            <span data-i18n>Službeni glasnik (opciono)</span>
+            <input type="text" class="form-input" id="lawGazette" placeholder="npr. Sl. glasnik RS, br. 25/2001" data-i18n-placeholder>
+          </label>
+        </div>
+
+        <div style="border:2px dashed var(--accent-dim);border-radius:10px;padding:20px;text-align:center;cursor:pointer;margin-bottom:12px;transition:border-color .2s" id="lawDropZone">
+          <i class="fa-solid fa-cloud-arrow-up" style="font-size:24px;color:var(--accent);display:block;margin-bottom:6px"></i>
+          <div style="font-size:13px;color:var(--text-muted)" data-i18n>Prevucite PDF ili DOCX fajl zakona ovde, ili kliknite</div>
+          <div id="lawFileName" style="font-size:12px;color:var(--accent);margin-top:6px;display:none"></div>
+          <input type="file" id="lawFileInput" accept=".pdf,.docx,.doc,.txt" style="display:none">
+        </div>
+
+        <div style="text-align:center;font-size:11px;color:var(--text-muted);margin:8px 0" data-i18n>— ili nalepite tekst zakona —</div>
+        <textarea class="form-textarea" id="lawText" rows="4" placeholder="Nalepite tekst zakona sa članovima (Član 1., Član 2. itd.)" style="margin-bottom:12px" data-i18n-placeholder></textarea>
+
+        <button class="btn-primary" id="btnUploadLaw" style="width:100%"><i class="fa-solid fa-plus"></i> <span data-i18n>Dodaj zakon u bazu</span></button>
+        <div id="lawUploadResult" style="display:none;margin-top:12px;padding:12px;border-radius:10px;font-size:13px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Settings -->
+  <div class="page" id="pageSettings">
+    <div class="page-header">
+      <h1 data-i18n>Podešavanja</h1>
+    </div>
+    <div class="page-content">
+      <div class="settings-section">
+        <h3 data-i18n>Jezik</h3>
+        <div class="script-toggle-settings">
+          <button class="active" id="btnLatSettings" data-lang="lat">Srpski (Latinica)</button>
+          <button id="btnCirSettings" data-lang="cir">Српски (Ћирилица)</button>
+          <button id="btnEnSettings" data-lang="en">English</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3 data-i18n>AI informacije</h3>
+        <div class="settings-row">
+          <span class="settings-label" data-i18n>Modeli</span>
+          <span class="settings-value" id="settingsModels">--</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label" data-i18n>Status</span>
+          <span class="settings-value" id="settingsAIStatus"><span class="status-dot" style="display:inline-block;vertical-align:middle;margin-right:4px"></span> --</span>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3 data-i18n>Korpus</h3>
+        <div class="settings-row">
+          <span class="settings-label" data-i18n>Pravni članci</span>
+          <span class="settings-value" id="settingsLawCount">--</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label" data-i18n>Korisnički dokumenti</span>
+          <span class="settings-value" id="settingsDocCount">--</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label" data-i18n>Poslednje ažuriranje</span>
+          <span class="settings-value" id="settingsLastUpdate">--</span>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3 data-i18n>Aplikacija</h3>
+        <div class="settings-row">
+          <span class="settings-label" data-i18n>Verzija</span>
+          <span class="settings-value" id="settingsVersion">--</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label" data-i18n>Licenca</span>
+          <span class="settings-value" id="settingsLicense">--</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label" data-i18n>ID instalacije</span>
+          <span class="settings-value" id="settingsInstallId" style="font-family:monospace;font-size:11px">--</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Help -->
+  <div class="page" id="pageHelp">
+    <div class="page-header">
+      <h1 data-i18n>Pomoć i podrška</h1>
+    </div>
+    <div class="page-content">
+      <div id="faqContainer">
+        <div class="faq-item">
+          <button class="faq-question"><span data-i18n>Kako da postavim pitanje?</span> <i class="fa-solid fa-chevron-right"></i></button>
+          <div class="faq-answer" data-i18n>Unesite vaše pravno pitanje u polje za tekst na stranici Razgovor i kliknite Pošalji. LexArdor pretražuje bazu srpskih propisa i daje odgovor sa izvorima. Za detaljniju analizu, označite opciju "Dublja analiza".</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question"><span data-i18n>Šta znači pouzdanost odgovora?</span> <i class="fa-solid fa-chevron-right"></i></button>
+          <div class="faq-answer" data-i18n>Pouzdanost pokazuje koliko je AI siguran u tačnost odgovora. Visoka pouzdanost znači da su pronađeni relevantni članci zakona. Srednja pouzdanost ukazuje na delimično poklapanje. Niska pouzdanost znači da je pitanje izvan opsega baze ili je odgovor nesiguran.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question"><span data-i18n>Kako da dodam svoj dokument?</span> <i class="fa-solid fa-chevron-right"></i></button>
+          <div class="faq-answer" data-i18n>Idite na stranicu "Moji dokumenti" u navigaciji i kliknite "Dodaj dokument". Unesite naslov, izaberite kategoriju i zalepite tekst dokumenta. LexArdor će ga koristiti zajedno sa bazom propisa prilikom analize vaših pitanja.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question"><span data-i18n>Da li su moji podaci bezbedni?</span> <i class="fa-solid fa-chevron-right"></i></button>
+          <div class="faq-answer" data-i18n>Da. Svi podaci se čuvaju lokalno na vašem serveru. Dokumenti koje dodate su dostupni samo vama. Komunikacija sa AI modelom se odvija unutar vaše lokalne mreže, bez slanja podataka eksternim servisima.</div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question"><span data-i18n>Koliko su odgovori tačni?</span> <i class="fa-solid fa-chevron-right"></i></button>
+          <div class="faq-answer" data-i18n>LexArdor koristi RAG tehnologiju (Retrieval-Augmented Generation) za pretragu relevantnih članaka zakona. Odgovori su informativnog karaktera i uvek zahtevaju proveru od strane kvalifikovanog advokata. Sistem navodi izvore za svaki odgovor radi verifikacije.</div>
+        </div>
+      </div>
+
+      <div class="report-form">
+        <h3 data-i18n>Prijavite problem</h3>
+        <div class="form-group">
+          <label data-i18n>Tip prijave</label>
+          <select class="form-select" id="reportType">
+            <option value="bug" data-i18n>Greška u aplikaciji</option>
+            <option value="incorrect_answer" data-i18n>Netačan odgovor</option>
+            <option value="feature_request" data-i18n>Predlog poboljšanja</option>
+            <option value="other" data-i18n>Ostalo</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label data-i18n>Opis problema</label>
+          <textarea class="form-textarea" id="reportDesc" rows="4" placeholder="Opišite problem ili predlog..." data-i18n-placeholder></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-check">
+            <input type="checkbox" id="reportIncludeChat"> <span data-i18n>Priloži poslednju konverzaciju</span>
+          </label>
+        </div>
+        <button class="btn-primary" id="btnSendReport" data-i18n>Pošalji prijavu</button>
+      </div>
+
+      <div class="report-history">
+        <h3 data-i18n>Prethodne prijave</h3>
+        <div id="reportList"></div>
+      </div>
+
+      <div class="contact-section">
+        <h3 data-i18n>Kontakt</h3>
+        <div class="settings-row">
+          <span class="settings-label">Email</span>
+          <span class="settings-value" id="helpEmail">--</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label" data-i18n>ID instalacije</span>
+          <span class="settings-value" id="helpInstallId" style="font-family:monospace;font-size:11px">--</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Templates -->
+  <div class="page" id="pageTemplates">
+    <!-- View 1: Template list -->
+    <div id="tplListView">
+      <div class="page-header">
+        <h1 data-i18n>Šabloni dokumenata</h1>
+        <div class="subtitle" data-i18n>Kreirajte šablone i brže popunjavajte dokumente</div>
+        <div class="page-header-actions">
+          <button class="btn-primary" id="btnNewTemplate"><i class="fa-solid fa-plus"></i> <span data-i18n>Novi šablon</span></button>
+        </div>
+      </div>
+      <div class="page-content" id="tplList">
+        <div class="doc-empty" data-i18n>Nemate šablona. Kreirajte prvi šablon iz primera dokumenta.</div>
+      </div>
+    </div>
+
+    <!-- View 2: Fill document -->
+    <div id="tplFillView" style="display:none">
+      <div class="page-header">
+        <h1 id="tplFillTitle"></h1>
+        <div style="margin-top:8px">
+          <button class="btn-danger" id="btnBackToTemplates"><i class="fa-solid fa-arrow-left"></i> <span data-i18n>Nazad na šablone</span></button>
+        </div>
+      </div>
+      <div class="page-content">
+        <!-- Smart fill -->
+        <div class="smart-fill-section">
+          <h3><i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n>AI popuni iz opisa</span></h3>
+          <textarea class="form-textarea" id="smartFillText" rows="3" placeholder="Opišite situaciju slobodnim tekstom..." data-i18n-placeholder></textarea>
+          <div style="margin-top:8px">
+            <button class="btn-primary" id="btnSmartFill"><i class="fa-solid fa-bolt"></i> <span data-i18n>Popuni polja</span></button>
+          </div>
+        </div>
+
+        <!-- Dynamic field form -->
+        <div class="settings-section">
+          <h3 data-i18n>Polja dokumenta</h3>
+          <div class="field-form" id="tplFieldForm"></div>
+        </div>
+
+        <!-- Live preview -->
+        <div class="settings-section" style="margin-top:16px">
+          <h3 data-i18n>Pregled dokumenta</h3>
+          <div class="doc-preview" id="tplPreview"><span style="color:var(--text-dim)" data-i18n>Popunite polja da vidite pregled...</span></div>
+        </div>
+
+        <!-- Validation -->
+        <div class="settings-section" style="margin-top:16px">
+          <h3 data-i18n>Validacija</h3>
+          <button class="btn-primary" id="btnValidateDraft" style="margin-bottom:10px"><i class="fa-solid fa-check-double"></i> <span data-i18n>Proveri dokument</span></button>
+          <div id="tplValidationResults"></div>
+        </div>
+
+        <!-- Script choice & export -->
+        <div class="settings-section" style="margin-top:16px">
+          <h3 data-i18n>Izvoz</h3>
+          <div class="script-choice">
+            <label><input type="radio" name="tplScript" value="original" checked> <span data-i18n>Originalno</span></label>
+            <label><input type="radio" name="tplScript" value="cyrillic"> <span data-i18n>Ćirilica</span></label>
+            <label><input type="radio" name="tplScript" value="latin"> <span data-i18n>Latinica</span></label>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-primary" id="btnSaveDraft"><i class="fa-solid fa-floppy-disk"></i> <span data-i18n>Sačuvaj nacrt</span></button>
+            <button class="btn-secondary" id="btnExportPdf"><i class="fa-solid fa-file-pdf"></i> <span data-i18n>Izvezi PDF</span></button>
+            <button class="btn-secondary" id="btnExportDocx"><i class="fa-solid fa-file-word"></i> <span data-i18n>Izvezi DOCX</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create template modal -->
+  <div class="modal-overlay hidden" id="createTemplateModal">
+    <div class="modal-card" style="width:540px">
+      <h2 data-i18n>Novi šablon</h2>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <label style="font-size:13px;font-weight:500">
+          <span data-i18n>Naziv šablona</span>
+          <input type="text" class="form-input" id="tplName" placeholder="npr. Tužba za naknadu štete" data-i18n-placeholder>
+        </label>
+        <label style="font-size:13px;font-weight:500">
+          <span data-i18n>Tip dokumenta</span>
+          <select class="form-select" id="tplDocType">
+            <option value="tuzba" data-i18n>Tužba</option>
+            <option value="ugovor" data-i18n>Ugovor</option>
+            <option value="resenje" data-i18n>Rešenje</option>
+            <option value="punomocje" data-i18n>Punomoćje</option>
+            <option value="dopis" data-i18n>Dopis</option>
+            <option value="ostalo" data-i18n>Ostalo</option>
+          </select>
+        </label>
+        <label style="font-size:13px;font-weight:500">
+          <span data-i18n>Popunjen primer dokumenta (PDF ili DOCX)</span>
+          <div style="border:2px dashed var(--accent-dim);border-radius:10px;padding:24px;text-align:center;margin-top:8px;cursor:pointer;transition:border-color .2s" id="tplDropZone">
+            <i class="fa-solid fa-cloud-arrow-up" style="font-size:28px;color:var(--accent);margin-bottom:8px;display:block"></i>
+            <div style="font-size:13px;color:var(--text-muted)" data-i18n>Prevucite PDF ili DOCX fajl ovde, ili kliknite da izaberete</div>
+            <div id="tplFileName" style="font-size:12px;color:var(--accent);margin-top:8px;display:none"></div>
+            <input type="file" id="tplFileInput" accept=".pdf,.docx,.doc,.txt" style="display:none">
+          </div>
+        </label>
+        <div style="text-align:center;font-size:11px;color:var(--text-muted);margin:8px 0" data-i18n>— ili —</div>
+        <label style="font-size:13px;font-weight:500">
+          <span data-i18n>Nalepite tekst dokumenta</span>
+          <textarea class="form-textarea" id="tplExampleText" rows="6" placeholder="Opciono: nalepite tekst ako nemate fajl..." data-i18n-placeholder></textarea>
+        </label>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.5">
+          <i class="fa-solid fa-info-circle"></i> <span data-i18n>Priložite popunjen primer dokumenta. AI će analizirati sadržaj i automatski kreirati šablon sa svim promenljivim poljima.</span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-danger" id="btnCancelTemplate" data-i18n>Otkaži</button>
+        <button class="btn-primary" id="btnCreateTemplate"><i class="fa-solid fa-plus"></i> <span data-i18n>Kreiraj šablon</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: Corpus Browser -->
+  <div class="page" id="pageCorpus">
+    <div class="page-header">
+      <h1 data-i18n>Baza propisa</h1>
+      <div class="subtitle" data-i18n>Pregledajte strukturiranu bazu srpskih propisa sa člancima i kros-referencama</div>
+    </div>
+    <div class="page-content">
+      <!-- Corpus stats summary -->
+      <div id="corpusSummary" class="settings-section" style="margin-bottom:16px"></div>
+
+      <!-- Search/filter bar -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center">
+        <input type="text" class="form-input" id="corpusSearch" placeholder="Pretraži zakone..." style="flex:1;margin:0" data-i18n-placeholder>
+        <select class="form-select" id="corpusTypeFilter" style="width:160px;margin:0">
+          <option value="" data-i18n>Svi tipovi</option>
+          <option value="zakon" data-i18n>Zakon</option>
+          <option value="zakonik" data-i18n>Zakonik</option>
+          <option value="uredba" data-i18n>Uredba</option>
+          <option value="pravilnik" data-i18n>Pravilnik</option>
+          <option value="odluka" data-i18n>Odluka</option>
+          <option value="kolektivni_ugovor" data-i18n>Kolektivni ugovor</option>
+        </select>
+      </div>
+
+      <!-- Law list -->
+      <div id="corpusLawList"></div>
+
+      <!-- Article detail panel (hidden by default) -->
+      <div id="corpusArticleDetail" style="display:none">
+        <button class="btn-secondary" id="btnBackToLaws" style="margin-bottom:12px"><i class="fa-solid fa-arrow-left"></i> <span data-i18n>Nazad na listu</span></button>
+        <div id="articleDetailContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: External AI -->
+  <div class="page" id="pageExternal">
+    <div class="page-header">
+      <h1 data-i18n>Spoljni AI</h1>
+      <div class="subtitle" data-i18n>Koristite eksterne AI modele sa automatskom anonimizacijom osetljivih podataka.</div>
+    </div>
+    <div class="page-content">
+      <!-- Provider selector -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px" id="providerCards">
+        <div class="provider-card" data-provider="openai" style="background:var(--bg-card);border:2px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;cursor:pointer;transition:all 0.2s cubic-bezier(0.4,0,0.2,1)">
+          <i class="fa-solid fa-robot" style="font-size:24px;color:var(--text-muted);margin-bottom:8px;display:block"></i>
+          <div style="font-size:13px;font-weight:600">OpenAI GPT</div>
+        </div>
+        <div class="provider-card" data-provider="anthropic" style="background:var(--bg-card);border:2px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;cursor:pointer;transition:all 0.2s cubic-bezier(0.4,0,0.2,1)">
+          <i class="fa-solid fa-brain" style="font-size:24px;color:var(--text-muted);margin-bottom:8px;display:block"></i>
+          <div style="font-size:13px;font-weight:600">Anthropic Claude</div>
+        </div>
+        <div class="provider-card" data-provider="google" style="background:var(--bg-card);border:2px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;cursor:pointer;transition:all 0.2s cubic-bezier(0.4,0,0.2,1)">
+          <i class="fa-solid fa-gem" style="font-size:24px;color:var(--text-muted);margin-bottom:8px;display:block"></i>
+          <div style="font-size:13px;font-weight:600">Google Gemini</div>
+        </div>
+        <div class="provider-card" data-provider="xai" style="background:var(--bg-card);border:2px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;cursor:pointer;transition:all 0.2s cubic-bezier(0.4,0,0.2,1)">
+          <i class="fa-solid fa-bolt" style="font-size:24px;color:var(--text-muted);margin-bottom:8px;display:block"></i>
+          <div style="font-size:13px;font-weight:600">xAI Grok</div>
+        </div>
+      </div>
+
+      <!-- API key -->
+      <div class="settings-section" style="margin-bottom:16px">
+        <h3 data-i18n>API ključ</h3>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="password" class="form-input" id="extApiKey" placeholder="Unesite API ključ za izabranog provajdera..." style="flex:1;margin:0" data-i18n-placeholder>
+          <button class="btn-primary" id="btnSaveApiKey" data-i18n>Sačuvaj</button>
+        </div>
+      </div>
+
+      <!-- Model selector -->
+      <div class="settings-section" style="margin-bottom:16px">
+        <h3 data-i18n>Model</h3>
+        <select class="form-select" id="extModelSelect">
+          <option value="" data-i18n>-- Izaberite provajdera --</option>
+        </select>
+      </div>
+
+      <!-- Prompt -->
+      <div class="settings-section" style="margin-bottom:16px">
+        <h3 data-i18n>Prompt</h3>
+        <textarea class="form-textarea" id="extPrompt" rows="6" placeholder="Unesite vaš prompt ovde..." data-i18n-placeholder></textarea>
+      </div>
+
+      <!-- Anonymization names -->
+      <div class="settings-section" style="margin-bottom:16px">
+        <h3 data-i18n>Imena za anonimizaciju</h3>
+        <input type="text" class="form-input" id="extNamesToHide" placeholder="Petar Petrović, Firma DOO, Beograd... (razdvojeno zarezima)" style="margin:0" data-i18n-placeholder>
+        <label class="form-check" style="margin-top:8px">
+          <input type="checkbox" id="extAnonymize" checked> <span data-i18n>Anonimizuj prompt</span>
+        </label>
+      </div>
+
+      <!-- Action buttons -->
+      <div style="display:flex;gap:10px;margin-bottom:20px">
+        <button class="btn-secondary" id="btnPreviewAnon"><i class="fa-solid fa-eye"></i> <span data-i18n>Pregled anonimizacije</span></button>
+        <button class="btn-primary" id="btnExtSend"><i class="fa-solid fa-paper-plane"></i> <span data-i18n>Pošalji</span></button>
+      </div>
+
+      <!-- Anonymization preview -->
+      <div id="anonPreview" style="display:none;margin-bottom:20px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase" data-i18n>Original</div>
+            <div id="anonOriginal" style="background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius);padding:12px;font-size:13px;line-height:1.6;white-space:pre-wrap;max-height:300px;overflow-y:auto"></div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase" data-i18n>Anonimizovano</div>
+            <div id="anonAnonymized" style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.2);border-radius:var(--radius);padding:12px;font-size:13px;line-height:1.6;white-space:pre-wrap;max-height:300px;overflow-y:auto"></div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:8px" id="anonReplacementCount"></div>
+      </div>
+
+      <!-- Response area -->
+      <div id="extResponse" style="display:none">
+        <div class="settings-section">
+          <h3 data-i18n>Odgovor</h3>
+          <div id="extDeanonNote" style="display:none;font-size:11px;color:var(--success);margin-bottom:8px;padding:6px 10px;background:rgba(16,185,129,0.08);border-radius:var(--radius)">
+            <i class="fa-solid fa-shield-check"></i> <span data-i18n>Odgovor deanonimizovan — originalni podaci restaurirani</span>
+          </div>
+          <div id="extAnswerText" style="font-size:14px;line-height:1.65;white-space:pre-wrap"></div>
+          <div id="extAnswerMeta" style="margin-top:12px;font-size:11px;color:var(--text-dim)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── State ───────────────────────────────────────────────────────────────────
+const state = {
+  chatId: null,
+  chats: [],
+  currentPage: 'chat',
+  streaming: false,
+  lang: localStorage.getItem('lexardor_lang') || localStorage.getItem('lexardor_script') || 'lat',
+  theme: localStorage.getItem('lexardor_theme') || 'light',
+  appInfo: {},
+  corpusStats: {},
+  models: [],
+};
+
+// ── DOM refs ────────────────────────────────────────────────────────────────
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
+const chatList = $('#chatList');
+const messages = $('#messages');
+const welcomeScreen = $('#welcomeScreen');
+const inputText = $('#inputText');
+const btnSend = $('#btnSend');
+const btnNewChat = $('#btnNewChat');
+const heavyCheck = $('#heavyCheck');
+const statusDot = $('#statusDot');
+const statusText = $('#statusText');
+const toasts = $('#toasts');
+const uploadModal = $('#uploadModal');
+const sidebar = $('#sidebar');
+
+// ── Cyrillic transliteration ────────────────────────────────────────────────
+const latToCirMap = {
+  'Lj':'\u0409','Nj':'\u040A','D\u017e':'\u040F',
+  'lj':'\u0459','nj':'\u045A','d\u017e':'\u045F',
+  'A':'\u0410','B':'\u0411','V':'\u0412','G':'\u0413','D':'\u0414',
+  '\u0110':'\u0402','E':'\u0415','\u017d':'\u0416','Z':'\u0417','I':'\u0418',
+  'J':'\u0408','K':'\u041A','L':'\u041B','M':'\u041C','N':'\u041D',
+  'O':'\u041E','P':'\u041F','R':'\u0420','S':'\u0421','T':'\u0422',
+  '\u0106':'\u040B','U':'\u0423','F':'\u0424','H':'\u0425','C':'\u0426',
+  '\u010c':'\u0427','\u0160':'\u0428',
+  'a':'\u0430','b':'\u0431','v':'\u0432','g':'\u0433','d':'\u0434',
+  '\u0111':'\u0452','e':'\u0435','\u017e':'\u0436','z':'\u0437','i':'\u0438',
+  'j':'\u0458','k':'\u043A','l':'\u043B','m':'\u043C','n':'\u043D',
+  'o':'\u043E','p':'\u043F','r':'\u0440','s':'\u0441','t':'\u0442',
+  '\u0107':'\u045B','u':'\u0443','f':'\u0444','h':'\u0445','c':'\u0446',
+  '\u010d':'\u0447','\u0161':'\u0448',
+};
+
+function toCyrillic(text) {
+  let result = '';
+  let i = 0;
+  while (i < text.length) {
+    if (i + 1 < text.length) {
+      const di = text.substring(i, i + 2);
+      if (latToCirMap[di]) { result += latToCirMap[di]; i += 2; continue; }
+    }
+    const ch = text[i];
+    result += latToCirMap[ch] || ch;
+    i++;
+  }
+  return result;
+}
+
+// ── English translations ───────────────────────────────────────────────────
+const EN = {
+  // Sidebar / Navigation
+  'AI pravni asistent': 'AI Legal Assistant',
+  '+ Nova konverzacija': '+ New Conversation',
+  'Razgovor': 'Chat',
+  'Moji dokumenti': 'My Documents',
+  '\u0160abloni': 'Templates',
+  'Pode\u0161avanja': 'Settings',
+  'Pomo\u0107 i podr\u0161ka': 'Help & Support',
+  'Spoljni AI': 'External AI',
+  'Provera...': 'Checking...',
+  '-- \u010dlanaka': '-- articles',
+  'Lokalno \u2022 Bezbedno': 'Local \u2022 Secure',
+
+  // Chat page
+  'Postavite pitanje o srpskom pravu': 'Ask a question about Serbian law',
+  'Pretra\u017eite bazu od preko 79.000 pravnih \u010dlanaka. Postavljajte pitanja o zakonima, uredbama i pravilnicima Republike Srbije.': 'Search a database of over 79,000 legal articles. Ask questions about laws, regulations, and rules of the Republic of Serbia.',
+  'Koji su uslovi za otkaz ugovora o radu?': 'What are the conditions for terminating an employment contract?',
+  'Koja je kazna za kra\u0111u prema Krivi\u010dnom zakoniku?': 'What is the penalty for theft under the Criminal Code?',
+  'Koliko traje probni rad po Zakonu o radu?': 'How long is the probation period under the Labor Law?',
+  '\u0160ta reguli\u0161e Zakon o za\u0161titi potro\u0161a\u010da?': 'What does the Consumer Protection Law regulate?',
+  'Po\u0161alji': 'Send',
+  'Dublja analiza': 'Deep analysis',
+  'Balansiran': 'Balanced',
+  'Za građane': 'For Citizens',
+  'Stručni': 'Professional',
+  'Citati': 'Citations',
+  'Povezan': 'Related',
+  'Zakonik': 'Legal Code',
+  'Uredba': 'Decree',
+  'Pravilnik': 'Regulation',
+  'Odluka': 'Decision',
+  'Kolektivni ugovor': 'Collective Agreement',
+  'Ustav': 'Constitution',
+  'LexArdor je AI asistent. Odgovori zahtevaju proveru od strane kvalifikovanog advokata.': 'LexArdor is an AI assistant. Answers require verification by a qualified lawyer.',
+
+  // Confidence
+  'Visoka pouzdanost': 'High confidence',
+  'Srednja pouzdanost': 'Medium confidence',
+  'Niska pouzdanost': 'Low confidence',
+
+  // Documents page
+  'Upravljajte svojim pravnim dokumentima koje LexArdor koristi prilikom analize.': 'Manage your legal documents that LexArdor uses during analysis.',
+  'Dodaj dokument': 'Add Document',
+  'Ovi dokumenti su dostupni samo vama. LexArdor ih koristi zajedno sa bazom propisa za preciznije odgovore.': 'These documents are only available to you. LexArdor uses them alongside the legal database for more precise answers.',
+  'Nemate dokumenata. Dodajte ugovore, presude ili druge dokumente.': 'No documents yet. Add contracts, court decisions, or other documents.',
+  'Dodaj zakon u bazu propisa': 'Add law to legal database',
+  'Nedostaje zakon u bazi? Prilo\u017eite PDF ili DOCX tekst zakona i LexArdor \u0107e ga dodati u svoju bazu propisa. AI \u0107e automatski prepoznati \u010dlanove (\u010clan 1, \u010clan 2...) i koristiti ih za odgovore.': 'Missing a law in the database? Attach a PDF or DOCX of the law text and LexArdor will add it to its legal database. The AI will automatically recognize articles (Article 1, Article 2...) and use them for answers.',
+  'Naziv zakona': 'Law name',
+  'Slu\u017ebeni glasnik (opciono)': 'Official Gazette (optional)',
+  'Prevucite PDF ili DOCX fajl zakona ovde, ili kliknite': 'Drag a PDF or DOCX law file here, or click',
+  '\u2014 ili nalepite tekst zakona \u2014': '\u2014 or paste law text \u2014',
+  'Dodaj zakon u bazu': 'Add law to database',
+  'Naslov': 'Title',
+  'Kategorija': 'Category',
+  'Sadr\u017eaj dokumenta': 'Document content',
+  'Otka\u017ei': 'Cancel',
+  'Sa\u010duvaj': 'Save',
+  'Ugovor': 'Contract',
+  'Presuda': 'Court Decision',
+  'Tu\u017eba': 'Lawsuit',
+  'Re\u0161enje': 'Resolution',
+  'Dopis': 'Letter',
+  'Ostalo': 'Other',
+  'Punomo\u0107je': 'Power of Attorney',
+
+  // Templates page
+  '\u0160abloni dokumenata': 'Document Templates',
+  'Kreirajte \u0161ablone i br\u017ee popunjavajte dokumente': 'Create templates and fill out documents faster',
+  'Novi \u0161ablon': 'New Template',
+  'Nemate \u0161ablona. Kreirajte prvi \u0161ablon iz primera dokumenta.': 'No templates yet. Create your first template from a sample document.',
+  'Nazad na \u0161ablone': 'Back to templates',
+  'AI popuni iz opisa': 'AI fill from description',
+  'Popuni polja': 'Fill fields',
+  'Polja dokumenta': 'Document fields',
+  'Pregled dokumenta': 'Document preview',
+  'Popunite polja da vidite pregled...': 'Fill in the fields to see a preview...',
+  'Validacija': 'Validation',
+  'Proveri dokument': 'Check document',
+  'Izvoz': 'Export',
+  'Originalno': 'Original',
+  '\u0106irilica': 'Cyrillic',
+  'Latinica': 'Latin',
+  'Sa\u010duvaj nacrt': 'Save draft',
+  'Izvezi PDF': 'Export PDF',
+  'Izvezi DOCX': 'Export DOCX',
+  'Naziv \u0161ablona': 'Template name',
+  'Tip dokumenta': 'Document type',
+  'Popunjen primer dokumenta (PDF ili DOCX)': 'Filled sample document (PDF or DOCX)',
+  'Prevucite PDF ili DOCX fajl ovde, ili kliknite da izaberete': 'Drag a PDF or DOCX file here, or click to select',
+  '\u2014 ili \u2014': '\u2014 or \u2014',
+  'Nalepite tekst dokumenta': 'Paste document text',
+  'Prilo\u017eite popunjen primer dokumenta. AI \u0107e analizirati sadr\u017eaj i automatski kreirati \u0161ablon sa svim promenljivim poljima.': 'Attach a filled sample document. The AI will analyze the content and automatically create a template with all variable fields.',
+  'Kreiraj \u0161ablon': 'Create Template',
+  'Popuni': 'Fill',
+  'Obri\u0161i': 'Delete',
+  'Ovaj \u0161ablon nema definisana polja.': 'This template has no defined fields.',
+
+  // Settings page
+  'Jezik': 'Language',
+  'AI informacije': 'AI Information',
+  'Modeli': 'Models',
+  'Status': 'Status',
+  'Korpus': 'Corpus',
+  'Pravni \u010dlanci': 'Legal articles',
+  'Korisni\u010dki dokumenti': 'User documents',
+  'Poslednje a\u017euriranje': 'Last update',
+  'Aplikacija': 'Application',
+  'Verzija': 'Version',
+  'Licenca': 'License',
+  'ID instalacije': 'Installation ID',
+
+  // Help page
+  'Kako da postavim pitanje?': 'How do I ask a question?',
+  'Unesite va\u0161e pravno pitanje u polje za tekst na stranici Razgovor i kliknite Po\u0161alji. LexArdor pretra\u017euje bazu srpskih propisa i daje odgovor sa izvorima. Za detaljniju analizu, ozna\u010dite opciju "Dublja analiza".': 'Enter your legal question in the text field on the Chat page and click Send. LexArdor searches the Serbian legal database and provides an answer with sources. For a more detailed analysis, check the "Deep analysis" option.',
+  '\u0160ta zna\u010di pouzdanost odgovora?': 'What does answer confidence mean?',
+  'Pouzdanost pokazuje koliko je AI siguran u ta\u010dnost odgovora. Visoka pouzdanost zna\u010di da su prona\u0111eni relevantni \u010dlanci zakona. Srednja pouzdanost ukazuje na delimi\u010dno poklapanje. Niska pouzdanost zna\u010di da je pitanje izvan opsega baze ili je odgovor nesiguran.': 'Confidence shows how sure the AI is about the accuracy of the answer. High confidence means relevant law articles were found. Medium confidence indicates partial matching. Low confidence means the question is outside the database scope or the answer is uncertain.',
+  'Kako da dodam svoj dokument?': 'How do I add my own document?',
+  'Idite na stranicu "Moji dokumenti" u navigaciji i kliknite "Dodaj dokument". Unesite naslov, izaberite kategoriju i zalepite tekst dokumenta. LexArdor \u0107e ga koristiti zajedno sa bazom propisa prilikom analize va\u0161ih pitanja.': 'Go to the "My Documents" page in the navigation and click "Add Document". Enter a title, select a category, and paste the document text. LexArdor will use it alongside the legal database when analyzing your questions.',
+  'Da li su moji podaci bezbedni?': 'Is my data safe?',
+  'Da. Svi podaci se \u010duvaju lokalno na va\u0161em serveru. Dokumenti koje dodate su dostupni samo vama. Komunikacija sa AI modelom se odvija unutar va\u0161e lokalne mre\u017ee, bez slanja podataka eksternim servisima.': 'Yes. All data is stored locally on your server. Documents you add are only available to you. Communication with the AI model takes place within your local network, without sending data to external services.',
+  'Koliko su odgovori ta\u010dni?': 'How accurate are the answers?',
+  'LexArdor koristi RAG tehnologiju (Retrieval-Augmented Generation) za pretragu relevantnih \u010dlanaka zakona. Odgovori su informativnog karaktera i uvek zahtevaju proveru od strane kvalifikovanog advokata. Sistem navodi izvore za svaki odgovor radi verifikacije.': 'LexArdor uses RAG technology (Retrieval-Augmented Generation) to search for relevant law articles. Answers are informational and always require verification by a qualified lawyer. The system cites sources for each answer for verification.',
+  'Prijavite problem': 'Report a Problem',
+  'Tip prijave': 'Report type',
+  'Gre\u0161ka u aplikaciji': 'Application bug',
+  'Neta\u010dan odgovor': 'Incorrect answer',
+  'Predlog pobolj\u0161anja': 'Feature request',
+  'Opis problema': 'Problem description',
+  'Prilo\u017ei poslednju konverzaciju': 'Attach last conversation',
+  'Po\u0161alji prijavu': 'Send report',
+  'Prethodne prijave': 'Previous reports',
+  'Nema prethodnih prijava.': 'No previous reports.',
+  'Kontakt': 'Contact',
+
+  // External AI page
+  'Koristite eksterne AI modele sa automatskom anonimizacijom osetljivih podataka.': 'Use external AI models with automatic anonymization of sensitive data.',
+  'API klju\u010d': 'API Key',
+  'Model': 'Model',
+  'Prompt': 'Prompt',
+  'Imena za anonimizaciju': 'Names to anonymize',
+  'Anonimizuj prompt': 'Anonymize prompt',
+  'Pregled anonimizacije': 'Anonymization preview',
+  'Original': 'Original',
+  'Anonimizovano': 'Anonymized',
+  'Odgovor': 'Response',
+  'Odgovor deanonimizovan \u2014 originalni podaci restaurirani': 'Response de-anonymized \u2014 original data restored',
+
+  // Dynamic JS strings
+  'AI aktivan': 'AI active',
+  'API aktivan': 'API active',
+  'Ollama offline': 'Ollama offline',
+  'Offline': 'Offline',
+  'Nova konverzacija': 'New conversation',
+  'Dokument obrisan': 'Document deleted',
+  'Unesite naslov i sadr\u017eaj dokumenta': 'Enter document title and content',
+  'Dokument sa\u010duvan': 'Document saved',
+  'Gre\u0161ka pri komunikaciji sa serverom': 'Error communicating with server',
+  'Unesite naziv zakona': 'Enter the law name',
+  'Prilo\u017eite dokument ili nalepite tekst zakona': 'Attach a document or paste law text',
+  'Obra\u0111ujem zakon...': 'Processing law...',
+  '\u010dlanaka zakona dodato u bazu': 'law articles added to database',
+  'Aktivan': 'Active',
+  'Nedostupan': 'Unavailable',
+  'Prijava poslata': 'Report sent',
+  'Unesite opis problema': 'Enter problem description',
+  '\u0160ablon kreiran sa': 'Template created with',
+  'polja': 'fields',
+  'Prilo\u017eite dokument (PDF/DOCX) ili unesite tekst': 'Attach a document (PDF/DOCX) or enter text',
+  'Da li ste sigurni da \u017eelite da obri\u0161ete ovaj \u0161ablon?': 'Are you sure you want to delete this template?',
+  '\u0160ablon obrisan': 'Template deleted',
+  'U\u010ditavanje...': 'Loading...',
+  'Popunjavanje: ': 'Filling: ',
+  'Gre\u0161ka pri u\u010ditavanju \u0161ablona.': 'Error loading template.',
+  'AI analizira dokument...': 'AI is analyzing the document...',
+  'Gre\u0161ka pri kreiranju \u0161ablona': 'Error creating template',
+  'Provera u toku...': 'Validation in progress...',
+  'Dokument je validan.': 'Document is valid.',
+  'Nacrt sa\u010duvan': 'Draft saved',
+  'Gre\u0161ka pri \u010duvanju nacrta': 'Error saving draft',
+  'izvezen': 'exported',
+  'Gre\u0161ka pri izvozu': 'Export error',
+  'Polja popunjena iz opisa': 'Fields filled from description',
+  'Unesite opis za automatsko popunjavanje': 'Enter a description for auto-fill',
+  'Gre\u0161ka pri automatskom popunjavanju': 'Error during auto-fill',
+  'Popunjavanje...': 'Filling...',
+  'Pregled nije dostupan.': 'Preview not available.',
+  'Unesite naziv \u0161ablona': 'Enter template name',
+  'Izaberite provajdera': 'Select a provider',
+  'API klju\u010d sa\u010duvan': 'API key saved',
+  'API klju\u010d obrisan': 'API key deleted',
+  'Unesite prompt': 'Enter a prompt',
+  'Unesite API klju\u010d': 'Enter API key',
+  'Nema odgovora.': 'No response.',
+  'Slanje...': 'Sending...',
+  'Gre\u0161ka pri u\u010ditavanju dokumenata.': 'Error loading documents.',
+  'Gre\u0161ka pri u\u010ditavanju \u0161ablona.': 'Error loading templates.',
+  'Nema dostupnih modela': 'No models available',
+  'A\u017eurirano: ': 'Updated: ',
+  'delova': 'chunks',
+  '\u010dlanaka': 'articles',
+  'Va\u0161 dokument': 'Your document',
+  'Zakon': 'Law',
+  'Prika\u017ei ceo \u010dlan': 'Show full article',
+  'Sakrij ceo \u010dlan': 'Hide full article',
+  'Sakrij izvore': 'Hide sources',
+  'Izvori': 'Sources',
+  'Proveri online': 'Check online',
+  'Gre\u0161ka': 'Error',
+  '\u010clan': 'Article',
+  'Gre\u0161ka pri validaciji': 'Validation error',
+
+  'Tamni re\u017eim': 'Dark mode',
+  'Svetli re\u017eim': 'Light mode',
+
+  // Placeholders
+  'Postavite pravno pitanje...': 'Ask a legal question...',
+  'Naziv dokumenta': 'Document name',
+  'Unesite ili zalepite tekst dokumenta ovde...': 'Enter or paste document text here...',
+  'Opi\u0161ite problem ili predlog...': 'Describe the problem or suggestion...',
+  'npr. Tu\u017eba za naknadu \u0161tete': 'e.g. Lawsuit for damages',
+  'Opciono: nalepite tekst ako nemate fajl...': 'Optional: paste text if you don\'t have a file...',
+  'Opi\u0161ite situaciju slobodnim tekstom...': 'Describe the situation in free text...',
+  'npr. Zakon o porezu na dobit pravnih lica': 'e.g. Law on Corporate Profit Tax',
+  'npr. Sl. glasnik RS, br. 25/2001': 'e.g. Official Gazette RS, No. 25/2001',
+  'Nalepite tekst zakona sa \u010dlanovima (\u010clan 1., \u010clan 2. itd.)': 'Paste law text with articles (Article 1, Article 2, etc.)',
+  'Unesite API klju\u010d za izabranog provajdera...': 'Enter API key for selected provider...',
+  '-- Izaberite provajdera --': '-- Select provider --',
+  'Unesite va\u0161 prompt ovde...': 'Enter your prompt here...',
+  'Petar Petrovi\u0107, Firma DOO, Beograd... (razdvojeno zarezima)': 'John Doe, Company LLC, Belgrade... (comma separated)',
+
+  // Corpus Browser
+  'Baza propisa': 'Legal Database',
+  'Pregledajte strukturiranu bazu srpskih propisa sa \u010dlancima i kros-referencama': 'Browse the structured database of Serbian regulations with articles and cross-references',
+  'Statistika korpusa': 'Corpus Statistics',
+  'Dokumenata': 'Documents',
+  '\u010clanaka': 'Articles',
+  'Kros-referenci': 'Cross-references',
+  'Verzija': 'Versions',
+  'Svi tipovi': 'All types',
+  'Zakonik': 'Code',
+  'Uredba': 'Decree',
+  'Pravilnik': 'Regulation',
+  'Odluka': 'Decision',
+  'Kolektivni ugovor': 'Collective agreement',
+  'Pretra\u017ei zakone...': 'Search laws...',
+  'Nema rezultata.': 'No results.',
+  'Prikazano': 'Showing',
+  'od': 'of',
+  'Tip': 'Type',
+  'Nivo autoriteta': 'Authority Level',
+  'Va\u017ei od': 'Valid From',
+  'stavova': 'paragraphs',
+  'ta\u010daka': 'points',
+  'Stavovi i ta\u010dke': 'Paragraphs and Points',
+  'Stav': 'Paragraph',
+  'Ta\u010dka': 'Point',
+  'Referi\u0161e na': 'References',
+  'Referisano od': 'Referenced by',
+  'Nazad na listu': 'Back to list',
+  'Gre\u0161ka pri u\u010ditavanju.': 'Error loading.',
+  'U\u010ditavanje...': 'Loading...',
+  '\u010clan': 'Article',
+  'dokumenata': 'documents',
+  'kros-referenci': 'cross-references',
+
+};
+
+// ── Translation function ──────────────────────────────────────────────────
+function t(srLatinText) {
+  if (state.lang === 'lat') return srLatinText;
+  if (state.lang === 'cir') return toCyrillic(srLatinText);
+  if (state.lang === 'en') return EN[srLatinText] || srLatinText;
+  return srLatinText;
+}
+
+function applyLang() {
+  // Translate text content
+  $$('[data-i18n]').forEach(el => {
+    if (!el.dataset.origText) el.dataset.origText = el.textContent;
+    const orig = el.dataset.origText;
+    if (state.lang === 'lat') el.textContent = orig;
+    else if (state.lang === 'cir') el.textContent = toCyrillic(orig);
+    else if (state.lang === 'en') el.textContent = EN[orig] || orig;
+  });
+  // Translate placeholders
+  $$('[data-i18n-placeholder]').forEach(el => {
+    if (!el.dataset.origPlaceholder) el.dataset.origPlaceholder = el.placeholder;
+    const orig = el.dataset.origPlaceholder;
+    if (state.lang === 'lat') el.placeholder = orig;
+    else if (state.lang === 'cir') el.placeholder = toCyrillic(orig);
+    else if (state.lang === 'en') el.placeholder = EN[orig] || orig;
+  });
+  // Toggle buttons
+  const btnLat = $('#btnLatSettings');
+  const btnCir = $('#btnCirSettings');
+  const btnEn = $('#btnEnSettings');
+  if (btnLat) btnLat.classList.toggle('active', state.lang === 'lat');
+  if (btnCir) btnCir.classList.toggle('active', state.lang === 'cir');
+  if (btnEn) btnEn.classList.toggle('active', state.lang === 'en');
+  // Update document title
+  document.title = 'LexArdor \u2014 ' + t('AI pravni asistent');
+}
+
+// ── Theme toggle ───────────────────────────────────────────────────────────
+function applyTheme() {
+  document.documentElement.dataset.theme = state.theme;
+  const icon = $('#themeIcon');
+  if (icon) {
+    icon.className = state.theme === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+  }
+  const btn = $('#btnThemeToggle');
+  if (btn) {
+    btn.title = state.theme === 'dark' ? t('Svetli re\u017eim') : t('Tamni re\u017eim');
+  }
+}
+
+// Apply theme immediately before DOM is fully ready
+applyTheme();
+
+$('#btnThemeToggle').addEventListener('click', () => {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('lexardor_theme', state.theme);
+  applyTheme();
+});
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+function showToast(msg, type = 'error', duration = 4000) {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  toasts.appendChild(el);
+  setTimeout(() => el.remove(), duration);
+}
+
+async function apiFetch(url, opts = {}) {
+  try {
+    const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+    const res = await fetch(url, { ...opts, headers });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.detail || `HTTP ${res.status}`);
+    }
+    return res;
+  } catch (e) {
+    showToast(e.message);
+    throw e;
+  }
+}
+
+function formatDate(d) {
+  if (!d) return '';
+  const dt = new Date(d);
+  return dt.toLocaleDateString('sr-Latn', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function formatDateShort(d) {
+  if (!d) return '';
+  const dt = new Date(d);
+  return dt.toLocaleDateString('sr-Latn', { day: 'numeric', month: 'short' });
+}
+
+function escapeHtml(s) {
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+function renderMarkdown(text) {
+  let html = escapeHtml(text);
+  html = html.replace(/```([\s\S]*?)```/g, '<pre>$1</pre>');
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+  html = html.replace(/^### (.+)$/gm, '<h4>$1</h4>');
+  html = html.replace(/^## (.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^# (.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^---$/gm, '<hr>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+  html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+  html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+  html = html.replace(/\n\n/g, '</p><p>');
+  html = html.replace(/\n/g, '<br>');
+  return `<p>${html}</p>`;
+}
+
+function scrollToBottom() {
+  requestAnimationFrame(() => { messages.scrollTop = messages.scrollHeight; });
+}
+
+// ── Navigation ──────────────────────────────────────────────────────────────
+function navigateTo(page) {
+  state.currentPage = page;
+  // Update nav items
+  $$('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === page));
+  // Show/hide pages
+  const pageMap = {
+    chat: '#pageChatContainer',
+    documents: '#pageDocuments',
+    templates: '#pageTemplates',
+    corpus: '#pageCorpus',
+    settings: '#pageSettings',
+    help: '#pageHelp',
+    external: '#pageExternal',
+  };
+  $$('.page').forEach(p => p.classList.remove('active'));
+  const target = $(pageMap[page]);
+  if (target) target.classList.add('active');
+
+  // Load page data
+  if (page === 'documents') loadDocuments();
+  if (page === 'templates') loadTemplates();
+  if (page === 'settings') loadSettings();
+  if (page === 'help') loadReports();
+  if (page === 'external') loadExternalProviders();
+  if (page === 'corpus') loadCorpus();
+
+  // Close sidebar on mobile
+  sidebar.classList.remove('open');
+}
+
+$$('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => navigateTo(btn.dataset.page));
+});
+
+// Sidebar toggle
+$('#sidebarToggle').addEventListener('click', () => sidebar.classList.toggle('open'));
+
+// ── Auto-grow textarea ──────────────────────────────────────────────────────
+inputText.addEventListener('input', () => {
+  inputText.style.height = 'auto';
+  inputText.style.height = Math.min(inputText.scrollHeight, 160) + 'px';
+});
+
+// ── Chat list ───────────────────────────────────────────────────────────────
+async function loadChats() {
+  try {
+    const res = await apiFetch('/api/chats');
+    state.chats = await res.json();
+    renderChatList();
+  } catch {}
+}
+
+function renderChatList() {
+  chatList.innerHTML = '';
+  state.chats.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'chat-item' + (c.id === state.chatId ? ' active' : '');
+    el.innerHTML = `
+      <div class="chat-title">${escapeHtml(c.title || t('Nova konverzacija'))}</div>
+      <div class="chat-date">${formatDateShort(c.created_at)}</div>
+      <button class="chat-delete" title="${t('Obri\u0161i')}">&times;</button>
+    `;
+    el.addEventListener('click', (e) => {
+      if (e.target.classList.contains('chat-delete')) return;
+      navigateTo('chat');
+      loadChat(c.id);
+    });
+    el.querySelector('.chat-delete').addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteChat(c.id);
+    });
+    chatList.appendChild(el);
+  });
+}
+
+async function loadChat(chatId) {
+  state.chatId = chatId;
+  renderChatList();
+  welcomeScreen.style.display = 'none';
+  // Clear all except welcome
+  const msgs = messages.querySelectorAll('.msg');
+  msgs.forEach(m => m.remove());
+
+  try {
+    const res = await apiFetch(`/api/chats/${chatId}/messages`);
+    const data = await res.json();
+    data.forEach(m => {
+      if (m.role === 'user') {
+        appendUserMessage(m.content);
+      } else {
+        let sources = m.sources;
+        if (typeof sources === 'string') {
+          try { sources = JSON.parse(sources); } catch { sources = []; }
+        }
+        appendAssistantMessage(m.content, sources || [], m.confidence || 'medium', null);
+      }
+    });
+    scrollToBottom();
+  } catch {}
+}
+
+async function deleteChat(chatId) {
+  try {
+    await apiFetch(`/api/chats/${chatId}`, { method: 'DELETE' });
+    if (state.chatId === chatId) {
+      state.chatId = null;
+      const msgs = messages.querySelectorAll('.msg');
+      msgs.forEach(m => m.remove());
+      welcomeScreen.style.display = '';
+    }
+    await loadChats();
+  } catch {}
+}
+
+// ── New chat ────────────────────────────────────────────────────────────────
+btnNewChat.addEventListener('click', () => {
+  state.chatId = null;
+  renderChatList();
+  const msgs = messages.querySelectorAll('.msg');
+  msgs.forEach(m => m.remove());
+  welcomeScreen.style.display = '';
+  navigateTo('chat');
+  inputText.focus();
+});
+
+// ── Example queries ─────────────────────────────────────────────────────────
+$$('.example-query').forEach(btn => {
+  btn.addEventListener('click', () => {
+    inputText.value = btn.dataset.origText || btn.textContent;
+    inputText.focus();
+    sendMessage();
+  });
+});
+
+// ── Render messages ─────────────────────────────────────────────────────────
+function appendUserMessage(text) {
+  const el = document.createElement('div');
+  el.className = 'msg user';
+  el.innerHTML = `<div class="msg-bubble"><div class="msg-text">${renderMarkdown(text)}</div></div>`;
+  messages.appendChild(el);
+}
+
+function buildConfidenceHtml(confidence) {
+  const levels = { high: 5, medium: 3, low: 1 };
+  const filled = levels[confidence] || 3;
+  const confClass = confidence === 'high' ? 'high' : confidence === 'low' ? 'low' : 'medium';
+  const labelMap = { high: t('Visoka pouzdanost'), medium: t('Srednja pouzdanost'), low: t('Niska pouzdanost') };
+  let squares = '';
+  for (let i = 0; i < 5; i++) {
+    squares += `<div class="confidence-sq ${i < filled ? 'filled ' + confClass : ''}"></div>`;
+  }
+  return `
+    <div class="confidence-bar">
+      <div class="confidence-squares">${squares}</div>
+      <span class="confidence-label ${confClass}">${labelMap[confidence] || labelMap.medium}</span>
+    </div>
+  `;
+}
+
+function appendAssistantMessage(text, sources, confidence, citations) {
+  const el = document.createElement('div');
+  el.className = 'msg assistant';
+  const confClass = confidence === 'high' ? 'high' : confidence === 'low' ? 'low' : 'medium';
+
+  // Build citations HTML
+  let citationsHtml = '';
+  if (citations && (citations.verified_count > 0 || citations.flagged_count > 0)) {
+    let citItems = '';
+    if (citations.verified && citations.verified.length) {
+      citItems += citations.verified.map(c =>
+        `<span class="citation-badge verified"><i class="fa-solid fa-check-circle"></i> ${t('Član')} ${escapeHtml(c.article)}</span>`
+      ).join(' ');
+    }
+    if (citations.flagged && citations.flagged.length) {
+      citItems += citations.flagged.map(c =>
+        `<span class="citation-badge flagged" title="${escapeHtml(c.reason || '')}"><i class="fa-solid fa-triangle-exclamation"></i> ${t('Član')} ${escapeHtml(c.article)}</span>`
+      ).join(' ');
+    }
+    citationsHtml = `
+      <div class="citations-bar">
+        <span class="citations-label">${t('Citati')}: </span>
+        ${citItems}
+      </div>
+    `;
+  }
+
+  const docTypeBadges = {
+    'zakon': { label: t('Zakon'), color: 'var(--success)' },
+    'zakonik': { label: t('Zakonik'), color: 'var(--success)' },
+    'uredba': { label: t('Uredba'), color: '#6366f1' },
+    'pravilnik': { label: t('Pravilnik'), color: '#8b5cf6' },
+    'odluka': { label: t('Odluka'), color: '#06b6d4' },
+    'kolektivni_ugovor': { label: t('Kolektivni ugovor'), color: '#f59e0b' },
+    'ustav': { label: t('Ustav'), color: '#ef4444' },
+  };
+
+  let sourcesHtml = '';
+  if (sources && sources.length) {
+    const items = sources.map((s, idx) => {
+      const lawDisplay = s.law || s.law_name || '';
+      let gazetteDisplay = s.gazette || '';
+      const isClientDoc = s.source_collection === 'client_documents' || s.is_client_doc || s.source_type === 'client';
+      gazetteDisplay = gazetteDisplay.replace(/^\(["']?/, '').replace(/["']?\)$/, '').trim();
+      if (gazetteDisplay.length > 80) gazetteDisplay = gazetteDisplay.substring(0, 80) + '...';
+
+      const docType = s.doc_type || '';
+      const dtBadge = docTypeBadges[docType];
+      const badge = isClientDoc
+        ? `<span style="background:var(--accent-glow);color:var(--accent);padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;margin-left:6px">${t('Va\u0161 dokument')}</span>`
+        : (dtBadge ? `<span style="background:${dtBadge.color}15;color:${dtBadge.color};padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;margin-left:6px">${dtBadge.label}</span>` : '');
+
+      const crossRefBadge = s.is_cross_ref
+        ? `<span style="background:rgba(99,102,241,0.1);color:#6366f1;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;margin-left:4px"><i class="fa-solid fa-link" style="font-size:9px"></i> ${t('Povezan')}</span>`
+        : '';
+
+      const keywordBoost = (s.keyword_boost && s.keyword_boost > 0)
+        ? '<span title="Keyword boost" style="background:var(--accent-glow);color:var(--accent);padding:0 4px;border-radius:3px;font-size:9px;font-weight:700;margin-left:4px">K</span>'
+        : '';
+
+      const fullTextId = 'fullText_' + idx + '_' + Date.now();
+      const showFullLabel = t('Prika\u017ei ceo \u010dlan');
+      const hideFullLabel = t('Sakrij ceo \u010dlan');
+      const fullTextBtn = s.full_text
+        ? `<button onclick="var el=document.getElementById('${fullTextId}');el.style.display=el.style.display==='none'?'block':'none';this.textContent=el.style.display==='none'?'${showFullLabel}':'${hideFullLabel}'" style="background:none;border:none;color:var(--accent);font-size:11px;cursor:pointer;padding:2px 0;margin-top:4px;font-weight:600">${showFullLabel}</button><div id="${fullTextId}" style="display:none;margin-top:6px;padding:8px 10px;background:rgba(0,0,0,0.15);border-radius:4px;font-size:12px;line-height:1.6;white-space:pre-wrap;max-height:300px;overflow-y:auto">${escapeHtml(s.full_text)}</div>`
+        : '';
+
+      const onlineLink = s.slug
+        ? `<a href="https://www.paragraf.rs/propisi/${encodeURIComponent(s.slug)}.html" target="_blank" rel="noopener" style="color:var(--accent);font-size:11px;text-decoration:none;margin-left:10px;font-weight:600"><i class="fa-solid fa-external-link-alt" style="font-size:10px"></i> ${t('Proveri online')}</a>`
+        : '';
+
+      return `
+        <div class="source-item">
+          <span class="source-score">${s.score != null ? (s.score * 100).toFixed(0) + '%' : '--'}${keywordBoost}</span>
+          <div>
+            <div class="source-law">${escapeHtml(lawDisplay)}${badge}${crossRefBadge}${onlineLink}</div>
+            <div class="source-article">${t('\u010clan')} ${escapeHtml(String(s.article_number || s.article || ''))}</div>
+            ${gazetteDisplay ? `<div class="source-gazette">${escapeHtml(gazetteDisplay)}</div>` : ''}
+            ${fullTextBtn}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const srcLabel = t('Izvori');
+    const srcHideLabel = t('Sakrij izvore');
+    sourcesHtml = `
+      <button class="sources-toggle" onclick="this.nextElementSibling.classList.toggle('open'); this.innerHTML = this.nextElementSibling.classList.contains('open') ? '<i class=\\'fa-solid fa-chevron-down\\'></i> ${srcHideLabel} (${sources.length})' : '<i class=\\'fa-solid fa-chevron-right\\'></i> ${srcLabel} (${sources.length})'"><i class="fa-solid fa-chevron-right"></i> ${srcLabel} (${sources.length})</button>
+      <div class="sources-list">${items}</div>
+    `;
+  }
+
+  el.innerHTML = `
+    <div class="msg-bubble">
+      <div class="msg-text">${renderMarkdown(text)}</div>
+      ${citationsHtml}
+      ${buildConfidenceHtml(confidence)}
+      ${sourcesHtml}
+    </div>
+  `;
+  messages.appendChild(el);
+}
+
+// ── Send message (streaming) ────────────────────────────────────────────────
+async function sendMessage() {
+  const text = inputText.value.trim();
+  if (!text || state.streaming) return;
+
+  welcomeScreen.style.display = 'none';
+  appendUserMessage(text);
+  inputText.value = '';
+  inputText.style.height = 'auto';
+  scrollToBottom();
+
+  state.streaming = true;
+  btnSend.disabled = true;
+
+  const typingEl = document.createElement('div');
+  typingEl.className = 'msg assistant';
+  typingEl.innerHTML = `
+    <div class="msg-bubble">
+      <div class="msg-text" id="streamTarget"></div>
+      <div class="typing-indicator" id="typingDots"><span></span><span></span><span></span></div>
+    </div>
+  `;
+  messages.appendChild(typingEl);
+  scrollToBottom();
+
+  const streamTarget = typingEl.querySelector('#streamTarget');
+  const typingDots = typingEl.querySelector('#typingDots');
+  let fullText = '';
+
+  const heavy = heavyCheck.checked;
+  const mode = $('#answerMode').value;
+  const params = new URLSearchParams({
+    q: text,
+    top_k: '5',
+    heavy: String(heavy),
+    short: 'false',
+    mode: mode,
+  });
+  if (state.chatId) params.set('chat_id', String(state.chatId));
+
+  try {
+    const evtSource = new EventSource(`/api/query/stream?${params.toString()}`);
+
+    evtSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.done) {
+          evtSource.close();
+          typingEl.remove();
+          appendAssistantMessage(fullText, data.sources || [], data.confidence || 'medium', data.citations || null);
+          scrollToBottom();
+          if (data.chat_id) {
+            state.chatId = data.chat_id;
+            loadChats();
+          }
+          state.streaming = false;
+          btnSend.disabled = false;
+          return;
+        }
+        if (data.token) {
+          fullText += data.token;
+          let displayText = fullText.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+          if (!displayText) { scrollToBottom(); return; }
+          typingDots.style.display = 'none';
+          streamTarget.innerHTML = renderMarkdown(displayText);
+          scrollToBottom();
+        }
+      } catch {}
+    };
+
+    evtSource.onerror = () => {
+      evtSource.close();
+      typingEl.remove();
+      if (fullText) {
+        appendAssistantMessage(fullText, [], 'low', null);
+      } else {
+        showToast(t('Gre\u0161ka pri komunikaciji sa serverom'));
+      }
+      state.streaming = false;
+      btnSend.disabled = false;
+      scrollToBottom();
+    };
+  } catch (e) {
+    typingEl.remove();
+    showToast(e.message);
+    state.streaming = false;
+    btnSend.disabled = false;
+  }
+}
+
+btnSend.addEventListener('click', sendMessage);
+inputText.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+// ── Documents page ──────────────────────────────────────────────────────────
+const categories = ['Ugovor', 'Presuda', 'Tu\u017eba', 'Re\u0161enje', 'Dopis', 'Ostalo'];
+
+async function loadDocuments() {
+  const container = $('#docList');
+  try {
+    const res = await apiFetch('/api/documents');
+    const docs = await res.json();
+    if (!docs.length) {
+      container.innerHTML = '<div class="doc-empty" data-i18n>Nemate dokumenata. Dodajte ugovore, presude ili druge dokumente.</div>';
+      applyLang();
+      return;
+    }
+    // Group by category
+    const grouped = {};
+    categories.forEach(c => grouped[c] = []);
+    docs.forEach(d => {
+      const cat = categories.includes(d.category) ? d.category : 'Ostalo';
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(d);
+    });
+
+    let html = '';
+    categories.forEach(cat => {
+      if (!grouped[cat] || !grouped[cat].length) return;
+      html += `<div class="doc-category-group">
+        <div class="doc-category-label">${escapeHtml(cat)}</div>`;
+      grouped[cat].forEach(d => {
+        html += `<div class="doc-item">
+          <div class="doc-item-info">
+            <div class="doc-item-title">${escapeHtml(d.title)}</div>
+            <div class="doc-item-meta">${d.chunks || 0} ${t('delova')} <span class="tag">${escapeHtml(d.category)}</span></div>
+          </div>
+          <button class="btn-danger" onclick="deleteDocument('${d.doc_id}')">${t('Obri\u0161i')}</button>
+        </div>`;
+      });
+      html += '</div>';
+    });
+    container.innerHTML = html;
+  } catch {
+    container.innerHTML = `<div class="doc-empty">${t('Gre\u0161ka pri u\u010ditavanju dokumenata.')}</div>`;
+  }
+}
+
+window.deleteDocument = async function(docId) {
+  try {
+    await apiFetch(`/api/documents/${docId}`, { method: 'DELETE' });
+    showToast(t('Dokument obrisan'), 'success');
+    loadDocuments();
+  } catch {}
+};
+
+$('#btnAddDoc').addEventListener('click', () => {
+  $('#docTitle').value = '';
+  $('#docCategory').value = 'Ugovor';
+  $('#docContent').value = '';
+  uploadModal.classList.remove('hidden');
+});
+
+$('#btnCancelUpload').addEventListener('click', () => uploadModal.classList.add('hidden'));
+
+$('#btnSaveDoc').addEventListener('click', async () => {
+  const title = $('#docTitle').value.trim();
+  const content = $('#docContent').value.trim();
+  const category = $('#docCategory').value;
+  if (!title || !content) {
+    showToast(t('Unesite naslov i sadr\u017eaj dokumenta'));
+    return;
+  }
+  try {
+    const res = await apiFetch('/api/documents/upload', {
+      method: 'POST',
+      body: JSON.stringify({ title, content, category }),
+    });
+    const data = await res.json();
+    showToast(`${t('Dokument sa\u010duvan')} (${data.chunks || 0} ${t('delova')})`, 'success');
+    uploadModal.classList.add('hidden');
+    loadDocuments();
+  } catch {}
+});
+
+// ── Law upload (add to corpus) ──────────────────────────────────────────────
+$('#lawDropZone').addEventListener('click', () => $('#lawFileInput').click());
+$('#lawDropZone').addEventListener('dragover', e => { e.preventDefault(); e.currentTarget.style.borderColor = 'var(--accent)'; });
+$('#lawDropZone').addEventListener('dragleave', e => { e.currentTarget.style.borderColor = 'var(--accent-dim)'; });
+$('#lawDropZone').addEventListener('drop', e => {
+  e.preventDefault(); e.currentTarget.style.borderColor = 'var(--accent-dim)';
+  if (e.dataTransfer.files.length) {
+    $('#lawFileInput').files = e.dataTransfer.files;
+    $('#lawFileName').textContent = e.dataTransfer.files[0].name;
+    $('#lawFileName').style.display = 'block';
+  }
+});
+$('#lawFileInput').addEventListener('change', e => {
+  if (e.target.files.length) {
+    $('#lawFileName').textContent = e.target.files[0].name;
+    $('#lawFileName').style.display = 'block';
+  }
+});
+
+$('#btnUploadLaw').addEventListener('click', async () => {
+  const title = $('#lawTitle').value.trim();
+  const gazette = $('#lawGazette').value.trim();
+  const file = $('#lawFileInput').files && $('#lawFileInput').files[0];
+  const text = $('#lawText').value.trim();
+  const resultDiv = $('#lawUploadResult');
+
+  if (!title) { showToast(t('Unesite naziv zakona')); return; }
+  if (!file && !text) { showToast(t('Prilo\u017eite dokument ili nalepite tekst zakona')); return; }
+
+  const btn = $('#btnUploadLaw');
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${t('Obra\u0111ujem zakon...')}`;
+
+  try {
+    const formData = new FormData();
+    formData.append('title', title);
+    if (gazette) formData.append('gazette', gazette);
+    if (file) formData.append('file', file);
+    else formData.append('text', text);
+
+    const res = await fetch('/api/corpus/upload-law', {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || t('Gre\u0161ka'));
+
+    resultDiv.style.display = 'block';
+    resultDiv.style.background = 'rgba(16,185,129,.1)';
+    resultDiv.style.color = 'var(--success)';
+    resultDiv.style.border = '1px solid var(--success)';
+    const successMsg = state.lang === 'en'
+      ? `Law "<strong>${data.title}</strong>" successfully added! Found and indexed <strong>${data.articles_found} articles</strong>.`
+      : `Zakon "<strong>${data.title}</strong>" uspe\u0161no dodat u bazu! Prona\u0111eno i indeksirano <strong>${data.articles_found} \u010dlanaka</strong>.`;
+    resultDiv.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${state.lang === 'cir' ? toCyrillic(successMsg) : successMsg}`;
+
+    // Clear form
+    $('#lawTitle').value = '';
+    $('#lawGazette').value = '';
+    $('#lawText').value = '';
+    $('#lawFileInput').value = '';
+    $('#lawFileName').style.display = 'none';
+
+    showToast(`${data.articles_found} ${t('\u010dlanaka zakona dodato u bazu')}`, 'success');
+  } catch (e) {
+    resultDiv.style.display = 'block';
+    resultDiv.style.background = 'rgba(239,68,68,.1)';
+    resultDiv.style.color = 'var(--danger)';
+    resultDiv.style.border = '1px solid var(--danger)';
+    resultDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${e.message}`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<i class="fa-solid fa-plus"></i> <span data-i18n>Dodaj zakon u bazu</span>`;
+    applyLang();
+  }
+});
+
+// ── Settings page ───────────────────────────────────────────────────────────
+async function loadSettings() {
+  // Load app info
+  try {
+    const res = await fetch('/api/app-info');
+    const info = await res.json();
+    state.appInfo = info;
+    $('#settingsVersion').textContent = info.version || '--';
+    $('#settingsLicense').textContent = info.license_firm || '--';
+    $('#settingsInstallId').textContent = info.installation_id || '--';
+    $('#helpEmail').textContent = info.support_email || '--';
+    $('#helpInstallId').textContent = info.installation_id || '--';
+  } catch {}
+
+  // Load corpus stats
+  try {
+    const res = await fetch('/api/corpus/stats');
+    const stats = await res.json();
+    state.corpusStats = stats;
+    $('#settingsLawCount').textContent = stats.total_articles ? stats.total_articles.toLocaleString() : '--';
+    const clientDocs = stats.client_documents || {};
+    $('#settingsDocCount').textContent = clientDocs.total_documents != null ? `${clientDocs.total_documents} (${clientDocs.total_chunks || 0} ${t('delova')})` : '--';
+    $('#settingsLastUpdate').textContent = stats.last_update ? formatDate(stats.last_update) : '--';
+  } catch {}
+
+  // Load models
+  try {
+    const res = await fetch('/api/models');
+    const data = await res.json();
+    if (data.models && data.models.length) {
+      state.models = data.models;
+      const names = data.models.map(m => typeof m === 'string' ? m : m.name || m.model || '').join(', ');
+      $('#settingsModels').textContent = names;
+    }
+  } catch {}
+
+  // AI status
+  try {
+    const res = await fetch('/api/health');
+    const data = await res.json();
+    const dot = $('#settingsAIStatus').querySelector('.status-dot');
+    const statusSpan = $('#settingsAIStatus');
+    if (data.ok && data.ollama_available) {
+      if (dot) dot.classList.add('online');
+      statusSpan.innerHTML = `<span class="status-dot online" style="display:inline-block;vertical-align:middle;margin-right:4px;width:7px;height:7px;border-radius:50%;background:var(--success)"></span> ${t('Aktivan')}`;
+    } else {
+      statusSpan.innerHTML = `<span class="status-dot" style="display:inline-block;vertical-align:middle;margin-right:4px;width:7px;height:7px;border-radius:50%;background:var(--danger)"></span> ${t('Nedostupan')}`;
+    }
+  } catch {}
+
+  // Engine info (enriched model/corpus data)
+  try {
+    const res = await fetch('/api/admin/engine');
+    const engine = await res.json();
+    if (engine.models) {
+      $('#settingsModels').textContent = engine.models.primary + (engine.models.heavy ? ' / ' + engine.models.heavy : '');
+    }
+    if (engine.corpus) {
+      const c = engine.corpus;
+      $('#settingsLawCount').textContent = c.total_articles ? c.total_articles.toLocaleString() + ' (' + c.total_documents + ' ' + t('dokumenata') + ')' : '--';
+      $('#settingsDocCount').textContent = (c.total_cross_references || 0).toLocaleString() + ' ' + t('kros-referenci');
+    }
+  } catch {}
+}
+
+// Language toggle (settings)
+$('#btnLatSettings').addEventListener('click', () => {
+  state.lang = 'lat';
+  localStorage.setItem('lexardor_lang', 'lat');
+  applyLang();
+});
+$('#btnCirSettings').addEventListener('click', () => {
+  state.lang = 'cir';
+  localStorage.setItem('lexardor_lang', 'cir');
+  applyLang();
+});
+$('#btnEnSettings').addEventListener('click', () => {
+  state.lang = 'en';
+  localStorage.setItem('lexardor_lang', 'en');
+  applyLang();
+});
+
+// ── Corpus Browser ─────────────────────────────────────────────────────────
+let corpusLaws = [];
+
+async function loadCorpus() {
+  // Load summary stats
+  try {
+    const res = await apiFetch('/api/corpus/summary');
+    const summary = await res.json();
+    const summaryEl = $('#corpusSummary');
+    summaryEl.innerHTML = `
+      <h3 data-i18n>Statistika korpusa</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-top:8px">
+        <div class="settings-row" style="flex-direction:column;align-items:flex-start">
+          <span class="settings-value" style="font-size:20px;font-weight:700;color:var(--accent)">${summary.total_documents?.toLocaleString() || 0}</span>
+          <span class="settings-label" data-i18n>Dokumenata</span>
+        </div>
+        <div class="settings-row" style="flex-direction:column;align-items:flex-start">
+          <span class="settings-value" style="font-size:20px;font-weight:700;color:var(--accent)">${summary.total_articles?.toLocaleString() || 0}</span>
+          <span class="settings-label" data-i18n>\u010clanaka</span>
+        </div>
+        <div class="settings-row" style="flex-direction:column;align-items:flex-start">
+          <span class="settings-value" style="font-size:20px;font-weight:700;color:var(--accent)">${summary.total_cross_references?.toLocaleString() || 0}</span>
+          <span class="settings-label" data-i18n>Kros-referenci</span>
+        </div>
+        <div class="settings-row" style="flex-direction:column;align-items:flex-start">
+          <span class="settings-value" style="font-size:20px;font-weight:700;color:var(--accent)">${summary.total_versions?.toLocaleString() || 0}</span>
+          <span class="settings-label" data-i18n>Verzija</span>
+        </div>
+      </div>
+    `;
+    applyLang();
+  } catch {}
+
+  // Load law list
+  try {
+    const res = await apiFetch('/api/corpus/laws');
+    corpusLaws = await res.json();
+    renderCorpusLaws(corpusLaws);
+  } catch {}
+}
+
+function renderCorpusLaws(laws) {
+  const container = $('#corpusLawList');
+  const search = ($('#corpusSearch')?.value || '').toLowerCase();
+  const typeFilter = $('#corpusTypeFilter')?.value || '';
+
+  let filtered = laws;
+  if (search) filtered = filtered.filter(l => (l.title || l.slug || '').toLowerCase().includes(search));
+  if (typeFilter) filtered = filtered.filter(l => (l.slug || '').includes(typeFilter));
+
+  if (!filtered.length) {
+    container.innerHTML = `<div class="doc-empty" data-i18n>Nema rezultata.</div>`;
+    applyLang();
+    return;
+  }
+
+  container.innerHTML = filtered.slice(0, 100).map(l => {
+    const title = l.title || l.slug || '';
+    const displayTitle = title.length > 80 ? title.substring(0, 80) + '...' : title;
+    return `
+      <div class="doc-item" style="cursor:pointer" onclick="loadLawArticles('${escapeHtml(l.slug)}')">
+        <div class="doc-item-info">
+          <div class="doc-item-title">${escapeHtml(displayTitle)}</div>
+          <div class="doc-item-meta">${l.article_count || 0} ${t('\u010dlanaka')} <span class="tag">${escapeHtml(l.gazette || '')}</span></div>
+        </div>
+        <i class="fa-solid fa-chevron-right" style="color:var(--text-dim)"></i>
+      </div>
+    `;
+  }).join('');
+
+  if (filtered.length > 100) {
+    container.innerHTML += `<div style="text-align:center;padding:12px;color:var(--text-muted);font-size:12px">${t('Prikazano')} 100 ${t('od')} ${filtered.length}</div>`;
+  }
+}
+
+window.loadLawArticles = async function(slug) {
+  const container = $('#corpusLawList');
+  const detailPanel = $('#corpusArticleDetail');
+  const detailContent = $('#articleDetailContent');
+
+  container.style.display = 'none';
+  detailPanel.style.display = 'block';
+  detailContent.innerHTML = `<div class="tpl-loading"><div class="spinner"></div> ${t('U\u010ditavanje...')}</div>`;
+
+  try {
+    const res = await apiFetch('/api/corpus/laws/' + encodeURIComponent(slug) + '/articles');
+    const data = await res.json();
+    const doc = data.document;
+    const articles = data.articles || [];
+
+    let html = `
+      <div class="settings-section" style="margin-bottom:16px">
+        <h3>${escapeHtml(doc.title || doc.slug)}</h3>
+        <div class="settings-row">
+          <span class="settings-label" data-i18n>Tip</span>
+          <span class="settings-value">${escapeHtml(doc.doc_type || '')}</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label" data-i18n>Nivo autoriteta</span>
+          <span class="settings-value">${doc.authority_level || ''}</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label" data-i18n>Va\u017ei od</span>
+          <span class="settings-value">${doc.valid_from || '--'}</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label" data-i18n>\u010clanaka</span>
+          <span class="settings-value">${articles.length}</span>
+        </div>
+      </div>
+    `;
+
+    html += `<div style="display:flex;flex-direction:column;gap:6px">`;
+    articles.forEach(a => {
+      html += `
+        <div class="doc-item" style="cursor:pointer" onclick="loadArticleDetail('${escapeHtml(slug)}', '${escapeHtml(a.article_number)}')">
+          <div class="doc-item-info">
+            <div class="doc-item-title">${t('\u010clan')} ${escapeHtml(a.article_number)} ${a.chapter ? '<span style="color:var(--text-muted);font-size:11px;margin-left:8px">' + escapeHtml(a.chapter) + '</span>' : ''}</div>
+            <div class="doc-item-meta">${a.stav_count || 0} ${t('stavova')}, ${a.tacka_count || 0} ${t('ta\u010daka')}</div>
+          </div>
+          <i class="fa-solid fa-chevron-right" style="color:var(--text-dim)"></i>
+        </div>
+      `;
+    });
+    html += '</div>';
+
+    detailContent.innerHTML = html;
+    applyLang();
+  } catch (e) {
+    detailContent.innerHTML = `<div class="doc-empty">${t('Gre\u0161ka pri u\u010ditavanju.')}</div>`;
+  }
+};
+
+window.loadArticleDetail = async function(slug, articleNumber) {
+  const detailContent = $('#articleDetailContent');
+  detailContent.innerHTML = `<div class="tpl-loading"><div class="spinner"></div> ${t('U\u010ditavanje...')}</div>`;
+
+  try {
+    const res = await apiFetch('/api/corpus/laws/' + encodeURIComponent(slug) + '/articles/' + encodeURIComponent(articleNumber));
+    const art = await res.json();
+
+    let html = `
+      <div class="settings-section" style="margin-bottom:16px">
+        <h3>${t('\u010clan')} ${escapeHtml(art.article_number)}</h3>
+        <div style="font-family:'Lora',Georgia,serif;font-size:15px;line-height:1.75;margin-top:12px;white-space:pre-wrap">${escapeHtml(art.full_text)}</div>
+      </div>
+    `;
+
+    // Sub-articles
+    if (art.sub_articles && art.sub_articles.length > 0) {
+      html += `<div class="settings-section" style="margin-bottom:16px"><h3 data-i18n>Stavovi i ta\u010dke</h3>`;
+      art.sub_articles.forEach(sa => {
+        const label = sa.tacka_number ? `${t('Stav')} ${sa.stav_number}, ${t('Ta\u010dka')} ${sa.tacka_number})` : `${t('Stav')} ${sa.stav_number}`;
+        html += `<div style="padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--accent);font-weight:600;font-size:12px">${label}</span><div style="font-size:13px;margin-top:4px">${escapeHtml(sa.text)}</div></div>`;
+      });
+      html += '</div>';
+    }
+
+    // Cross-references (outgoing)
+    if (art.cross_references && art.cross_references.length > 0) {
+      html += `<div class="settings-section" style="margin-bottom:16px"><h3 data-i18n>Referi\u0161e na</h3>`;
+      art.cross_references.forEach(ref => {
+        const target = ref.target_article_number ? `${t('\u010clan')} ${ref.target_article_number}` : '';
+        const law = ref.target_document_slug ? ref.target_document_slug.replace(/_/g, ' ') : '';
+        html += `<div style="padding:4px 0;font-size:13px"><i class="fa-solid fa-arrow-right" style="color:var(--accent);margin-right:6px;font-size:10px"></i>${target} ${law ? '(' + escapeHtml(law) + ')' : ''} <span style="color:var(--text-dim);font-size:11px">${escapeHtml(ref.citation_text || '')}</span></div>`;
+      });
+      html += '</div>';
+    }
+
+    // Inbound references
+    if (art.inbound_references && art.inbound_references.length > 0) {
+      html += `<div class="settings-section" style="margin-bottom:16px"><h3 data-i18n>Referisano od</h3>`;
+      art.inbound_references.forEach(ref => {
+        html += `<div style="padding:4px 0;font-size:13px"><i class="fa-solid fa-arrow-left" style="color:var(--success);margin-right:6px;font-size:10px"></i>${t('\u010clan')} ${escapeHtml(ref.source_article || '')} (${escapeHtml(ref.source_title || ref.source_slug || '')})</div>`;
+      });
+      html += '</div>';
+    }
+
+    detailContent.innerHTML = html;
+    applyLang();
+  } catch (e) {
+    detailContent.innerHTML = `<div class="doc-empty">${t('Gre\u0161ka pri u\u010ditavanju.')}</div>`;
+  }
+};
+
+// Back to law list button
+$('#btnBackToLaws').addEventListener('click', () => {
+  $('#corpusLawList').style.display = '';
+  $('#corpusArticleDetail').style.display = 'none';
+});
+
+// Corpus search/filter handlers
+$('#corpusSearch').addEventListener('input', () => renderCorpusLaws(corpusLaws));
+$('#corpusTypeFilter').addEventListener('change', () => renderCorpusLaws(corpusLaws));
+
+// ── Help page ───────────────────────────────────────────────────────────────
+// FAQ toggle
+$$('.faq-question').forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.closest('.faq-item').classList.toggle('open');
+  });
+});
+
+// Report
+$('#btnSendReport').addEventListener('click', async () => {
+  const type = $('#reportType').value;
+  const description = $('#reportDesc').value.trim();
+  const include_last_chat = $('#reportIncludeChat').checked;
+  if (!description) { showToast(t('Unesite opis problema')); return; }
+  try {
+    const res = await apiFetch('/api/support/report', {
+      method: 'POST',
+      body: JSON.stringify({ type, description, include_last_chat }),
+    });
+    const data = await res.json();
+    showToast(t('Prijava poslata'), 'success');
+    $('#reportDesc').value = '';
+    $('#reportIncludeChat').checked = false;
+    // Open mailto if available
+    if (data.mailto_to) {
+      const subject = encodeURIComponent(data.mailto_subject || 'LexArdor prijava');
+      const body = encodeURIComponent(data.mailto_body || description);
+      window.open(`mailto:${data.mailto_to}?subject=${subject}&body=${body}`, '_blank');
+    }
+    loadReports();
+  } catch {}
+});
+
+async function loadReports() {
+  const container = $('#reportList');
+  try {
+    const res = await apiFetch('/api/support/reports');
+    const reports = await res.json();
+    if (!reports.length) {
+      container.innerHTML = '<div style="font-size:13px;color:var(--text-dim);padding:8px 0" data-i18n>Nema prethodnih prijava.</div>';
+      applyLang();
+      return;
+    }
+    container.innerHTML = reports.map(r => `
+      <div class="report-item">
+        <div class="report-type">${escapeHtml(r.type)}</div>
+        <div class="report-desc">${escapeHtml(r.description)}</div>
+        <div class="report-date">${formatDate(r.created_at)}</div>
+      </div>
+    `).join('');
+  } catch {
+    container.innerHTML = '';
+  }
+}
+
+// ── Templates page ──────────────────────────────────────────────────────────
+const docTypeLabels = { tuzba: 'Tu\u017eba', ugovor: 'Ugovor', resenje: 'Re\u0161enje', punomocje: 'Punomo\u0107je', dopis: 'Dopis', ostalo: 'Ostalo' };
+const docTypeOrder = ['tuzba', 'ugovor', 'resenje', 'punomocje', 'dopis', 'ostalo'];
+let currentTemplateId = null;
+let currentDraftId = null;
+let currentTemplateFields = [];
+let previewDebounceTimer = null;
+
+async function loadTemplates() {
+  const container = $('#tplList');
+  // Reset to list view
+  $('#tplListView').style.display = '';
+  $('#tplFillView').style.display = 'none';
+  try {
+    const res = await apiFetch('/api/templates');
+    const templates = await res.json();
+    if (!templates.length) {
+      container.innerHTML = '<div class="doc-empty" data-i18n>Nemate \u0161ablona. Kreirajte prvi \u0161ablon iz primera dokumenta.</div>';
+      applyLang();
+      return;
+    }
+    // Group by doc_type
+    const grouped = {};
+    docTypeOrder.forEach(tp => grouped[tp] = []);
+    templates.forEach(tpl => {
+      const dt = docTypeOrder.includes(tpl.doc_type) ? tpl.doc_type : 'ostalo';
+      if (!grouped[dt]) grouped[dt] = [];
+      grouped[dt].push(tpl);
+    });
+
+    let html = '';
+    const fillLabel = t('Popuni');
+    const deleteLabel = t('Obri\u0161i');
+    const fieldsLabel = t('polja');
+    docTypeOrder.forEach(dt => {
+      if (!grouped[dt] || !grouped[dt].length) return;
+      html += `<div class="tpl-group-label">${escapeHtml(docTypeLabels[dt] || dt)}</div>`;
+      grouped[dt].forEach(tpl => {
+        const fieldCount = (tpl.fields && tpl.fields.length) || 0;
+        html += `<div class="template-card">
+          <div class="tpl-info">
+            <div class="tpl-name">${escapeHtml(tpl.name)}</div>
+            <div class="tpl-meta">
+              <span>${fieldCount} ${fieldsLabel}</span>
+              <span class="tpl-badge">${escapeHtml(docTypeLabels[tpl.doc_type] || tpl.doc_type)}</span>
+            </div>
+          </div>
+          <div class="tpl-actions">
+            <button class="btn-primary" onclick="openFillView('${tpl.id}')">${fillLabel}</button>
+            <button class="btn-danger" onclick="deleteTemplate('${tpl.id}')">${deleteLabel}</button>
+          </div>
+        </div>`;
+      });
+    });
+    container.innerHTML = html;
+    applyLang();
+  } catch {
+    container.innerHTML = `<div class="doc-empty">${t('Gre\u0161ka pri u\u010ditavanju \u0161ablona.')}</div>`;
+  }
+}
+
+async function createTemplate(name, docType) {
+  const fileInput = $('#tplFileInput');
+  const exampleText = $('#tplExampleText').value.trim();
+  const file = fileInput.files && fileInput.files[0];
+
+  if (!file && !exampleText) {
+    showToast(t('Prilo\u017eite dokument (PDF/DOCX) ili unesite tekst'));
+    return;
+  }
+
+  const loadingEl = document.createElement('div');
+  loadingEl.className = 'tpl-loading';
+  loadingEl.innerHTML = `<div class="spinner"></div> <span>${t('AI analizira dokument...')}</span>`;
+  $('#createTemplateModal .modal-actions').before(loadingEl);
+  $('#btnCreateTemplate').disabled = true;
+
+  try {
+    // Use FormData for file upload
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('doc_type', docType);
+    if (file) {
+      formData.append('file', file);
+    } else {
+      formData.append('example_text', exampleText);
+    }
+
+    const res = await fetch('/api/templates', {
+      method: 'POST',
+      body: formData,
+    });
+    if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.detail || t('Gre\u0161ka')); }
+    const data = await res.json();
+    showToast(`${t('\u0160ablon kreiran sa')} ${(data.fields && data.fields.length) || 0} ${t('polja')}`, 'success');
+    $('#createTemplateModal').classList.add('hidden');
+    // Reset form
+    fileInput.value = '';
+    $('#tplFileName').style.display = 'none';
+    $('#tplExampleText').value = '';
+    loadTemplates();
+  } catch (e) {
+    showToast(e.message || t('Gre\u0161ka pri kreiranju \u0161ablona'));
+  } finally {
+    loadingEl.remove();
+    $('#btnCreateTemplate').disabled = false;
+  }
+}
+
+window.deleteTemplate = async function(id) {
+  if (!confirm(t('Da li ste sigurni da \u017eelite da obri\u0161ete ovaj \u0161ablon?'))) return;
+  try {
+    await apiFetch(`/api/templates/${id}`, { method: 'DELETE' });
+    showToast(t('\u0160ablon obrisan'), 'success');
+    loadTemplates();
+  } catch {}
+};
+
+window.openFillView = async function(templateId) {
+  currentTemplateId = templateId;
+  currentDraftId = null;
+  $('#tplListView').style.display = 'none';
+  $('#tplFillView').style.display = '';
+  $('#tplFieldForm').innerHTML = `<div class="tpl-loading"><div class="spinner"></div> ${t('U\u010ditavanje...')}</div>`;
+  $('#tplPreview').innerHTML = '<span style="color:var(--text-dim)" data-i18n>Popunite polja da vidite pregled...</span>';
+  $('#tplValidationResults').innerHTML = '';
+  $('#smartFillText').value = '';
+
+  try {
+    const res = await apiFetch(`/api/templates/${templateId}`);
+    const tpl = await res.json();
+    currentTemplateFields = tpl.fields || [];
+    $('#tplFillTitle').textContent = t('Popunjavanje: ') + (tpl.name || t('\u0160abloni'));
+    renderFieldForm(currentTemplateFields);
+    applyLang();
+  } catch (e) {
+    $('#tplFieldForm').innerHTML = `<div class="doc-empty">${t('Gre\u0161ka pri u\u010ditavanju \u0161ablona.')}</div>`;
+  }
+};
+
+function renderFieldForm(fields) {
+  const form = $('#tplFieldForm');
+  if (!fields.length) {
+    form.innerHTML = `<div class="doc-empty">${t('Ovaj \u0161ablon nema definisana polja.')}</div>`;
+    return;
+  }
+
+  let html = '';
+  fields.forEach((f, i) => {
+    const req = f.required ? '<span class="required-mark">*</span>' : '';
+    const typeHint = f.field_type && f.field_type !== 'text' ? `<span class="field-type-hint">${escapeHtml(f.field_type)}</span>` : '';
+    const fieldId = `tplField_${i}`;
+
+    if (f.field_type === 'multiline') {
+      html += `<label>${escapeHtml(f.label || f.name)} ${req} ${typeHint}
+        <textarea class="form-textarea tpl-field-input" id="${fieldId}" data-field-name="${escapeHtml(f.name)}" rows="3" placeholder="${escapeHtml(f.placeholder || '')}"></textarea>
+      </label>`;
+    } else if (f.field_type === 'date') {
+      html += `<label>${escapeHtml(f.label || f.name)} ${req} ${typeHint}
+        <input type="text" class="form-input tpl-field-input" id="${fieldId}" data-field-name="${escapeHtml(f.name)}" placeholder="DD.MM.GGGG">
+      </label>`;
+    } else if (f.field_type === 'money') {
+      html += `<label>${escapeHtml(f.label || f.name)} ${req} ${typeHint}
+        <div style="display:flex;align-items:center;gap:6px">
+          <input type="text" class="form-input tpl-field-input" id="${fieldId}" data-field-name="${escapeHtml(f.name)}" placeholder="${escapeHtml(f.placeholder || '0')}" style="flex:1">
+          <span style="font-size:13px;color:var(--text-muted)">RSD</span>
+        </div>
+      </label>`;
+    } else {
+      html += `<label>${escapeHtml(f.label || f.name)} ${req} ${typeHint}
+        <input type="text" class="form-input tpl-field-input" id="${fieldId}" data-field-name="${escapeHtml(f.name)}" placeholder="${escapeHtml(f.placeholder || '')}">
+      </label>`;
+    }
+  });
+  form.innerHTML = html;
+
+  // Attach debounced preview
+  form.querySelectorAll('.tpl-field-input').forEach(input => {
+    input.addEventListener('input', () => {
+      clearTimeout(previewDebounceTimer);
+      previewDebounceTimer = setTimeout(() => updatePreview(), 600);
+    });
+  });
+}
+
+function getFieldValues() {
+  const values = {};
+  document.querySelectorAll('.tpl-field-input').forEach(el => {
+    values[el.dataset.fieldName] = el.value;
+  });
+  return values;
+}
+
+async function updatePreview() {
+  if (!currentDraftId && !currentTemplateId) return;
+  try {
+    const fieldValues = getFieldValues();
+    const endpoint = currentDraftId
+      ? `/api/drafts/${currentDraftId}/preview`
+      : `/api/templates/${currentTemplateId}/preview`;
+    const res = await apiFetch(endpoint, {
+      method: 'POST',
+      body: JSON.stringify({ field_values: fieldValues }),
+    });
+    const data = await res.json();
+    $('#tplPreview').textContent = data.preview || data.text || '';
+  } catch {
+    $('#tplPreview').innerHTML = `<span style="color:var(--text-dim)">${t('Pregled nije dostupan.')}</span>`;
+  }
+}
+
+async function smartFill(templateId, description) {
+  $('#btnSmartFill').disabled = true;
+  $('#btnSmartFill').innerHTML = `<div class="spinner" style="width:14px;height:14px;display:inline-block;vertical-align:middle"></div> ${t('Popunjavanje...')}`;
+  try {
+    const res = await apiFetch(`/api/templates/${templateId}/smart-fill`, {
+      method: 'POST',
+      body: JSON.stringify({ description }),
+    });
+    const data = await res.json();
+    // Populate form fields from AI response
+    const fieldValues = data.field_values || data.fields || {};
+    Object.entries(fieldValues).forEach(([name, value]) => {
+      const input = document.querySelector(`.tpl-field-input[data-field-name="${name}"]`);
+      if (input) input.value = value;
+    });
+    showToast(t('Polja popunjena iz opisa'), 'success');
+    updatePreview();
+  } catch (e) {
+    showToast(e.message || t('Gre\u0161ka pri automatskom popunjavanju'));
+  } finally {
+    $('#btnSmartFill').disabled = false;
+    $('#btnSmartFill').innerHTML = `<i class="fa-solid fa-bolt"></i> <span data-i18n>Popuni polja</span>`;
+    applyLang();
+  }
+}
+
+async function validateDraft(templateId, fieldValues) {
+  const container = $('#tplValidationResults');
+  container.innerHTML = `<div class="tpl-loading"><div class="spinner"></div> ${t('Provera u toku...')}</div>`;
+  try {
+    const res = await apiFetch(`/api/templates/${templateId}/validate`, {
+      method: 'POST',
+      body: JSON.stringify({ field_values: fieldValues }),
+    });
+    const data = await res.json();
+    const checks = data.checks || data.results || [];
+    if (!checks.length) {
+      container.innerHTML = `<div class="validation-result ok">\u2705 ${t('Dokument je validan.')}</div>`;
+      return;
+    }
+    let html = '';
+    checks.forEach(c => {
+      const icon = c.status === 'ok' ? '\u2705' : c.status === 'warning' ? '\u26a0\ufe0f' : '\u274c';
+      const cls = c.status === 'ok' ? 'ok' : c.status === 'warning' ? 'warn' : 'err';
+      html += `<div class="validation-result ${cls}">${icon} ${escapeHtml(c.message || c.text || '')}</div>`;
+    });
+    container.innerHTML = html;
+  } catch (e) {
+    container.innerHTML = `<div class="validation-result err">\u274c ${escapeHtml(e.message || t('Gre\u0161ka pri validaciji'))}</div>`;
+  }
+}
+
+async function saveDraft(templateId, fieldValues) {
+  try {
+    const res = await apiFetch('/api/drafts', {
+      method: 'POST',
+      body: JSON.stringify({ template_id: templateId, field_values: fieldValues }),
+    });
+    const data = await res.json();
+    currentDraftId = data.id || data.draft_id;
+    showToast(t('Nacrt sa\u010duvan'), 'success');
+    return currentDraftId;
+  } catch (e) {
+    showToast(e.message || t('Gre\u0161ka pri \u010duvanju nacrta'));
+    return null;
+  }
+}
+
+async function exportDraft(draftId, format, script) {
+  try {
+    const res = await apiFetch(`/api/drafts/${draftId}/export/${format}?script=${encodeURIComponent(script)}`, {
+      method: 'POST',
+    });
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `dokument.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showToast(`${format.toUpperCase()} ${t('izvezen')}`, 'success');
+  } catch (e) {
+    showToast(e.message || `${t('Gre\u0161ka pri izvozu')} ${format.toUpperCase()}`);
+  }
+}
+
+function getSelectedScript() {
+  const checked = document.querySelector('input[name="tplScript"]:checked');
+  return checked ? checked.value : 'original';
+}
+
+// Template page event listeners
+$('#btnNewTemplate').addEventListener('click', () => {
+  $('#tplName').value = '';
+  $('#tplDocType').value = 'tuzba';
+  $('#tplExampleText').value = '';
+  $('#tplFileInput').value = '';
+  $('#tplFileName').style.display = 'none';
+  $('#createTemplateModal').classList.remove('hidden');
+});
+
+$('#btnCancelTemplate').addEventListener('click', () => {
+  $('#createTemplateModal').classList.add('hidden');
+});
+
+// File upload — drag & drop + click
+$('#tplDropZone').addEventListener('click', () => $('#tplFileInput').click());
+$('#tplDropZone').addEventListener('dragover', (e) => { e.preventDefault(); e.currentTarget.style.borderColor = 'var(--accent)'; });
+$('#tplDropZone').addEventListener('dragleave', (e) => { e.currentTarget.style.borderColor = 'var(--accent-dim)'; });
+$('#tplDropZone').addEventListener('drop', (e) => {
+  e.preventDefault();
+  e.currentTarget.style.borderColor = 'var(--accent-dim)';
+  const files = e.dataTransfer.files;
+  if (files.length) {
+    $('#tplFileInput').files = files;
+    $('#tplFileName').textContent = files[0].name;
+    $('#tplFileName').style.display = 'block';
+  }
+});
+$('#tplFileInput').addEventListener('change', (e) => {
+  if (e.target.files.length) {
+    $('#tplFileName').textContent = e.target.files[0].name;
+    $('#tplFileName').style.display = 'block';
+  }
+});
+
+$('#btnCreateTemplate').addEventListener('click', () => {
+  const name = $('#tplName').value.trim();
+  const docType = $('#tplDocType').value;
+  const hasFile = $('#tplFileInput').files && $('#tplFileInput').files.length > 0;
+  const hasText = $('#tplExampleText').value.trim().length > 0;
+  if (!name) {
+    showToast(t('Unesite naziv \u0161ablona'));
+    return;
+  }
+  if (!hasFile && !hasText) {
+    showToast(t('Prilo\u017eite dokument (PDF/DOCX) ili unesite tekst'));
+    return;
+  }
+  createTemplate(name, docType);
+});
+
+$('#btnBackToTemplates').addEventListener('click', () => {
+  currentTemplateId = null;
+  currentDraftId = null;
+  currentTemplateFields = [];
+  $('#tplListView').style.display = '';
+  $('#tplFillView').style.display = 'none';
+  loadTemplates();
+});
+
+$('#btnSmartFill').addEventListener('click', () => {
+  const desc = $('#smartFillText').value.trim();
+  if (!desc) {
+    showToast(t('Unesite opis za automatsko popunjavanje'));
+    return;
+  }
+  smartFill(currentTemplateId, desc);
+});
+
+$('#btnValidateDraft').addEventListener('click', () => {
+  validateDraft(currentTemplateId, getFieldValues());
+});
+
+$('#btnSaveDraft').addEventListener('click', async () => {
+  await saveDraft(currentTemplateId, getFieldValues());
+});
+
+$('#btnExportPdf').addEventListener('click', async () => {
+  let draftId = currentDraftId;
+  if (!draftId) draftId = await saveDraft(currentTemplateId, getFieldValues());
+  if (draftId) exportDraft(draftId, 'pdf', getSelectedScript());
+});
+
+$('#btnExportDocx').addEventListener('click', async () => {
+  let draftId = currentDraftId;
+  if (!draftId) draftId = await saveDraft(currentTemplateId, getFieldValues());
+  if (draftId) exportDraft(draftId, 'docx', getSelectedScript());
+});
+
+// Close create template modal on click outside
+$('#createTemplateModal').addEventListener('click', (e) => {
+  if (e.target === $('#createTemplateModal')) $('#createTemplateModal').classList.add('hidden');
+});
+
+// ── External AI page ─────────────────────────────────────────────────────────
+let extProviders = {};
+let extSelectedProvider = null;
+
+async function loadExternalProviders() {
+  try {
+    const res = await apiFetch('/api/external/providers');
+    extProviders = await res.json();
+  } catch {
+    extProviders = {
+      openai: { name: 'OpenAI GPT', models: ['gpt-4o', 'gpt-4o-mini'], default_model: 'gpt-4o-mini' },
+      anthropic: { name: 'Anthropic Claude', models: ['claude-sonnet-4-20250514'], default_model: 'claude-sonnet-4-20250514' },
+      google: { name: 'Google Gemini', models: ['gemini-2.0-flash'], default_model: 'gemini-2.0-flash' },
+      xai: { name: 'xAI Grok', models: ['grok-3'], default_model: 'grok-3' },
+    };
+  }
+  // If a provider was already selected, refresh models
+  if (extSelectedProvider) selectProvider(extSelectedProvider);
+}
+
+function selectProvider(provider) {
+  extSelectedProvider = provider;
+  // Update card styles
+  document.querySelectorAll('.provider-card').forEach(c => {
+    c.style.borderColor = c.dataset.provider === provider ? 'var(--accent)' : 'var(--border)';
+    c.querySelector('i').style.color = c.dataset.provider === provider ? 'var(--accent)' : 'var(--text-muted)';
+  });
+  // Load API key from localStorage
+  const savedKey = localStorage.getItem('lexardor_apikey_' + provider) || '';
+  $('#extApiKey').value = savedKey;
+  // Populate models
+  const modelSelect = $('#extModelSelect');
+  const prov = extProviders[provider];
+  if (prov && prov.models) {
+    modelSelect.innerHTML = prov.models.map(m =>
+      `<option value="${escapeHtml(m)}" ${m === prov.default_model ? 'selected' : ''}>${escapeHtml(m)}</option>`
+    ).join('');
+  } else {
+    modelSelect.innerHTML = `<option value="">-- ${t('Nema dostupnih modela')} --</option>`;
+  }
+}
+
+document.querySelectorAll('.provider-card').forEach(card => {
+  card.addEventListener('click', () => selectProvider(card.dataset.provider));
+});
+
+$('#btnSaveApiKey').addEventListener('click', () => {
+  if (!extSelectedProvider) { showToast(t('Izaberite provajdera')); return; }
+  const key = $('#extApiKey').value.trim();
+  if (key) {
+    localStorage.setItem('lexardor_apikey_' + extSelectedProvider, key);
+    showToast(t('API klju\u010d sa\u010duvan'), 'success');
+  } else {
+    localStorage.removeItem('lexardor_apikey_' + extSelectedProvider);
+    showToast(t('API klju\u010d obrisan'), 'success');
+  }
+});
+
+$('#btnPreviewAnon').addEventListener('click', async () => {
+  if (!extSelectedProvider) { showToast(t('Izaberite provajdera')); return; }
+  const prompt = $('#extPrompt').value.trim();
+  if (!prompt) { showToast(t('Unesite prompt')); return; }
+  const apiKey = $('#extApiKey').value.trim();
+  if (!apiKey) { showToast(t('Unesite API klju\u010d')); return; }
+  const namesRaw = $('#extNamesToHide').value.trim();
+  const namesToHide = namesRaw ? namesRaw.split(',').map(n => n.trim()).filter(Boolean) : [];
+
+  try {
+    const res = await apiFetch('/api/external/anonymize', {
+      method: 'POST',
+      body: JSON.stringify({
+        provider: extSelectedProvider,
+        api_key: apiKey,
+        prompt: prompt,
+        anonymize: true,
+        names_to_hide: namesToHide,
+      }),
+    });
+    const data = await res.json();
+    $('#anonOriginal').textContent = prompt;
+    $('#anonAnonymized').textContent = data.anonymized || prompt;
+    $('#anonReplacementCount').textContent = state.lang === 'en' ? `Replaced: ${data.replacement_count || 0} entities` : `Zamenjeno: ${data.replacement_count || 0} entiteta`;
+    $('#anonPreview').style.display = 'block';
+  } catch {}
+});
+
+$('#btnExtSend').addEventListener('click', async () => {
+  if (!extSelectedProvider) { showToast(t('Izaberite provajdera')); return; }
+  const prompt = $('#extPrompt').value.trim();
+  if (!prompt) { showToast(t('Unesite prompt')); return; }
+  const apiKey = $('#extApiKey').value.trim();
+  if (!apiKey) { showToast(t('Unesite API klju\u010d')); return; }
+  const model = $('#extModelSelect').value;
+  const anonymize = $('#extAnonymize').checked;
+  const namesRaw = $('#extNamesToHide').value.trim();
+  const namesToHide = namesRaw ? namesRaw.split(',').map(n => n.trim()).filter(Boolean) : [];
+
+  $('#btnExtSend').disabled = true;
+  $('#btnExtSend').innerHTML = `<span class="login-spinner"></span> ${t('Slanje...')}`;
+
+  try {
+    const res = await apiFetch('/api/external/query', {
+      method: 'POST',
+      body: JSON.stringify({
+        provider: extSelectedProvider,
+        api_key: apiKey,
+        prompt: prompt,
+        model: model || undefined,
+        anonymize: anonymize,
+        names_to_hide: namesToHide,
+      }),
+    });
+    const data = await res.json();
+    $('#extAnswerText').textContent = data.answer || t('Nema odgovora.');
+    $('#extAnswerMeta').textContent = `Provajder: ${data.provider || extSelectedProvider} | Model: ${data.model || model}`;
+    if (data.anonymized && data.replacements_made > 0) {
+      $('#extDeanonNote').style.display = 'block';
+    } else {
+      $('#extDeanonNote').style.display = 'none';
+    }
+    $('#extResponse').style.display = 'block';
+  } catch {} finally {
+    $('#btnExtSend').disabled = false;
+    $('#btnExtSend').innerHTML = `<i class="fa-solid fa-paper-plane"></i> ${t('Po\u0161alji')}`;
+  }
+});
+
+// ── Health check & init ─────────────────────────────────────────────────────
+async function checkHealth() {
+  try {
+    const res = await fetch('/api/health');
+    const data = await res.json();
+    if (data.ok && data.ollama_available) {
+      statusDot.classList.add('online');
+      statusText.textContent = t('AI aktivan');
+    } else {
+      statusDot.classList.remove('online');
+      statusText.textContent = data.ollama_available ? t('API aktivan') : t('Ollama offline');
+    }
+    if (data.corpus_stats && data.corpus_stats.total_articles) {
+      $('#corpusStatus').textContent = data.corpus_stats.total_articles.toLocaleString() + ' ' + t('\u010dlanaka');
+    }
+  } catch {
+    statusDot.classList.remove('online');
+    statusText.textContent = t('Offline');
+  }
+  // App info (used by settings page)
+  try {
+    const infoRes = await fetch('/api/app-info');
+    const info = await infoRes.json();
+    state.appInfo = info;
+  } catch {}
+}
+
+async function init() {
+  applyTheme();
+  checkHealth();
+  applyLang();
+  loadChats();
+  // Periodic health check
+  setInterval(checkHealth, 30000);
+}
+
+// ── Keyboard shortcuts ──────────────────────────────────────────────────────
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    uploadModal.classList.add('hidden');
+    $('#createTemplateModal').classList.add('hidden');
+    sidebar.classList.remove('open');
+  }
+});
+
+// ── Click outside modal ─────────────────────────────────────────────────────
+uploadModal.addEventListener('click', (e) => {
+  if (e.target === uploadModal) uploadModal.classList.add('hidden');
+});
+
+// ── Boot ────────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

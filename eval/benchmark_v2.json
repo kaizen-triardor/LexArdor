@@ -1,0 +1,2015 @@
+{
+  "version": "2.0",
+  "description": "LexArdor Benchmark Suite v2 — 200 questions across 10 legal domains",
+  "questions": [
+    {
+      "id": "RD001",
+      "domain": "radno_pravo",
+      "question": "Koji je zakonski otkazni rok za zaposlenog sa 10 godina staža?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["179", "180"],
+      "expected_keywords": ["otkazni rok", "staž"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "RD002",
+      "domain": "radno_pravo",
+      "question": "Koliko traje probni rad prema Zakonu o radu?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["36"],
+      "expected_keywords": ["šest meseci", "probni rad"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "RD003",
+      "domain": "radno_pravo",
+      "question": "Koliko dana godišnjeg odmora pripada zaposlenom prema zakonu?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["68", "69"],
+      "expected_keywords": ["20 radnih dana", "godišnji odmor"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "RD004",
+      "domain": "radno_pravo",
+      "question": "Da li zaposleni ima pravo na naknadu troškova prevoza za dolazak na rad?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["118"],
+      "expected_keywords": ["troškovi prevoza", "dolazak na rad"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "RD005",
+      "domain": "radno_pravo",
+      "question": "Koliko iznosi minimalni otkazni rok prema Zakonu o radu?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["189"],
+      "expected_keywords": ["15 dana", "otkazni rok"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "RD006",
+      "domain": "radno_pravo",
+      "question": "Koje su obaveze poslodavca u pogledu zaštite na radu?",
+      "expected_law": "Zakon o bezbednosti i zdravlju na radu",
+      "expected_articles": ["9", "15"],
+      "expected_keywords": ["zaštita", "bezbednost", "zdravlje"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "RD007",
+      "domain": "radno_pravo",
+      "question": "Koji su uslovi za noćni rad i koja su prava zaposlenih koji rade noću?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["62", "63"],
+      "expected_keywords": ["noćni rad", "između 22 i 6 časova", "uvećana zarada"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "RD008",
+      "domain": "radno_pravo",
+      "question": "Koliko iznosi uvećanje zarade za prekovremeni rad?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["108"],
+      "expected_keywords": ["uvećana zarada", "prekovremeni rad", "26%"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "RD009",
+      "domain": "radno_pravo",
+      "question": "Da li trudnica može dobiti otkaz ugovora o radu?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["187"],
+      "expected_keywords": ["trudnoća", "porodiljsko", "zabrana otkaza"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "RD010",
+      "domain": "radno_pravo",
+      "question": "Kada poslodavac može da uvede skraćeno radno vreme?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["51", "52"],
+      "expected_keywords": ["štetni uticaj", "skraćeno radno vreme"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "RD011",
+      "domain": "radno_pravo",
+      "question": "Koji su uslovi za zasnivanje radnog odnosa sa maloletnikom?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["24", "25"],
+      "expected_keywords": ["15 godina", "maloletnik", "saglasnost roditelja"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "RD012",
+      "domain": "radno_pravo",
+      "question": "Kako se utvrđuje višak zaposlenih i koji je postupak za kolektivno otpuštanje?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["153", "154", "155"],
+      "expected_keywords": ["višak zaposlenih", "program rešavanja", "kolektivno otpuštanje"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "RD013",
+      "domain": "radno_pravo",
+      "question": "Koja su prava zaposlenog u slučaju nezakonitog otkaza?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["191", "194"],
+      "expected_keywords": ["vraćanje na rad", "naknada štete", "nezakonit otkaz"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "RD014",
+      "domain": "radno_pravo",
+      "question": "Koji su uslovi za rad na određeno vreme i koliko može trajati?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["37"],
+      "expected_keywords": ["određeno vreme", "24 meseca", "opravdani razlog"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "RD015",
+      "domain": "radno_pravo",
+      "question": "Kako se određuje minimalna zarada u Republici Srbiji?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["111", "112"],
+      "expected_keywords": ["minimalna zarada", "Socijalno-ekonomski savet"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "RD016",
+      "domain": "radno_pravo",
+      "question": "Koje su obaveze poslodavca prilikom donošenja pravilnika o radu?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["1", "3"],
+      "expected_keywords": ["pravilnik o radu", "sindikat", "mišljenje"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "RD017",
+      "domain": "radno_pravo",
+      "question": "Kako se rešava kolektivni radni spor prema srpskom pravu? Objasnite postupak mirenja i arbitraže.",
+      "expected_law": "Zakon o mirnom rešavanju radnih sporova",
+      "expected_articles": ["18", "22", "31"],
+      "expected_keywords": ["mirenje", "arbitraža", "kolektivni spor", "Republika agencija"],
+      "difficulty": "hard",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "RD018",
+      "domain": "radno_pravo",
+      "question": "Zaposlena je na bolovanju due trudnoće. Poslodavac želi da joj uruči otkaz jer je njen ugovor na određeno vreme istekao. Da li može?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["187", "37"],
+      "expected_keywords": ["trudnoća", "zabrana otkaza", "određeno vreme", "produženje"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "RD019",
+      "domain": "radno_pravo",
+      "question": "Koji su pravni efekti mobinga na radnom mestu i kako se štiti zaposleni prema Zakonu o sprečavanju zlostavljanja na radu?",
+      "expected_law": "Zakon o sprečavanju zlostavljanja na radu",
+      "expected_articles": ["6", "12", "30"],
+      "expected_keywords": ["zlostavljanje", "mobing", "posrednik", "teret dokazivanja"],
+      "difficulty": "hard",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "RD020",
+      "domain": "radno_pravo",
+      "question": "Radnik je radio bez zaključenog ugovora o radu 3 godine. Kakva su njegova prava i kako može da dokaže postojanje radnog odnosa?",
+      "expected_law": "Zakon o radu",
+      "expected_articles": ["30", "32", "197"],
+      "expected_keywords": ["faktički rad", "ugovor o radu", "neformalan", "radni odnos"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+
+    {
+      "id": "KP001",
+      "domain": "krivicno_pravo",
+      "question": "Koja je kazna za krivično delo krađe prema Krivičnom zakoniku?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["203"],
+      "expected_keywords": ["krađa", "zatvor", "novčana kazna"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KP002",
+      "domain": "krivicno_pravo",
+      "question": "Šta je krivično delo prevare i koja je propisana kazna?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["208"],
+      "expected_keywords": ["prevara", "lažno prikazivanje", "imovinska korist"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KP003",
+      "domain": "krivicno_pravo",
+      "question": "Kolika je zaprećena kazna za krivično delo ubistva?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["113"],
+      "expected_keywords": ["ubistvo", "zatvor", "pet godina"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KP004",
+      "domain": "krivicno_pravo",
+      "question": "Šta je nužna odbrana prema Krivičnom zakoniku?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["19"],
+      "expected_keywords": ["nužna odbrana", "napad", "odbijanje"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KP005",
+      "domain": "krivicno_pravo",
+      "question": "Kada nastupa apsolutna zastarelost krivičnog gonjenja?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["103", "104"],
+      "expected_keywords": ["zastarelost", "dvostruko vreme", "krivično gonjenje"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KP006",
+      "domain": "krivicno_pravo",
+      "question": "Koje su kazne za neovlašćenu proizvodnju i promet opojnih droga?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["246"],
+      "expected_keywords": ["opojne droge", "zatvor", "proizvodnja", "promet"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KP007",
+      "domain": "krivicno_pravo",
+      "question": "Šta predstavlja krivično delo nasilja u porodici?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["194"],
+      "expected_keywords": ["nasilje u porodici", "fizičko", "psihičko", "član porodice"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KP008",
+      "domain": "krivicno_pravo",
+      "question": "Šta je krajnja nužda prema Krivičnom zakoniku?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["20"],
+      "expected_keywords": ["krajnja nužda", "opasnost", "zlo"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KP009",
+      "domain": "krivicno_pravo",
+      "question": "Koja je kazna za teško ubistvo i koji su kvalifikovani oblici?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["114"],
+      "expected_keywords": ["teško ubistvo", "najmanje deset godina", "okrutnost", "dete"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KP010",
+      "domain": "krivicno_pravo",
+      "question": "Koji su uslovi za uslovnu osudu prema Krivičnom zakoniku?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["65", "66"],
+      "expected_keywords": ["uslovna osuda", "kazna zatvora", "rok proveravanja"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KP011",
+      "domain": "krivicno_pravo",
+      "question": "Kada se može izreći mera bezbednosti obaveznog lečenja narkomana?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["83"],
+      "expected_keywords": ["obavezno lečenje", "narkoman", "mera bezbednosti"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "KP012",
+      "domain": "krivicno_pravo",
+      "question": "Kako se određuje kazna za sticaj krivičnih dela?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["60"],
+      "expected_keywords": ["sticaj", "jedinstvena kazna", "povećanje"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "KP013",
+      "domain": "krivicno_pravo",
+      "question": "Koji su uslovi za rad u javnom interesu kao alternativnu krivičnu sankciju?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["52"],
+      "expected_keywords": ["rad u javnom interesu", "zatvor do šest meseci", "pristanak"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KP014",
+      "domain": "krivicno_pravo",
+      "question": "Šta je krivično delo pranja novca i koja je zaprećena kazna?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["231"],
+      "expected_keywords": ["pranje novca", "prikrivanje", "imovinska korist", "kriminalna aktivnost"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KP015",
+      "domain": "krivicno_pravo",
+      "question": "Kakva je krivična odgovornost pravnih lica prema srpskom pravu?",
+      "expected_law": "Zakon o odgovornosti pravnih lica za krivična dela",
+      "expected_articles": ["6", "13"],
+      "expected_keywords": ["pravno lice", "odgovornost", "novčana kazna", "prestanak"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "KP016",
+      "domain": "krivicno_pravo",
+      "question": "Kako se primenjuje institut produženog krivičnog dela?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["61"],
+      "expected_keywords": ["produženo krivično delo", "ista vrsta", "jedinstveni umišljaj"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "KP017",
+      "domain": "krivicno_pravo",
+      "question": "Osoba A napadne osobu B nožem. Osoba B u samoodbrani teško povredi osobu A. Da li je osoba B krivično odgovorna? Analizirajte granice nužne odbrane.",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["19"],
+      "expected_keywords": ["nužna odbrana", "prekoračenje", "srazmernost", "krivična odgovornost"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "KP018",
+      "domain": "krivicno_pravo",
+      "question": "Koji su uslovi za primenu instituta odlaganja krivičnog gonjenja (oportuniteta) prema srpskom pravu?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["283"],
+      "expected_keywords": ["oportunitet", "odlaganje gonjenja", "javni tužilac", "obaveza"],
+      "difficulty": "hard",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "KP019",
+      "domain": "krivicno_pravo",
+      "question": "Direktor firme je znao da se na računu nalaze sredstva kriminalonog porekla ali ih nije prijavio. Koje krivično delo je učinjeno i koja je odgovornost?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["231", "232"],
+      "expected_keywords": ["pranje novca", "neprijavljivanje", "odgovornost", "saučesništvo"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "KP020",
+      "domain": "krivicno_pravo",
+      "question": "Kako se razlikuje pokušaj od pripremnih radnji u srpskom krivičnom pravu i koji su pravni efekti te razlike?",
+      "expected_law": "Krivični zakonik",
+      "expected_articles": ["30", "31"],
+      "expected_keywords": ["pokušaj", "pripremne radnje", "kažnjivost", "dobrovoljni odustanak"],
+      "difficulty": "hard",
+      "answer_type": "analytical"
+    },
+
+    {
+      "id": "PP001",
+      "domain": "porodicno_pravo",
+      "question": "Koji su uslovi za zaključenje braka u Republici Srbiji?",
+      "expected_law": "Porodični zakon",
+      "expected_articles": ["15", "16", "17"],
+      "expected_keywords": ["brak", "punoletstvo", "pristanak", "matičar"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PP002",
+      "domain": "porodicno_pravo",
+      "question": "Koji su razlozi za razvod braka prema Porodičnom zakonu?",
+      "expected_law": "Porodični zakon",
+      "expected_articles": ["41"],
+      "expected_keywords": ["razvod", "ozbiljno poremećeni", "bračni odnosi", "sporazum"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PP003",
+      "domain": "porodicno_pravo",
+      "question": "Ko ima pravo na izdržavanje prema Porodičnom zakonu?",
+      "expected_law": "Porodični zakon",
+      "expected_articles": ["151", "152"],
+      "expected_keywords": ["izdržavanje", "maloletno dete", "supružnik"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PP004",
+      "domain": "porodicno_pravo",
+      "question": "Šta je zajednička imovina supružnika?",
+      "expected_law": "Porodični zakon",
+      "expected_articles": ["171", "176"],
+      "expected_keywords": ["zajednička imovina", "brak", "rad", "udeli"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PP005",
+      "domain": "porodicno_pravo",
+      "question": "Koji su uslovi za priznanje očinstva?",
+      "expected_law": "Porodični zakon",
+      "expected_articles": ["45", "46"],
+      "expected_keywords": ["očinstvo", "priznanje", "matičar", "saglasnost majke"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PP006",
+      "domain": "porodicno_pravo",
+      "question": "Koliko traje postupak za sporazumni razvod braka?",
+      "expected_law": "Porodični zakon",
+      "expected_articles": ["40"],
+      "expected_keywords": ["sporazumni razvod", "predlog za sporazumni razvod"],
+      "difficulty": "easy",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "PP007",
+      "domain": "porodicno_pravo",
+      "question": "Šta je vanbračna zajednica i kakva su prava partnera?",
+      "expected_law": "Porodični zakon",
+      "expected_articles": ["4"],
+      "expected_keywords": ["vanbračna zajednica", "trajnija zajednica", "bračna prava"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PP008",
+      "domain": "porodicno_pravo",
+      "question": "Kada sud može oduzeti roditeljsko pravo?",
+      "expected_law": "Porodični zakon",
+      "expected_articles": ["81", "82"],
+      "expected_keywords": ["lišenje roditeljskog prava", "zlostavljanje", "zanemarivanje"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PP009",
+      "domain": "porodicno_pravo",
+      "question": "Kako se određuje visina alimentacije za dete i koji faktori se uzimaju u obzir?",
+      "expected_law": "Porodični zakon",
+      "expected_articles": ["160", "162"],
+      "expected_keywords": ["izdržavanje", "potrebe deteta", "mogućnosti roditelja"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "PP010",
+      "domain": "porodicno_pravo",
+      "question": "Koji su uslovi za usvojenje deteta prema Porodičnom zakonu?",
+      "expected_law": "Porodični zakon",
+      "expected_articles": ["89", "90", "97"],
+      "expected_keywords": ["usvojenje", "usvojilac", "usvojenik", "potpuno usvojenje"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "PP011",
+      "domain": "porodicno_pravo",
+      "question": "Ko nasledjuje u prvom naslednom redu prema Zakonu o nasleđivanju?",
+      "expected_law": "Zakon o nasleđivanju",
+      "expected_articles": ["9", "10"],
+      "expected_keywords": ["prvi nasledni red", "potomci", "supružnik", "jednaki delovi"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PP012",
+      "domain": "porodicno_pravo",
+      "question": "Šta je starateljstvo i ko može biti staratelj?",
+      "expected_law": "Porodični zakon",
+      "expected_articles": ["124", "125", "128"],
+      "expected_keywords": ["starateljstvo", "centar za socijalni rad", "štićenik"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PP013",
+      "domain": "porodicno_pravo",
+      "question": "Kako se vrši deoba zajedničke imovine supružnika nakon razvoda?",
+      "expected_law": "Porodični zakon",
+      "expected_articles": ["176", "177", "178"],
+      "expected_keywords": ["deoba", "zajednička imovina", "udeli", "doprinos"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "PP014",
+      "domain": "porodicno_pravo",
+      "question": "Koja je uloga centra za socijalni rad u porodičnim sporovima?",
+      "expected_law": "Porodični zakon",
+      "expected_articles": ["56", "265"],
+      "expected_keywords": ["centar za socijalni rad", "zaštita", "mišljenje"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "PP015",
+      "domain": "porodicno_pravo",
+      "question": "Šta je nužni nasledni deo i ko ima pravo na njega?",
+      "expected_law": "Zakon o nasleđivanju",
+      "expected_articles": ["39", "40"],
+      "expected_keywords": ["nužni deo", "polovina zakonskog dela", "nužni naslednici"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PP016",
+      "domain": "porodicno_pravo",
+      "question": "Kako se može osporiti testament prema srpskom pravu?",
+      "expected_law": "Zakon o nasleđivanju",
+      "expected_articles": ["65", "85"],
+      "expected_keywords": ["ništavost testamenta", "rušljivost", "osporavanje", "rok"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "PP017",
+      "domain": "porodicno_pravo",
+      "question": "Supružnici se razvode. Majka želi da se sa decom preseli u inostranstvo. Otac se protivi. Kako sud odlučuje?",
+      "expected_law": "Porodični zakon",
+      "expected_articles": ["61", "77", "78"],
+      "expected_keywords": ["roditeljsko pravo", "preseljenje", "najbolji interes deteta", "saglasnost"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "PP018",
+      "domain": "porodicno_pravo",
+      "question": "Vanbračni partner je živeo sa ostaviocem 20 godina. Da li ima nasledno pravo i kako ga ostvaruje?",
+      "expected_law": "Zakon o nasleđivanju",
+      "expected_articles": ["8"],
+      "expected_keywords": ["vanbračni partner", "nasledno pravo", "trajnija zajednica", "dokazivanje"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "PP019",
+      "domain": "porodicno_pravo",
+      "question": "Kako se štite prava deteta kada roditelji žive u različitim državama? Koji se međunarodni instrumenti primenjuju?",
+      "expected_law": "Haška konvencija o građanskopravnim aspektima međunarodne otmice dece",
+      "expected_articles": [],
+      "expected_keywords": ["Haška konvencija", "otmica deteta", "uobičajeno boravište", "vraćanje"],
+      "difficulty": "hard",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "PP020",
+      "domain": "porodicno_pravo",
+      "question": "Preminuli ostavilac je pred smrt prodao jedini stan sinu po ceni ispod tržišne. Kćerka traži zaštitu svog naslednog prava. Kakve su njene mogućnosti?",
+      "expected_law": "Zakon o nasleđivanju",
+      "expected_articles": ["39", "40", "50"],
+      "expected_keywords": ["nužni deo", "simulovani ugovor", "vraćanje poklona", "umanjenje nužnog dela"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+
+    {
+      "id": "OB001",
+      "domain": "obligaciono_pravo",
+      "question": "Koji su bitni elementi ugovora o kupoprodaji?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["454", "455"],
+      "expected_keywords": ["kupoprodaja", "stvar", "cena", "predaja"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "OB002",
+      "domain": "obligaciono_pravo",
+      "question": "Šta je ugovorna odgovornost za štetu?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["263"],
+      "expected_keywords": ["naknada štete", "neispunjenje obaveze"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "OB003",
+      "domain": "obligaciono_pravo",
+      "question": "Koji je opšti rok zastarelosti potraživanja?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["371"],
+      "expected_keywords": ["zastarelost", "deset godina", "opšti rok"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "OB004",
+      "domain": "obligaciono_pravo",
+      "question": "Šta je kapara i kakve su njene pravne posledice?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["79", "80"],
+      "expected_keywords": ["kapara", "odustanak", "dvostruko vraćanje"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "OB005",
+      "domain": "obligaciono_pravo",
+      "question": "Šta je ugovorna kazna i kada se primenjuje?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["270", "273"],
+      "expected_keywords": ["ugovorna kazna", "neispunjenje", "novčani iznos"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "OB006",
+      "domain": "obligaciono_pravo",
+      "question": "Kada nastaje obaveza naknade štete prema opštim pravilima odgovornosti?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["154", "158"],
+      "expected_keywords": ["šteta", "protivpravnost", "uzročna veza", "krivica"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "OB007",
+      "domain": "obligaciono_pravo",
+      "question": "Šta je cesija (ustupanje potraživanja) i koji su njeni uslovi?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["436", "438"],
+      "expected_keywords": ["cesija", "ustupanje", "poverilac", "dužnik", "obaveštenje"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "OB008",
+      "domain": "obligaciono_pravo",
+      "question": "Šta je solidarna odgovornost dužnika?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["414", "423"],
+      "expected_keywords": ["solidarna odgovornost", "svi dužnici", "celokupno ispunjenje"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "OB009",
+      "domain": "obligaciono_pravo",
+      "question": "Kada se može raskinuti ugovor zbog promenjenih okolnosti?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["133"],
+      "expected_keywords": ["promenjene okolnosti", "raskid ugovora", "nesrazmernost"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "OB010",
+      "domain": "obligaciono_pravo",
+      "question": "Kako funkcioniše odgovornost za štetu od opasne stvari ili delatnosti?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["173", "174"],
+      "expected_keywords": ["opasna stvar", "objektivna odgovornost", "uzročna veza"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "OB011",
+      "domain": "obligaciono_pravo",
+      "question": "Koji su uslovi za poništaj ugovora zaključenog pod prinudom?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["60"],
+      "expected_keywords": ["prinuda", "pretnja", "rušljivost", "poništaj"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "OB012",
+      "domain": "obligaciono_pravo",
+      "question": "Šta je odgovornost proizvođača za štetu od proizvoda sa nedostatkom?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["179"],
+      "expected_keywords": ["proizvod", "nedostatak", "proizvođač", "odgovornost"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "OB013",
+      "domain": "obligaciono_pravo",
+      "question": "Koji je rok zastarelosti za potraživanja nastala iz naknade štete?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["376"],
+      "expected_keywords": ["zastarelost", "tri godine", "saznanje za štetu", "štetnik"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "OB014",
+      "domain": "obligaciono_pravo",
+      "question": "Kako se računa zatezna kamata na dospela potraživanja?",
+      "expected_law": "Zakon o zateznoj kamati",
+      "expected_articles": ["2", "3"],
+      "expected_keywords": ["zatezna kamata", "referentna stopa", "NBS"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "OB015",
+      "domain": "obligaciono_pravo",
+      "question": "Šta je zelenaški ugovor i koje su posledice?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["141"],
+      "expected_keywords": ["zelenaški ugovor", "nesrazmera", "stanje nužde", "ništavost"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "OB016",
+      "domain": "obligaciono_pravo",
+      "question": "Kako se primenjuje pravilo o prelazu rizika kod ugovora o kupoprodaji?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["463", "464"],
+      "expected_keywords": ["rizik", "predaja", "slučajna propast", "kupac"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "OB017",
+      "domain": "obligaciono_pravo",
+      "question": "Izvođač radova je kasnio sa završetkom objekta 6 meseci. Investitor traži naknadu štete i ugovornu kaznu. Da li može kumulirati obe?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["270", "273", "274"],
+      "expected_keywords": ["ugovorna kazna", "naknada štete", "kumulacija", "razlika"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "OB018",
+      "domain": "obligaciono_pravo",
+      "question": "Kompanija je zaključila ugovor sa dobavljačem koji sadrži klauzulu o isključenju odgovornosti za štetu. Da li je takva klauzula punovažna?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["265", "270"],
+      "expected_keywords": ["isključenje odgovornosti", "namera", "gruba nepažnja", "ništavost"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "OB019",
+      "domain": "obligaciono_pravo",
+      "question": "Analizirajte razliku između stvarne i materijalne štete u srpskom obligacionom pravu. Kada se priznaje nematerijalna šteta?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["155", "200"],
+      "expected_keywords": ["materijalna šteta", "nematerijalna šteta", "fizički bol", "duševni bol", "pravičan novčani iznos"],
+      "difficulty": "hard",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "OB020",
+      "domain": "obligaciono_pravo",
+      "question": "Poslodavac je dao jemstvo za kredit zaposlenog. Zaposleni nije otplaćivao kredit. Banka traži naplatu od jemca. Koji su pravni efekti jemstva?",
+      "expected_law": "Zakon o obligacionim odnosima",
+      "expected_articles": ["997", "1004"],
+      "expected_keywords": ["jemstvo", "supsidijarnost", "solidarno jemstvo", "regres"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+
+    {
+      "id": "PO001",
+      "domain": "poresko_pravo",
+      "question": "Kolika je opšta stopa poreza na dodatu vrednost (PDV)?",
+      "expected_law": "Zakon o porezu na dodatu vrednost",
+      "expected_articles": ["23"],
+      "expected_keywords": ["20%", "PDV", "opšta stopa"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PO002",
+      "domain": "poresko_pravo",
+      "question": "Kolika je stopa poreza na dobit pravnih lica?",
+      "expected_law": "Zakon o porezu na dobit pravnih lica",
+      "expected_articles": ["40"],
+      "expected_keywords": ["15%", "porez na dobit"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PO003",
+      "domain": "poresko_pravo",
+      "question": "Ko je obveznik poreza na dodatu vrednost?",
+      "expected_law": "Zakon o porezu na dodatu vrednost",
+      "expected_articles": ["8"],
+      "expected_keywords": ["PDV", "obveznik", "promet dobara", "promet usluga"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PO004",
+      "domain": "poresko_pravo",
+      "question": "Kolika je snižena stopa PDV-a i na šta se primenjuje?",
+      "expected_law": "Zakon o porezu na dodatu vrednost",
+      "expected_articles": ["23"],
+      "expected_keywords": ["10%", "posebna stopa", "hleb", "mleko", "lekovi"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PO005",
+      "domain": "poresko_pravo",
+      "question": "Koji je rok za podnošenje godišnjeg poreskog bilansa pravnih lica?",
+      "expected_law": "Zakon o porezu na dobit pravnih lica",
+      "expected_articles": ["63"],
+      "expected_keywords": ["poreski bilans", "180 dana", "rok"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PO006",
+      "domain": "poresko_pravo",
+      "question": "Šta je porez na zarade i kako se obračunava?",
+      "expected_law": "Zakon o porezu na dohodak građana",
+      "expected_articles": ["13", "15"],
+      "expected_keywords": ["porez na zarade", "10%", "neoporezivi iznos"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PO007",
+      "domain": "poresko_pravo",
+      "question": "Ko je obveznik doprinosa za obavezno socijalno osiguranje?",
+      "expected_law": "Zakon o doprinosima za obavezno socijalno osiguranje",
+      "expected_articles": ["7"],
+      "expected_keywords": ["doprinosi", "zaposleni", "poslodavac", "PIO", "zdravstveno"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PO008",
+      "domain": "poresko_pravo",
+      "question": "Šta je porez na imovinu fizičkih lica i kako se utvrđuje?",
+      "expected_law": "Zakon o porezima na imovinu",
+      "expected_articles": ["2", "5"],
+      "expected_keywords": ["porez na imovinu", "nepokretnost", "tržišna vrednost"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PO009",
+      "domain": "poresko_pravo",
+      "question": "Koji su uslovi za oslobađanje od PDV-a pri izvozu robe?",
+      "expected_law": "Zakon o porezu na dodatu vrednost",
+      "expected_articles": ["24"],
+      "expected_keywords": ["oslobođenje", "izvoz", "PDV", "carinska dokumentacija"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "PO010",
+      "domain": "poresko_pravo",
+      "question": "Kako funkcioniše sistem prethodnog poreza (odbitnog PDV-a)?",
+      "expected_law": "Zakon o porezu na dodatu vrednost",
+      "expected_articles": ["28"],
+      "expected_keywords": ["prethodni porez", "odbitak", "ulazni PDV", "faktura"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "PO011",
+      "domain": "poresko_pravo",
+      "question": "Koji su rokovi za podnošenje PDV prijave?",
+      "expected_law": "Zakon o porezu na dodatu vrednost",
+      "expected_articles": ["48", "50"],
+      "expected_keywords": ["PDV prijava", "mesečni", "tromesečni", "rok", "15. u mesecu"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "PO012",
+      "domain": "poresko_pravo",
+      "question": "Kako se oporezuje prenos nepokretnosti?",
+      "expected_law": "Zakon o porezima na imovinu",
+      "expected_articles": ["23", "25"],
+      "expected_keywords": ["porez na prenos", "2.5%", "nepokretnost", "kupac"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PO013",
+      "domain": "poresko_pravo",
+      "question": "Koji su poreski podsticaji za ulaganja u Srbiji?",
+      "expected_law": "Zakon o porezu na dobit pravnih lica",
+      "expected_articles": ["50a"],
+      "expected_keywords": ["poreski kredit", "ulaganja", "osnovni kapital", "10 godina"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "PO014",
+      "domain": "poresko_pravo",
+      "question": "Kako se oporezuju dividende u Srbiji?",
+      "expected_law": "Zakon o porezu na dohodak građana",
+      "expected_articles": ["61", "61a"],
+      "expected_keywords": ["dividenda", "15%", "porez po odbitku"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PO015",
+      "domain": "poresko_pravo",
+      "question": "Šta je paušalno oporezivanje preduzetnika i koji su uslovi?",
+      "expected_law": "Zakon o porezu na dohodak građana",
+      "expected_articles": ["40", "41"],
+      "expected_keywords": ["paušalac", "preduzetnik", "promet", "6.000.000"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PO016",
+      "domain": "poresko_pravo",
+      "question": "Kako funkcioniše poreski postupak inspekcije i koja su prava poreskog obveznika?",
+      "expected_law": "Zakon o poreskom postupku i poreskoj administraciji",
+      "expected_articles": ["118", "124"],
+      "expected_keywords": ["poreska kontrola", "inspekcija", "prava obveznika", "nalog"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "PO017",
+      "domain": "poresko_pravo",
+      "question": "Firma iz Srbije pruža IT usluge firmi u EU. Kako se određuje mesto prometa usluga za PDV? Da li postoji obaveza obračuna PDV-a?",
+      "expected_law": "Zakon o porezu na dodatu vrednost",
+      "expected_articles": ["12"],
+      "expected_keywords": ["mesto prometa", "sedište primaoca", "oslobođenje", "izvoz usluga"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "PO018",
+      "domain": "poresko_pravo",
+      "question": "Kompanija je prikrila prihode od 50 miliona dinara. Koje su poreske i krivičnopravne posledice poreske evazije?",
+      "expected_law": "Zakon o poreskom postupku i poreskoj administraciji",
+      "expected_articles": ["173", "176"],
+      "expected_keywords": ["poreska evazija", "krivično delo", "kazna", "zatezna kamata"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "PO019",
+      "domain": "poresko_pravo",
+      "question": "Analizirajte ugovor o izbegavanju dvostrukog oporezivanja. Koji je pravni okvir za primenu UIDO-a u Srbiji?",
+      "expected_law": "Zakon o porezu na dobit pravnih lica",
+      "expected_articles": ["40a", "71"],
+      "expected_keywords": ["dvostruko oporezivanje", "UIDO", "rezident", "stalna poslovna jedinica"],
+      "difficulty": "hard",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "PO020",
+      "domain": "poresko_pravo",
+      "question": "Preduzetnik paušalac je premašio limit prometa. Koje su obaveze prelaska na knjigvodstveno vođenje i PDV sistem?",
+      "expected_law": "Zakon o porezu na dohodak građana",
+      "expected_articles": ["40", "42"],
+      "expected_keywords": ["paušalac", "prelazak", "PDV obveznik", "knjige", "rok"],
+      "difficulty": "hard",
+      "answer_type": "procedural"
+    },
+
+    {
+      "id": "PR001",
+      "domain": "privredno_pravo",
+      "question": "Kako se osniva društvo sa ograničenom odgovornošću (DOO)?",
+      "expected_law": "Zakon o privrednim društvima",
+      "expected_articles": ["104", "105"],
+      "expected_keywords": ["DOO", "osnivanje", "osnivački akt", "APR"],
+      "difficulty": "easy",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "PR002",
+      "domain": "privredno_pravo",
+      "question": "Koji je minimalni osnovni kapital za DOO?",
+      "expected_law": "Zakon o privrednim društvima",
+      "expected_articles": ["145"],
+      "expected_keywords": ["100 dinara", "osnovni kapital", "DOO"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PR003",
+      "domain": "privredno_pravo",
+      "question": "Šta je preduzetnik prema srpskom pravu i kako se registruje?",
+      "expected_law": "Zakon o privrednim društvima",
+      "expected_articles": ["83", "84"],
+      "expected_keywords": ["preduzetnik", "fizičko lice", "APR", "registracija"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PR004",
+      "domain": "privredno_pravo",
+      "question": "Koji organi upravljanja postoje u DOO?",
+      "expected_law": "Zakon o privrednim društvima",
+      "expected_articles": ["139", "140"],
+      "expected_keywords": ["skupština", "direktor", "nadzorni odbor"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PR005",
+      "domain": "privredno_pravo",
+      "question": "Koji je rok za registraciju privrednog subjekta u Agenciji za privredne registre?",
+      "expected_law": "Zakon o registraciji privrednih subjekata",
+      "expected_articles": ["15"],
+      "expected_keywords": ["APR", "5 radnih dana", "registracija"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PR006",
+      "domain": "privredno_pravo",
+      "question": "Šta je akcionarsko društvo i koji su osnovni elementi?",
+      "expected_law": "Zakon o privrednim društvima",
+      "expected_articles": ["196", "293"],
+      "expected_keywords": ["akcionarsko društvo", "akcije", "osnovni kapital"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PR007",
+      "domain": "privredno_pravo",
+      "question": "Šta je prokura i koja su ovlašćenja prokuriste?",
+      "expected_law": "Zakon o privrednim društvima",
+      "expected_articles": ["36"],
+      "expected_keywords": ["prokura", "prokurista", "zastupanje", "ovlašćenje"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PR008",
+      "domain": "privredno_pravo",
+      "question": "Šta je ortačko društvo i kakva je odgovornost ortaka?",
+      "expected_law": "Zakon o privrednim društvima",
+      "expected_articles": ["93", "94"],
+      "expected_keywords": ["ortačko društvo", "neograničena odgovornost", "solidarno"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PR009",
+      "domain": "privredno_pravo",
+      "question": "Koji je minimalni osnovni kapital za akcionarsko društvo?",
+      "expected_law": "Zakon o privrednim društvima",
+      "expected_articles": ["293"],
+      "expected_keywords": ["akcionarsko društvo", "3.000.000 dinara", "osnovni kapital"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PR010",
+      "domain": "privredno_pravo",
+      "question": "Kako se sprovodi statusna promena pripajanja privrednih društava?",
+      "expected_law": "Zakon o privrednim društvima",
+      "expected_articles": ["486", "488"],
+      "expected_keywords": ["pripajanje", "statusna promena", "plan", "registracija"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "PR011",
+      "domain": "privredno_pravo",
+      "question": "Koji su uslovi za pokretanje stečajnog postupka?",
+      "expected_law": "Zakon o stečaju",
+      "expected_articles": ["11", "12"],
+      "expected_keywords": ["stečaj", "trajnija nesposobnost plaćanja", "prezaduženost"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "PR012",
+      "domain": "privredno_pravo",
+      "question": "Kako se štite manjinski akcionari u akcionarskom društvu?",
+      "expected_law": "Zakon o privrednim društvima",
+      "expected_articles": ["313", "376"],
+      "expected_keywords": ["manjinski akcionari", "posebna prava", "tužba", "zaštita"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "PR013",
+      "domain": "privredno_pravo",
+      "question": "Šta je zabrana konkurencije za direktore privrednih društava?",
+      "expected_law": "Zakon o privrednim društvima",
+      "expected_articles": ["72"],
+      "expected_keywords": ["zabrana konkurencije", "direktor", "odobrenje", "šteta"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "PR014",
+      "domain": "privredno_pravo",
+      "question": "Kako se vrši likvidacija privrednog društva?",
+      "expected_law": "Zakon o privrednim društvima",
+      "expected_articles": ["524", "530"],
+      "expected_keywords": ["likvidacija", "likvidacioni upravnik", "namirenje poverilaca"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "PR015",
+      "domain": "privredno_pravo",
+      "question": "Koji su efekti otvaranja stečajnog postupka na poverilace?",
+      "expected_law": "Zakon o stečaju",
+      "expected_articles": ["73", "80"],
+      "expected_keywords": ["stečajni postupak", "obustava izvršenja", "prijava potraživanja"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "PR016",
+      "domain": "privredno_pravo",
+      "question": "Šta je reorganizacija u stečaju i kako se sprovodi?",
+      "expected_law": "Zakon o stečaju",
+      "expected_articles": ["155", "157"],
+      "expected_keywords": ["reorganizacija", "plan", "poverioci", "glasanje"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "PR017",
+      "domain": "privredno_pravo",
+      "question": "Dva privredna društva se dogovaraju o podeli tržišta. Da li takav sporazum krši Zakon o zaštiti konkurencije? Koje su sankcije?",
+      "expected_law": "Zakon o zaštiti konkurencije",
+      "expected_articles": ["10"],
+      "expected_keywords": ["restriktivni sporazum", "podela tržišta", "Komisija za zaštitu konkurencije", "kazna"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "PR018",
+      "domain": "privredno_pravo",
+      "question": "Direktor DOO je zaključio ugovor u ime društva koji je štetan po društvo. Koja je njegova lična odgovornost?",
+      "expected_law": "Zakon o privrednim društvima",
+      "expected_articles": ["61", "63"],
+      "expected_keywords": ["odgovornost direktora", "dužnost pažnje", "naknada štete", "probijanje pravne ličnosti"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "PR019",
+      "domain": "privredno_pravo",
+      "question": "Analizirajte institut probijanja pravne ličnosti (piercing the corporate veil) u srpskom pravu. Kada se može primeniti?",
+      "expected_law": "Zakon o privrednim društvima",
+      "expected_articles": ["18"],
+      "expected_keywords": ["probijanje pravne ličnosti", "zloupotreba", "neograničena odgovornost", "član društva"],
+      "difficulty": "hard",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "PR020",
+      "domain": "privredno_pravo",
+      "question": "Stečajni dužnik je pre pokretanja stečaja preneo nepokretnost na povezano lice po znatno nižoj ceni. Može li se ta transakcija pobijati?",
+      "expected_law": "Zakon o stečaju",
+      "expected_articles": ["119", "120"],
+      "expected_keywords": ["pobijanje pravnih radnji", "paulijanska tužba", "povezano lice", "stečaj"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+
+    {
+      "id": "UP001",
+      "domain": "upravno_pravo",
+      "question": "Koji je rok za žalbu na prvostepeno rešenje u upravnom postupku?",
+      "expected_law": "Zakon o opštem upravnom postupku",
+      "expected_articles": ["151"],
+      "expected_keywords": ["15 dana", "žalba", "rešenje"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "UP002",
+      "domain": "upravno_pravo",
+      "question": "Šta je upravni akt prema Zakonu o opštem upravnom postupku?",
+      "expected_law": "Zakon o opštem upravnom postupku",
+      "expected_articles": ["16"],
+      "expected_keywords": ["upravni akt", "rešenje", "zaključak", "konkretna stvar"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "UP003",
+      "domain": "upravno_pravo",
+      "question": "Ko ima stranačku sposobnost u upravnom postupku?",
+      "expected_law": "Zakon o opštem upravnom postupku",
+      "expected_articles": ["33"],
+      "expected_keywords": ["stranka", "fizičko lice", "pravno lice", "sposobnost"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "UP004",
+      "domain": "upravno_pravo",
+      "question": "Šta je garantni akt i kakva su njegova dejstva?",
+      "expected_law": "Zakon o opštem upravnom postupku",
+      "expected_articles": ["18"],
+      "expected_keywords": ["garantni akt", "obećanje", "organ", "obavezivanje"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "UP005",
+      "domain": "upravno_pravo",
+      "question": "Koji je rok za donošenje rešenja u upravnom postupku?",
+      "expected_law": "Zakon o opštem upravnom postupku",
+      "expected_articles": ["145"],
+      "expected_keywords": ["30 dana", "60 dana", "rok za rešenje"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "UP006",
+      "domain": "upravno_pravo",
+      "question": "Kada se može podneti upravna tužba pred Upravnim sudom?",
+      "expected_law": "Zakon o upravnim sporovima",
+      "expected_articles": ["14", "15"],
+      "expected_keywords": ["upravni spor", "upravni akt", "Upravni sud"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "UP007",
+      "domain": "upravno_pravo",
+      "question": "Šta je načelo saslušanja stranke u upravnom postupku?",
+      "expected_law": "Zakon o opštem upravnom postupku",
+      "expected_articles": ["8"],
+      "expected_keywords": ["saslušanje stranke", "izjašnjavanje", "pravo", "činjenice"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "UP008",
+      "domain": "upravno_pravo",
+      "question": "Koja su pravna sredstva protiv ćutanja uprave?",
+      "expected_law": "Zakon o opštem upravnom postupku",
+      "expected_articles": ["153"],
+      "expected_keywords": ["ćutanje uprave", "žalba", "rok", "nadležni organ"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "UP009",
+      "domain": "upravno_pravo",
+      "question": "Kako se sprovodi inspekcijski nadzor prema Zakonu o inspekcijskom nadzoru?",
+      "expected_law": "Zakon o inspekcijskom nadzoru",
+      "expected_articles": ["20", "24"],
+      "expected_keywords": ["inspekcija", "nalog", "zapisnik", "mere"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "UP010",
+      "domain": "upravno_pravo",
+      "question": "Koji su uslovi za ponavljanje upravnog postupka?",
+      "expected_law": "Zakon o opštem upravnom postupku",
+      "expected_articles": ["176"],
+      "expected_keywords": ["ponavljanje postupka", "novi dokazi", "pravnosnažnost"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "UP011",
+      "domain": "upravno_pravo",
+      "question": "Šta je eksproprijacija i koji je postupak za oduzimanje nepokretnosti?",
+      "expected_law": "Zakon o eksproprijaciji",
+      "expected_articles": ["1", "20"],
+      "expected_keywords": ["eksproprijacija", "javni interes", "naknada", "nepokretnost"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "UP012",
+      "domain": "upravno_pravo",
+      "question": "Kako se izdaje građevinska dozvola prema Zakonu o planiranju i izgradnji?",
+      "expected_law": "Zakon o planiranju i izgradnji",
+      "expected_articles": ["133", "135"],
+      "expected_keywords": ["građevinska dozvola", "zahtev", "lokacijski uslovi", "rok"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "UP013",
+      "domain": "upravno_pravo",
+      "question": "Šta je upravni ugovor i kada se zaključuje?",
+      "expected_law": "Zakon o opštem upravnom postupku",
+      "expected_articles": ["22", "23"],
+      "expected_keywords": ["upravni ugovor", "javni interes", "organ", "stranka"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "UP014",
+      "domain": "upravno_pravo",
+      "question": "Kako funkcioniše elektronska uprava prema Zakonu o elektronskoj upravi?",
+      "expected_law": "Zakon o elektronskoj upravi",
+      "expected_articles": ["7", "9"],
+      "expected_keywords": ["elektronska uprava", "e-uprava", "elektronski dokument", "servisna magistrala"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "UP015",
+      "domain": "upravno_pravo",
+      "question": "Koji su uslovi za dobijanje dozvole za rad (licence) za obavljanje delatnosti?",
+      "expected_law": "Zakon o opštem upravnom postupku",
+      "expected_articles": ["16", "18"],
+      "expected_keywords": ["licenca", "dozvola", "ispunjenost uslova", "organ"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "UP016",
+      "domain": "upravno_pravo",
+      "question": "Koje su ovlašćenja komunalnog inspektora?",
+      "expected_law": "Zakon o komunalnim delatnostima",
+      "expected_articles": ["35", "36"],
+      "expected_keywords": ["komunalni inspektor", "nadzor", "mere", "rešenje"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "UP017",
+      "domain": "upravno_pravo",
+      "question": "Građanin je podneo zahtev za građevinsku dozvolu, ali organ nije doneo rešenje u roku od 30 dana. Šta može da uradi i koja su mu prava?",
+      "expected_law": "Zakon o opštem upravnom postupku",
+      "expected_articles": ["145", "153"],
+      "expected_keywords": ["ćutanje uprave", "žalba", "rok", "drugostepeni organ", "upravni spor"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "UP018",
+      "domain": "upravno_pravo",
+      "question": "Analizirajte sukob nadležnosti između dve opštine u upravnom postupku. Kako se rešava i koji organ je nadležan?",
+      "expected_law": "Zakon o opštem upravnom postupku",
+      "expected_articles": ["30", "31"],
+      "expected_keywords": ["sukob nadležnosti", "zajednički viši organ", "rešavanje"],
+      "difficulty": "hard",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "UP019",
+      "domain": "upravno_pravo",
+      "question": "Inspektor je doneo rešenje o rušenju objekta. Vlasnik tvrdi da je objekat legalizovan. Kako se rešava ovaj spor?",
+      "expected_law": "Zakon o ozakonjenju objekata",
+      "expected_articles": ["4", "10"],
+      "expected_keywords": ["ozakonjenje", "legalizacija", "rušenje", "žalba", "upravni spor"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "UP020",
+      "domain": "upravno_pravo",
+      "question": "Kako se štite prava stranke u slučaju neosnovane prinudne naplate upravne mere? Koji su pravni lekovi?",
+      "expected_law": "Zakon o opštem upravnom postupku",
+      "expected_articles": ["198"],
+      "expected_keywords": ["prinudna naplata", "administrativno izvršenje", "prigovor", "sudska zaštita"],
+      "difficulty": "hard",
+      "answer_type": "analytical"
+    },
+
+    {
+      "id": "US001",
+      "domain": "ustavno_pravo",
+      "question": "Koja su osnovna ljudska prava garantovana Ustavom Republike Srbije?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["21", "23", "25"],
+      "expected_keywords": ["ljudska prava", "dostojanstvo", "jednakost", "sloboda"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "US002",
+      "domain": "ustavno_pravo",
+      "question": "Šta je Ustavni sud i koja je njegova nadležnost?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["166", "167"],
+      "expected_keywords": ["Ustavni sud", "ustavnost", "zakonitost", "ustavna žalba"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "US003",
+      "domain": "ustavno_pravo",
+      "question": "Kako se bira predsednik Republike Srbije?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["114"],
+      "expected_keywords": ["predsednik", "neposredni izbori", "pet godina", "mandat"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "US004",
+      "domain": "ustavno_pravo",
+      "question": "Koja je uloga Narodne skupštine prema Ustavu?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["98", "99"],
+      "expected_keywords": ["Narodna skupština", "zakonodavna vlast", "250 narodnih poslanika"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "US005",
+      "domain": "ustavno_pravo",
+      "question": "Šta je ustavna žalba i ko može da je podnese?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["170"],
+      "expected_keywords": ["ustavna žalba", "ljudska prava", "Ustavni sud", "pojedinačni akt"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "US006",
+      "domain": "ustavno_pravo",
+      "question": "Kako se menja Ustav Republike Srbije?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["203", "204"],
+      "expected_keywords": ["promena Ustava", "dvotrećinska većina", "referendum"],
+      "difficulty": "easy",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "US007",
+      "domain": "ustavno_pravo",
+      "question": "Šta je načelo podele vlasti prema srpskom Ustavu?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["4"],
+      "expected_keywords": ["podela vlasti", "zakonodavna", "izvršna", "sudska"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "US008",
+      "domain": "ustavno_pravo",
+      "question": "Koja su prava nacionalnih manjina prema Ustavu?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["75", "79"],
+      "expected_keywords": ["nacionalne manjine", "pravo na samoupravu", "jezik", "kultura"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "US009",
+      "domain": "ustavno_pravo",
+      "question": "Kada se može proglasiti vanredno stanje prema Ustavu Srbije?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["200"],
+      "expected_keywords": ["vanredno stanje", "javna opasnost", "Narodna skupština", "ograničenje prava"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "US010",
+      "domain": "ustavno_pravo",
+      "question": "Šta je Zaštitnik građana (ombudsman) i kakva su njegova ovlašćenja?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["138"],
+      "expected_keywords": ["Zaštitnik građana", "ombudsman", "kontrola uprave", "ljudska prava"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "US011",
+      "domain": "ustavno_pravo",
+      "question": "Kakav je ustavni status autonomne pokrajine Vojvodine?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["182", "183"],
+      "expected_keywords": ["Vojvodina", "autonomna pokrajina", "nadležnosti", "statut"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "US012",
+      "domain": "ustavno_pravo",
+      "question": "Kako se obezbeđuje nezavisnost sudstva prema Ustavu?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["142", "146"],
+      "expected_keywords": ["nezavisnost sudstva", "sudija", "stalnost", "nepremestivost"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "US013",
+      "domain": "ustavno_pravo",
+      "question": "Koja su ograničenja slobode izražavanja prema Ustavu?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["46"],
+      "expected_keywords": ["sloboda izražavanja", "ograničenja", "javni moral", "prava drugih"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "US014",
+      "domain": "ustavno_pravo",
+      "question": "Kako funkcioniše lokalna samouprava prema srpskom ustavnom okviru?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["176", "177"],
+      "expected_keywords": ["lokalna samouprava", "opština", "grad", "izvorna nadležnost"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "US015",
+      "domain": "ustavno_pravo",
+      "question": "Šta je imunitet narodnog poslanika i u kojim slučajevima se može ukinuti?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["103"],
+      "expected_keywords": ["imunitet", "poslanik", "odgovornost", "ukidanje"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "US016",
+      "domain": "ustavno_pravo",
+      "question": "Kako se ratifikuju međunarodni ugovori u Republici Srbiji?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["16", "99"],
+      "expected_keywords": ["ratifikacija", "Narodna skupština", "međunarodni ugovor", "potvrđivanje"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "US017",
+      "domain": "ustavno_pravo",
+      "question": "Da li je smrtna kazna dozvoljena prema srpskom Ustavu? Obrazložite ustavni osnov.",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["24"],
+      "expected_keywords": ["smrtna kazna", "zabrana", "pravo na život", "nepovredivost"],
+      "difficulty": "hard",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "US018",
+      "domain": "ustavno_pravo",
+      "question": "Vlada donosi uredbu koja ograničava pravo na okupljanje. Građani smatraju da je uredba neustavna. Koji je postupak pred Ustavnim sudom?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["167", "168"],
+      "expected_keywords": ["ocena ustavnosti", "Ustavni sud", "inicijativa", "uredba", "pravo na okupljanje"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "US019",
+      "domain": "ustavno_pravo",
+      "question": "Analizirajte ustavni status Kosova i Metohije prema važećem Ustavu Republike Srbije.",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["182"],
+      "expected_keywords": ["Kosovo i Metohija", "suštinska autonomija", "preambula", "teritorijalni integritet"],
+      "difficulty": "hard",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "US020",
+      "domain": "ustavno_pravo",
+      "question": "Tokom vanrednog stanja Vlada donosi uredbu sa zakonskom snagom koja ograničava slobodu kretanja. Po prestanku vanrednog stanja, da li uredba automatski prestaje da važi?",
+      "expected_law": "Ustav Republike Srbije",
+      "expected_articles": ["200", "201"],
+      "expected_keywords": ["vanredno stanje", "uredba sa zakonskom snagom", "potvrda Skupštine", "prestanak"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+
+    {
+      "id": "KS001",
+      "domain": "krivicni_postupak",
+      "question": "Koje su faze krivičnog postupka prema Zakoniku o krivičnom postupku?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["2"],
+      "expected_keywords": ["istraga", "optužnica", "glavni pretres", "presuda"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KS002",
+      "domain": "krivicni_postupak",
+      "question": "Ko pokreće krivični postupak u Republici Srbiji?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["5", "43"],
+      "expected_keywords": ["javni tužilac", "optužni akt", "krivična prijava"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KS003",
+      "domain": "krivicni_postupak",
+      "question": "Koja su prava okrivljenog u krivičnom postupku?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["68"],
+      "expected_keywords": ["pravo na odbranu", "branilac", "ćutanje", "upoznavanje sa dokazima"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KS004",
+      "domain": "krivicni_postupak",
+      "question": "Kada se može odrediti pritvor okrivljenom?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["211"],
+      "expected_keywords": ["pritvor", "bekstvo", "uticaj na svedoke", "ponavljanje dela"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KS005",
+      "domain": "krivicni_postupak",
+      "question": "Koliko može trajati pritvor u toku istrage?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["215"],
+      "expected_keywords": ["pritvor", "tri meseca", "produženje", "šest meseci"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KS006",
+      "domain": "krivicni_postupak",
+      "question": "Šta je sporazum o priznanju krivičnog dela?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["313", "314"],
+      "expected_keywords": ["sporazum o priznanju", "tužilac", "okrivljeni", "kazna"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KS007",
+      "domain": "krivicni_postupak",
+      "question": "Koji je rok za ulaganje žalbe na prvostepenu presudu?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["441"],
+      "expected_keywords": ["žalba", "15 dana", "presuda", "rok"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KS008",
+      "domain": "krivicni_postupak",
+      "question": "Šta je pretpostavka nevinosti?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["3"],
+      "expected_keywords": ["pretpostavka nevinosti", "teret dokazivanja", "tužilac"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KS009",
+      "domain": "krivicni_postupak",
+      "question": "Kada je obavezna odbrana u krivičnom postupku?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["74"],
+      "expected_keywords": ["obavezna odbrana", "branilac po službenoj dužnosti", "kazna zatvora"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KS010",
+      "domain": "krivicni_postupak",
+      "question": "Koji su uslovi za sprovođenje pretresa stana?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["152", "153"],
+      "expected_keywords": ["pretres stana", "naredba suda", "osnov sumnje", "svedoci"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "KS011",
+      "domain": "krivicni_postupak",
+      "question": "Kako funkcionišu posebne dokazne radnje (prisluškivanje, tajni nadzor)?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["161", "166"],
+      "expected_keywords": ["posebne dokazne radnje", "prisluškivanje", "naredba suda", "teža krivična dela"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "KS012",
+      "domain": "krivicni_postupak",
+      "question": "Šta su nezakoniti dokazi i kakav je njihov procesni tretman?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["16"],
+      "expected_keywords": ["nezakoniti dokazi", "izdvajanje", "zabrana korišćenja"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "KS013",
+      "domain": "krivicni_postupak",
+      "question": "Koji su uslovi za određivanje jemstva umesto pritvora?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["207"],
+      "expected_keywords": ["jemstvo", "mera obezbeđenja", "novčani iznos", "umesto pritvora"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "KS014",
+      "domain": "krivicni_postupak",
+      "question": "Kako teče istraga prema reformisanom ZKP-u? Koja je uloga javnog tužioca?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["295", "296"],
+      "expected_keywords": ["istraga", "javni tužilac", "naredba o sprovođenju istrage", "dokazne radnje"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "KS015",
+      "domain": "krivicni_postupak",
+      "question": "Šta je skraćeni krivični postupak i za koja dela se primenjuje?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["495"],
+      "expected_keywords": ["skraćeni postupak", "lakša krivična dela", "kazna zatvora do 8 godina"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "KS016",
+      "domain": "krivicni_postupak",
+      "question": "Kako se primenjuje načelo ne bis in idem u srpskom krivičnom postupku?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["4"],
+      "expected_keywords": ["ne bis in idem", "pravosnažna presuda", "isti čin", "zabrana ponovnog suđenja"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "KS017",
+      "domain": "krivicni_postupak",
+      "question": "Policija je pretresla stan osumnjičenog bez sudskog naloga pozivajući se na hitnost. Osumnjičeni tvrdi da su dokazi nezakoniti. Kako sud odlučuje?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["152", "155", "16"],
+      "expected_keywords": ["pretres bez naloga", "hitnost", "nezakoniti dokazi", "izdvajanje"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "KS018",
+      "domain": "krivicni_postupak",
+      "question": "Analizirajte uslove i ograničenja za primenu instituta svedoka saradnika (krunski svedok) u srpskom pravu.",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["320", "321"],
+      "expected_keywords": ["svedok saradnik", "krunski svedok", "organizovani kriminal", "imunitet"],
+      "difficulty": "hard",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "KS019",
+      "domain": "krivicni_postupak",
+      "question": "Okrivljeni je priznao krivično delo tokom policijskog saslušanja bez prisustva branioca. Da li se takvo priznanje može koristiti kao dokaz na suđenju?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["68", "85", "16"],
+      "expected_keywords": ["priznanje", "branilac", "policijsko saslušanje", "nezakonit dokaz"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "KS020",
+      "domain": "krivicni_postupak",
+      "question": "U kom slučaju se može podneti zahtev za zaštitu zakonitosti i koji je organ nadležan za odlučivanje?",
+      "expected_law": "Zakonik o krivičnom postupku",
+      "expected_articles": ["482", "485"],
+      "expected_keywords": ["zahtev za zaštitu zakonitosti", "Vrhovni kasacioni sud", "Republički javni tužilac", "povreda zakona"],
+      "difficulty": "hard",
+      "answer_type": "analytical"
+    },
+
+    {
+      "id": "GP001",
+      "domain": "gradjansko_pravo",
+      "question": "Šta je pravo svojine prema srpskom pravu?",
+      "expected_law": "Zakon o osnovama svojinskopravnih odnosa",
+      "expected_articles": ["3"],
+      "expected_keywords": ["svojina", "držanje", "korišćenje", "raspolaganje"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "GP002",
+      "domain": "gradjansko_pravo",
+      "question": "Šta je hipoteka i kako se zasniva?",
+      "expected_law": "Zakon o hipoteci",
+      "expected_articles": ["2", "9"],
+      "expected_keywords": ["hipoteka", "nepokretnost", "obezbeđenje", "upis"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "GP003",
+      "domain": "gradjansko_pravo",
+      "question": "Šta je službenost i koje vrste službenosti postoje?",
+      "expected_law": "Zakon o osnovama svojinskopravnih odnosa",
+      "expected_articles": ["49", "50"],
+      "expected_keywords": ["službenost", "stvarna službenost", "lična službenost", "prolaz"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "GP004",
+      "domain": "gradjansko_pravo",
+      "question": "Šta je državina i kako se štiti?",
+      "expected_law": "Zakon o osnovama svojinskopravnih odnosa",
+      "expected_articles": ["70", "77"],
+      "expected_keywords": ["državina", "zaštita", "smetanje", "rok"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "GP005",
+      "domain": "gradjansko_pravo",
+      "question": "Koji je rok za sticanje prava svojine održajem (uzukapija)?",
+      "expected_law": "Zakon o osnovama svojinskopravnih odnosa",
+      "expected_articles": ["28"],
+      "expected_keywords": ["održaj", "10 godina", "20 godina", "savesnost", "zakonitost"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "GP006",
+      "domain": "gradjansko_pravo",
+      "question": "Kako se vrši upis prava na nepokretnostima u katastar?",
+      "expected_law": "Zakon o postupku upisa u katastar nepokretnosti i vodova",
+      "expected_articles": ["4", "10"],
+      "expected_keywords": ["katastar", "upis", "nepokretnost", "pravni osnov"],
+      "difficulty": "easy",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "GP007",
+      "domain": "gradjansko_pravo",
+      "question": "Šta je pravo preče kupovine i kada se primenjuje?",
+      "expected_law": "Zakon o osnovama svojinskopravnih odnosa",
+      "expected_articles": ["5"],
+      "expected_keywords": ["pravo preče kupovine", "suvlasnik", "ponuda", "rok"],
+      "difficulty": "easy",
+      "answer_type": "factual"
+    },
+    {
+      "id": "GP008",
+      "domain": "gradjansko_pravo",
+      "question": "Kako se deli suvlasnička nepokretnost?",
+      "expected_law": "Zakon o osnovama svojinskopravnih odnosa",
+      "expected_articles": ["14", "16"],
+      "expected_keywords": ["suvlasništvo", "deoba", "fizička deoba", "civilna deoba"],
+      "difficulty": "easy",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "GP009",
+      "domain": "gradjansko_pravo",
+      "question": "Koji je postupak za vansudsko namirenje hipotekarnog potraživanja?",
+      "expected_law": "Zakon o hipoteci",
+      "expected_articles": ["29", "30"],
+      "expected_keywords": ["vansudska prodaja", "hipoteka", "poverilac", "opomena"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "GP010",
+      "domain": "gradjansko_pravo",
+      "question": "Kako se rešava spor o granici između susednih parcela?",
+      "expected_law": "Zakon o osnovama svojinskopravnih odnosa",
+      "expected_articles": ["5"],
+      "expected_keywords": ["međa", "granica", "susedska prava", "katastar"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "GP011",
+      "domain": "gradjansko_pravo",
+      "question": "Šta je etažna svojina i kako se uspostavlja?",
+      "expected_law": "Zakon o stanovanju i održavanju zgrada",
+      "expected_articles": ["2", "18"],
+      "expected_keywords": ["etažna svojina", "posebni deo zgrade", "stan", "zajednički delovi"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "GP012",
+      "domain": "gradjansko_pravo",
+      "question": "Koja su prava i obaveze zakupca stana prema Zakonu o stanovanju?",
+      "expected_law": "Zakon o stanovanju i održavanju zgrada",
+      "expected_articles": ["32", "34"],
+      "expected_keywords": ["zakup stana", "zakupac", "zakupnina", "održavanje"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "GP013",
+      "domain": "gradjansko_pravo",
+      "question": "Kako se štiti pravo svojine rei vindikacionom tužbom?",
+      "expected_law": "Zakon o osnovama svojinskopravnih odnosa",
+      "expected_articles": ["37"],
+      "expected_keywords": ["rei vindicatio", "tužba za povraćaj", "vlasnik", "držalac"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "GP014",
+      "domain": "gradjansko_pravo",
+      "question": "Šta je pravo građenja i kako nastaje?",
+      "expected_law": "Zakon o planiranju i izgradnji",
+      "expected_articles": ["84"],
+      "expected_keywords": ["pravo građenja", "tuđe zemljište", "zgrade", "upis"],
+      "difficulty": "medium",
+      "answer_type": "factual"
+    },
+    {
+      "id": "GP015",
+      "domain": "gradjansko_pravo",
+      "question": "Šta je pravo plodouživanja i kako se razlikuje od zakupa?",
+      "expected_law": "Zakon o osnovama svojinskopravnih odnosa",
+      "expected_articles": ["60"],
+      "expected_keywords": ["plodouživanje", "lična službenost", "korišćenje", "plodovi"],
+      "difficulty": "medium",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "GP016",
+      "domain": "gradjansko_pravo",
+      "question": "Kako funkcioniše izvršni postupak na nepokretnosti prema Zakonu o izvršenju i obezbeđenju?",
+      "expected_law": "Zakon o izvršenju i obezbeđenju",
+      "expected_articles": ["166", "170"],
+      "expected_keywords": ["izvršenje", "nepokretnost", "javna prodaja", "javni izvršitelj"],
+      "difficulty": "medium",
+      "answer_type": "procedural"
+    },
+    {
+      "id": "GP017",
+      "domain": "gradjansko_pravo",
+      "question": "Lice je gradilo na tuđem zemljištu u dobroj veri 15 godina. Da li može steći pravo svojine na objektu?",
+      "expected_law": "Zakon o osnovama svojinskopravnih odnosa",
+      "expected_articles": ["24", "28"],
+      "expected_keywords": ["gradnja na tuđem zemljištu", "savesnost", "održaj", "sticanje svojine"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "GP018",
+      "domain": "gradjansko_pravo",
+      "question": "Analizirajte pravne posledice dvostrukog otuđenja nepokretnosti — kada prodavac proda istu nepokretnost dvama kupcima.",
+      "expected_law": "Zakon o osnovama svojinskopravnih odnosa",
+      "expected_articles": ["33"],
+      "expected_keywords": ["dvostruko otuđenje", "upis u katastar", "savesnost", "prioritet"],
+      "difficulty": "hard",
+      "answer_type": "analytical"
+    },
+    {
+      "id": "GP019",
+      "domain": "gradjansko_pravo",
+      "question": "Suvlasnik želi da proda svoj udeo ali drugi suvlasnik koristi pravo preče kupovine po nižoj ceni. Kako se rešava ovaj spor?",
+      "expected_law": "Zakon o osnovama svojinskopravnih odnosa",
+      "expected_articles": ["5", "14"],
+      "expected_keywords": ["pravo preče kupovine", "suvlasnik", "tržišna cena", "ponuda"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    },
+    {
+      "id": "GP020",
+      "domain": "gradjansko_pravo",
+      "question": "Banka je upisala hipoteku na stanu ali korisnik kredita tvrdi da ugovor o hipoteci sadrži ništave odredbe. Kako se može osporiti hipoteka i u kojem postupku?",
+      "expected_law": "Zakon o hipoteci",
+      "expected_articles": ["2", "15"],
+      "expected_keywords": ["hipoteka", "ništavost", "brisanje", "tužba", "katastar"],
+      "difficulty": "hard",
+      "answer_type": "hypothetical"
+    }
+  ]
+}

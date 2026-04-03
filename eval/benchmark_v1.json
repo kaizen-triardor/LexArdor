@@ -1,0 +1,38 @@
+[
+  {"id": "rp-01", "question": "Koji su uslovi za otkaz ugovora o radu od strane poslodavca?", "expected_articles": ["179"], "expected_keywords": ["opravdani razlog", "radna sposobnost", "ponašanje"], "domain": "radno_pravo", "difficulty": "easy"},
+  {"id": "rp-02", "question": "Koliko traje probni rad prema Zakonu o radu?", "expected_articles": ["36"], "expected_keywords": ["šest meseci", "probni rad"], "domain": "radno_pravo", "difficulty": "easy"},
+  {"id": "rp-03", "question": "Koliko iznosi minimalni otkazni rok?", "expected_articles": ["189"], "expected_keywords": ["15 dana", "otkazni rok"], "domain": "radno_pravo", "difficulty": "easy"},
+  {"id": "rp-04", "question": "Da li trudnica može dobiti otkaz?", "expected_articles": ["187"], "expected_keywords": ["trudnoća", "porodiljsko", "zabrana"], "domain": "radno_pravo", "difficulty": "medium"},
+  {"id": "rp-05", "question": "Koliko dana godišnjeg odmora pripada zaposlenom?", "expected_articles": ["68", "69"], "expected_keywords": ["20 radnih dana", "godišnji odmor"], "domain": "radno_pravo", "difficulty": "easy"},
+  {"id": "rp-06", "question": "Kada poslodavac može da uvede skraćeno radno vreme?", "expected_articles": ["51", "52"], "expected_keywords": ["štetni uticaj", "skraćeno radno vreme"], "domain": "radno_pravo", "difficulty": "medium"},
+  {"id": "rp-07", "question": "Koji je postupak za kolektivno otpuštanje zaposlenih?", "expected_articles": ["153", "154"], "expected_keywords": ["višak zaposlenih", "program rešavanja"], "domain": "radno_pravo", "difficulty": "hard"},
+  {"id": "rp-08", "question": "Da li zaposleni ima pravo na naknadu troškova prevoza?", "expected_articles": ["118"], "expected_keywords": ["troškovi prevoza", "dolazak na rad"], "domain": "radno_pravo", "difficulty": "easy"},
+
+  {"id": "kp-01", "question": "Koja je kazna za krađu prema Krivičnom zakoniku?", "expected_articles": ["203"], "expected_keywords": ["krađa", "zatvor", "novčana kazna"], "domain": "krivicno_pravo", "difficulty": "easy"},
+  {"id": "kp-02", "question": "Šta je krivično delo prevare?", "expected_articles": ["208"], "expected_keywords": ["prevara", "lažno prikazivanje", "imovinska korist"], "domain": "krivicno_pravo", "difficulty": "easy"},
+  {"id": "kp-03", "question": "Koja je kazna za teško ubistvo?", "expected_articles": ["114"], "expected_keywords": ["teško ubistvo", "zatvor", "najmanje deset godina"], "domain": "krivicno_pravo", "difficulty": "medium"},
+  {"id": "kp-04", "question": "Šta je nužna odbrana prema Krivičnom zakoniku?", "expected_articles": ["19"], "expected_keywords": ["nužna odbrana", "napad", "odbijanje"], "domain": "krivicno_pravo", "difficulty": "medium"},
+  {"id": "kp-05", "question": "Koji su uslovi za uslovnu osudu?", "expected_articles": ["65", "66"], "expected_keywords": ["uslovna osuda", "kazna zatvora", "rok proveravanja"], "domain": "krivicno_pravo", "difficulty": "medium"},
+
+  {"id": "pp-01", "question": "Koji su uslovi za razvod braka?", "expected_articles": ["41"], "expected_keywords": ["razvod", "ozbiljno poremećeni", "bračni odnosi"], "domain": "porodicno_pravo", "difficulty": "easy"},
+  {"id": "pp-02", "question": "Kako se određuje alimentacija za dete?", "expected_articles": ["160", "162"], "expected_keywords": ["izdržavanje", "potrebe deteta", "mogućnosti roditelja"], "domain": "porodicno_pravo", "difficulty": "medium"},
+  {"id": "pp-03", "question": "Ko ima pravo na starateljstvo nad detetom?", "expected_articles": ["77", "78"], "expected_keywords": ["vršenje roditeljskog prava", "najbolji interes"], "domain": "porodicno_pravo", "difficulty": "medium"},
+  {"id": "pp-04", "question": "Koji su uslovi za usvojenje deteta?", "expected_articles": ["89", "90"], "expected_keywords": ["usvojenje", "usvojilac", "usvojenik"], "domain": "porodicno_pravo", "difficulty": "hard"},
+
+  {"id": "op-01", "question": "Šta je ugovorna odgovornost za štetu?", "expected_articles": ["263"], "expected_keywords": ["naknada štete", "neispunjenje obaveze"], "domain": "obligaciono_pravo", "difficulty": "medium"},
+  {"id": "op-02", "question": "Koji je rok zastarelosti za potraživanja iz ugovora?", "expected_articles": ["371", "374"], "expected_keywords": ["zastarelost", "deset godina", "opšti rok"], "domain": "obligaciono_pravo", "difficulty": "medium"},
+  {"id": "op-03", "question": "Kada se može raskinuti ugovor zbog promenjenih okolnosti?", "expected_articles": ["133"], "expected_keywords": ["promenjene okolnosti", "raskid ugovora"], "domain": "obligaciono_pravo", "difficulty": "hard"},
+
+  {"id": "por-01", "question": "Kolika je stopa poreza na dobit pravnih lica?", "expected_articles": ["40"], "expected_keywords": ["15%", "porez na dobit"], "domain": "poresko_pravo", "difficulty": "easy"},
+  {"id": "por-02", "question": "Ko je obveznik poreza na dodatu vrednost?", "expected_articles": ["8"], "expected_keywords": ["PDV", "promet dobara", "promet usluga"], "domain": "poresko_pravo", "difficulty": "easy"},
+  {"id": "por-03", "question": "Koji su uslovi za oslobađanje od PDV-a?", "expected_articles": ["24", "25"], "expected_keywords": ["oslobođenje", "izvoz", "PDV"], "domain": "poresko_pravo", "difficulty": "hard"},
+
+  {"id": "pr-01", "question": "Kako se osniva društvo sa ograničenom odgovornošću?", "expected_articles": ["104", "105"], "expected_keywords": ["DOO", "osnivanje", "osnivački akt"], "domain": "privredno_pravo", "difficulty": "easy"},
+  {"id": "pr-02", "question": "Koji je minimalni osnovni kapital za akcionarsko društvo?", "expected_articles": ["293"], "expected_keywords": ["akcionarsko društvo", "osnovni kapital", "3.000.000"], "domain": "privredno_pravo", "difficulty": "medium"},
+
+  {"id": "up-01", "question": "Koji je rok za žalbu na prvostepeno rešenje u upravnom postupku?", "expected_articles": ["151"], "expected_keywords": ["15 dana", "žalba", "rešenje"], "domain": "upravno_pravo", "difficulty": "easy"},
+  {"id": "up-02", "question": "Kada se može podneti upravna tužba?", "expected_articles": ["14", "15"], "expected_keywords": ["upravni spor", "upravni akt"], "domain": "upravno_pravo", "difficulty": "medium"},
+
+  {"id": "temp-01", "question": "Da li je Zakon o radu iz 2005. godine još uvek na snazi?", "expected_articles": [], "expected_keywords": ["važeći", "2005", "izmene"], "domain": "radno_pravo", "difficulty": "hard", "requires_temporal": true},
+  {"id": "comp-01", "question": "Koja je razlika između DOO i preduzetnika u Srbiji?", "expected_articles": [], "expected_keywords": ["DOO", "preduzetnik", "odgovornost", "razlika"], "domain": "privredno_pravo", "difficulty": "hard"}
+]

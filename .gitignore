@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.eggs/
+dist/
+build/
+venv/
+.venv/
+
+# Data (too large for git — 28GB+)
+data/chroma/
+data/chromadb/
+data/court_decisions/
+data/laws/
+data/additional-documents/
+data/lexardor.db
+data/bm25_index.pkl
+data/law_links.json
+data/priority_laws.json
+
+# Top-level empty db (duplicate)
+lexardor.db
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# pytest
+.pytest_cache/
+
+# Screenshots
+*.png
+!favicon.png
+
+# OS
+.DS_Store
+Thumbs.db
