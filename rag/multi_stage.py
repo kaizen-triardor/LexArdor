@@ -330,10 +330,10 @@ def query_deep(user_query: str, top_k: int = 8, chat_history: list[dict] = None,
     critique = _critique(user_query, answer, sources_summary, llm_critic)
 
     # ── Assemble results ──
-    confidence = _calculate_confidence(search_query, hits,
-                                       citations=citations, answer_text=answer)
     sources = _format_sources(hits)
     citations = verify_citations(answer, sources)
+    confidence = _calculate_confidence(search_query, hits,
+                                       citations=citations, answer_text=answer)
 
     diagnostics = {
         "query_class": query_class,
