@@ -355,6 +355,10 @@ def query_deep(user_query: str, top_k: int = 8, chat_history: list[dict] = None,
     elif critique.get("quality") == "medium" and confidence == "high":
         confidence = "medium"
 
+    # Source span mapping
+    from rag.span_mapper import map_answer_to_sources
+    answer_spans = map_answer_to_sources(answer, sources)
+
     return {
         "answer": answer,
         "sources": sources,
@@ -362,6 +366,7 @@ def query_deep(user_query: str, top_k: int = 8, chat_history: list[dict] = None,
         "model_used": reasoning.get("name", "unknown"),
         "answer_mode": answer_mode,
         "citations": citations,
+        "answer_spans": answer_spans,
         "critique": critique,
         "diagnostics": diagnostics,
     }
