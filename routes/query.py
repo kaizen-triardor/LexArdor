@@ -96,6 +96,7 @@ def query_stream_endpoint(
     mode: str = Query("balanced"),
     ref_date: str | None = Query(None),
     doc_types: str | None = Query(None),
+    deep: bool = Query(False),
 ):
     user = get_user(settings.default_admin_user)
     if not user:
@@ -108,6 +109,39 @@ def query_stream_endpoint(
 
     chat_history = get_chat_messages(cid)[:-1] if cid else []
     parsed_doc_types = doc_types.split(",") if doc_types else None
+
+    # Deep analysis: use multi-stage pipeline (not streamable, emit as single result)
+    if deep:
+        from rag.multi_stage import query_deep
+        import time as _t
+        t0 = _t.time()
+
+        def deep_generator():
+            yield f"data: {json.dumps({'token': '🧠 Temeljita analiza — 4 faze u toku...\n\n'})}\n\n"
+            result = query_deep(q, top_k=max(top_k, 8), chat_history=chat_history,
+                                answer_mode=mode, reference_date=ref_date)
+            answer = result["answer"]
+            # Emit the full answer as a stream of chunks (simulate streaming)
+            chunk_size = 80
+            for i in range(0, len(answer), chunk_size):
+                yield f"data: {json.dumps({'token': answer[i:i+chunk_size]})}\n\n"
+            citations = result.get("citations", {})
+            yield f"data: {json.dumps({'done': True, 'sources': result['sources'], 'confidence': result['confidence'], 'chat_id': cid, 'model_used': result.get('model_used',''), 'citations': citations})}\n\n"
+            add_message(cid, "assistant", answer, sources=result["sources"], confidence=result["confidence"])
+            if not chat_id:
+                update_chat_title(cid, q[:60] + ("..." if len(q) > 60 else ""))
+            try:
+                from db.models import log_query
+                elapsed = int((_t.time() - t0) * 1000)
+                conf = result.get("confidence", {})
+                log_query(query=q, answer_mode=mode, confidence=conf.get("level","") if isinstance(conf, dict) else str(conf),
+                          source_count=len(result.get("sources") or []), citation_verified=0, citation_flagged=0,
+                          model_used=result.get("model_used",""), bm25_used=False, response_time_ms=elapsed, multi_stage=True)
+            except Exception:
+                pass
+
+        return StreamingResponse(deep_generator(), media_type="text/event-stream")
+
     result = rag_query_stream(q, top_k=top_k, use_heavy_model=heavy,
                               short_answer=short, chat_history=chat_history,
                               answer_mode=mode, reference_date=ref_date,

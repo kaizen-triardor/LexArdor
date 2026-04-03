@@ -630,14 +630,17 @@ a:hover { text-decoration: underline; }
   </div>
   <div class="chat-input-bar">
     <div class="chat-controls">
-      <select class="select" id="answerMode" style="max-width:160px;padding:6px 28px 6px 10px;font-size:12px;">
+      <select class="select" id="answerMode" style="max-width:140px;padding:6px 28px 6px 10px;font-size:12px;">
         <option value="balanced" data-i18n="Balansiran">Balansiran</option>
         <option value="citizen" data-i18n="Za građane">Za građane</option>
         <option value="strict" data-i18n="Stručni">Stručni</option>
       </select>
-      <label><input type="checkbox" id="heavyCheck"> <span data-i18n="Dublja analiza">Dublja analiza</span></label>
-      <label class="chat-option"><input type="checkbox" id="deepCheck" style="accent-color:var(--accent)"> <span data-i18n="Duboka analiza">Duboka analiza</span></label>
-      <select class="select" id="chatDocTypeFilter" style="max-width:150px;padding:4px 24px 4px 8px;font-size:11px;">
+      <select class="select" id="analysisDepth" style="max-width:150px;padding:4px 24px 4px 8px;font-size:11px;" title="Dubina analize">
+        <option value="fast" data-i18n="Brza analiza">⚡ Brza analiza</option>
+        <option value="heavy" data-i18n="Dublja analiza">🔍 Dublja analiza</option>
+        <option value="deep" data-i18n="Temeljita analiza">🧠 Temeljita analiza</option>
+      </select>
+      <select class="select" id="chatDocTypeFilter" style="max-width:140px;padding:4px 24px 4px 8px;font-size:11px;">
         <option value="" data-i18n="Svi izvori">Svi izvori</option>
         <option value="zakon,zakonik" data-i18n="Samo zakoni">Samo zakoni</option>
         <option value="sudska_praksa" data-i18n="Sudska praksa">Sudska praksa</option>
@@ -648,10 +651,10 @@ a:hover { text-decoration: underline; }
         <label style="font-size:11px;color:var(--text-muted);" data-i18n="Na dan:">Na dan:</label>
         <input type="date" id="refDatePicker" class="input" style="padding:2px 6px;font-size:11px;width:130px;">
       </div>
-      <button class="btn btn-ghost" id="btnToggleVerify" onclick="toggleVerifyBar()" style="padding:4px 10px;font-size:11px;border:1px solid var(--border);border-radius:6px;color:var(--text-muted)">
-        <i class="fa-solid fa-shield-halved"></i> <span data-i18n="Spoljni AI verifikacija">Spoljni AI verifikacija</span>
-      </button>
       <button class="btn btn-sm" onclick="openResearchModal()" title="Istraži temu"><i class="fa-solid fa-microscope"></i> <span data-i18n="Istraži">Istraži</span></button>
+      <button class="btn btn-sm" id="btnOnlineVerify" onclick="onlineAIVerify()" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;padding:4px 12px;font-size:11px;border-radius:6px;" title="Proveri odgovor sa spoljnim AI">
+        <i class="fa-solid fa-globe"></i> <span data-i18n="Online AI Provera">Online AI Provera</span>
+      </button>
     </div>
     <div class="chat-input-row">
       <input class="input" id="chatInput" data-i18n-placeholder="Postavite pravno pitanje..." placeholder="Postavite pravno pitanje..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}">
@@ -922,8 +925,8 @@ a:hover { text-decoration: underline; }
           <div class="faq-a" data-i18n="faq_a1">Otvorite stranicu Razgovor i unesite pitanje u polje za unos. LexArdor će pretražiti bazu propisa i dati odgovor zasnovan na relevantnim članovima zakona. Za složenija pitanja, uključite opciju "Dublja analiza".</div>
         </div>
         <div class="faq-item">
-          <div class="faq-q" onclick="toggleFaq(this)" data-i18n="faq_q2">Šta znači "Dublja analiza"?</div>
-          <div class="faq-a" data-i18n="faq_a2">Dublja analiza koristi veći AI model (32B parametara) za detaljniji odgovor sa chain-of-thought razmišljanjem. Obrada traje duže (~30-60s), ali rezultati su precizniji za složena pravna pitanja sa više strana.</div>
+          <div class="faq-q" onclick="toggleFaq(this)" data-i18n="faq_q2">Kako funkcionišu režimi analize?</div>
+          <div class="faq-a" data-i18n="faq_a2">⚡ <strong>Brza analiza</strong> — koristi mali brzi model, odgovor za ~10s. Dovoljno za jednostavna pitanja.<br>🔍 <strong>Dublja analiza</strong> — koristi veliki reasoning model (32B), chain-of-thought razmišljanje, ~30-60s.<br>🧠 <strong>Temeljita analiza</strong> — 4-fazni pipeline: Planer → Istraživač → Sintetizator → Kritičar. Najdetaljniji odgovor, 1-2 min.</div>
         </div>
         <div class="faq-item">
           <div class="faq-q" onclick="toggleFaq(this)" data-i18n="faq_q3">Mogu li dodati svoje dokumente?</div>
@@ -1341,6 +1344,12 @@ const EN = {
   'tpl_step4': '<strong>Export</strong> the filled document as PDF or DOCX',
   'tpl_modal_desc': 'Upload a filled document or enter text. AI will analyze the structure and create a template with smart fields.',
   'tpl_or_text': 'or enter text directly:',
+  'Brza analiza': 'Quick analysis',
+  'Temeljita analiza': 'Thorough analysis (4 phases)',
+  'Online AI Provera': 'Online AI Check',
+  'Proveravam...': 'Checking...',
+  'Online provera završena': 'Online check complete',
+  'Izaberite provajdera i unesite API ključ za Online AI Proveru': 'Select a provider and enter API key for Online AI Check',
   'Tema istraživanja': 'Research topic',
   'Pokreni istraživanje': 'Start research',
   'Unesite temu': 'Enter a topic',
@@ -1761,9 +1770,10 @@ async function sendMessage() {
   // Streaming response
   S.streaming = true;
   const mode = document.getElementById('answerMode').value;
-  const heavy = document.getElementById('heavyCheck').checked;
+  const depth = document.getElementById('analysisDepth').value;
+  const heavy = depth === 'heavy' || depth === 'deep';
   const params = new URLSearchParams({ q, top_k: 5, heavy, short: false, mode });
-  if (document.getElementById('deepCheck').checked) params.set('deep', 'true');
+  if (depth === 'deep') params.set('deep', 'true');
   const refDate = document.getElementById('refDatePicker').value;
   if (refDate) params.set('ref_date', refDate);
   const docTypeFilter = document.getElementById('chatDocTypeFilter').value;
@@ -1867,8 +1877,9 @@ async function verifyConversation() {
 
   if (!apiKey) { toast(t('Unesite API ključ'), 'error'); return; }
 
-  // Save key for convenience
+  // Save key + provider for one-click flow
   localStorage.setItem('lexardor_verify_key_' + provider, apiKey);
+  localStorage.setItem('lexardor_verify_last_provider', provider);
 
   const btn = document.getElementById('btnVerify');
   btn.disabled = true;
@@ -1912,6 +1923,59 @@ async function verifyConversation() {
   } finally {
     btn.disabled = false;
     btn.innerHTML = '<i class="fa-solid fa-magnifying-glass-chart"></i> ' + t('Proveri');
+  }
+}
+
+async function onlineAIVerify() {
+  if (!S.currentChatId) { toast(t('Prvo započnite konverzaciju'), 'warning'); return; }
+
+  // Check if we have a saved provider + key — if so, one-click flow
+  const lastProvider = localStorage.getItem('lexardor_verify_last_provider') || '';
+  const savedKey = lastProvider ? (localStorage.getItem('lexardor_verify_key_' + lastProvider) || '') : '';
+
+  if (lastProvider && savedKey) {
+    // One-click: send immediately
+    const btn = document.getElementById('btnOnlineVerify');
+    const origHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ' + t('Proveravam...');
+    try {
+      const result = await apiFetch('/api/verify-conversation', {
+        method: 'POST',
+        body: JSON.stringify({
+          chat_id: S.currentChatId,
+          provider: lastProvider,
+          api_key: savedKey,
+          anonymize: true,
+        }),
+      });
+      const provName = (S.extProviders[lastProvider] || {}).name || lastProvider.toUpperCase();
+      const msgEl = document.createElement('div');
+      msgEl.className = 'msg msg-assistant';
+      msgEl.innerHTML = `
+        <div class="msg-body" style="border-left:3px solid #8b5cf6;font-family:'Lora',serif;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-family:'Inter',sans-serif;">
+            <span style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700;display:inline-flex;align-items:center;gap:4px;">
+              <i class="fa-solid fa-globe"></i> ${escHtml(provName)}
+            </span>
+            <span style="font-size:12px;color:var(--text-muted);font-weight:600">${t('Online AI Provera')}</span>
+            <span class="badge badge-success" style="font-size:10px"><i class="fa-solid fa-shield"></i> ${t('Anonimizovano')}</span>
+          </div>
+          ${renderMarkdown(result.answer)}
+        </div>`;
+      document.getElementById('chatMessages').appendChild(msgEl);
+      scrollChat();
+      toast(t('Online provera završena') + ' (' + provName + ')', 'success');
+    } catch(e) {
+      toast(e.message || t('Greška pri proveri'), 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = origHTML;
+    }
+  } else {
+    // No saved key — open the verify bar for setup
+    document.getElementById('verifyBar').style.display = '';
+    toast(t('Izaberite provajdera i unesite API ključ za Online AI Proveru'), 'info');
   }
 }
 
