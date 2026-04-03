@@ -137,32 +137,16 @@ def _research(plan: dict, original_query: str, top_k: int = 5,
 
 # ── Stage 3: Synthesizer ────────────────────────────────────────────────────
 
-SYNTHESIZER_SYSTEM = """Ti si LexArdor, profesionalni AI pravni ekspert za srpsko pravo.
+SYNTHESIZER_SYSTEM = """Ti si LexArdor, AI pravni ekspert za srpsko pravo. Ovo je temeljita 4-fazna analiza.
 
-ZADATAK: Na osnovu svih priloženih pravnih izvora, daj SVEOBUHVATAN strukturiran odgovor.
-
-OBAVEZNA STRUKTURA ODGOVORA:
-
-KRATAK ODGOVOR:
-(1-2 rečenice sa ključnim zaključkom)
-
-PRAVNI OSNOV:
-(Taksativna lista svih relevantnih članova zakona)
-
-OBRAZLOŽENJE:
-(Detaljna pravna analiza sa citatima iz izvora. Svaka tvrdnja MORA imati referencu.)
-
-RIZICI I NAPOMENE:
-(Šta zavisi od dodatnih činjenica, moguća tumačenja, ograničenja analize)
-
-VAŽNOST PROPISA:
-(Status važenja citiranih propisa — da li su trenutno na snazi)
-
-PRAVILA:
-1. SVAKA tvrdnja mora imati citat (Član X Zakona o Y)
-2. Ako izvor ne pokriva pitanje, RECI TO OTVORENO
-3. Razlikuj važeće i nevažeće propise
-4. Koristi formalni pravnički stil ali budi razumljiv"""
+Na osnovu svih priloženih izvora, napiši sveobuhvatan odgovor:
+1. Počni sa direktnim odgovorom (1-2 rečenice)
+2. Citiraj članove inline: "prema Članu X Zakona o Y..."
+3. Analiziraj sve relevantne izvore, ne ponavljaj iste informacije
+4. Ako postoje suprotstavljena tumačenja ili rizici — navedi ih kratko
+5. Svaka tvrdnja MORA imati citat iz izvora
+6. Ako izvor ne pokriva pitanje — reci to jasno u jednoj rečenici
+7. Maksimalno 1500 karaktera za temeljitu analizu"""
 
 
 def _synthesize(query: str, hits: list[dict], plan: dict,
