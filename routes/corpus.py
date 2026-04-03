@@ -338,11 +338,14 @@ def search_corpus_articles(q: str, top_k: int = 20,
     if not q or len(q.strip()) < 2:
         raise HTTPException(status_code=400, detail="Search query too short")
 
-    from rag.bm25 import bm25_search, get_bm25_index
+    from rag.bm25 import bm25_search, get_bm25_index, build_bm25_index
     idx = get_bm25_index()
     if not idx.ready:
-        from rag.bm25 import build_bm25_index
-        build_bm25_index()
+        # Try loading from disk; if not available, start background build
+        build_bm25_index(background=True)
+        if not idx.ready:
+            return {"results": [], "total": 0, "status": "bm25_building",
+                    "message": "BM25 indeks se gradi u pozadini. Pokušajte ponovo za minut."}
 
     results = bm25_search(q, top_k=top_k)
     if not results:
