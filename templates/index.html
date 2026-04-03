@@ -588,7 +588,7 @@ a:hover { text-decoration: underline; }
   <div class="chat-area" id="chatArea">
     <div class="chat-welcome" id="chatWelcome">
       <h1 data-i18n="Dobrodošli u LexArdor">Dobrodošli u LexArdor</h1>
-      <p data-i18n="Postavite pitanje o srpskom zakonodavstvu. Pretražujem bazu od preko 79.000 članaka zakona, uredbi i pravilnika.">Postavite pitanje o srpskom zakonodavstvu. Pretražujem bazu od preko 79.000 članaka zakona, uredbi i pravilnika.</p>
+      <p data-i18n="Postavite pitanje o srpskom zakonodavstvu. Pretražujem bazu od preko 72.000 članaka zakona, uredbi i pravilnika, i 73.000 sudskih odluka.">Postavite pitanje o srpskom zakonodavstvu. Pretražujem bazu od preko 72.000 članaka zakona, uredbi i pravilnika, i 73.000 sudskih odluka.</p>
       <div class="example-queries">
         <button class="example-q" onclick="askExample(this)">Koja su prava zakupca po Zakonu o obligacionim odnosima?</button>
         <button class="example-q" onclick="askExample(this)">Koji su rokovi za žalbu u upravnom postupku?</button>
@@ -1183,7 +1183,7 @@ const EN = {
   'Podešavanja': 'Settings',
   'Pomoć i podrška': 'Help & Support',
   'Dobrodošli u LexArdor': 'Welcome to LexArdor',
-  'Postavite pitanje o srpskom zakonodavstvu. Pretražujem bazu od preko 79.000 članaka zakona, uredbi i pravilnika.': 'Ask a question about Serbian legislation. I search a database of over 79,000 articles from laws, decrees and regulations.',
+  'Postavite pitanje o srpskom zakonodavstvu. Pretražujem bazu od preko 72.000 članaka zakona, uredbi i pravilnika, i 73.000 sudskih odluka.': 'Ask a question about Serbian legislation. I search a database of over 72,000 articles from laws, decrees and regulations, plus 73,000 court decisions.',
   'Balansiran': 'Balanced',
   'Za građane': 'For citizens',
   'Stručni': 'Expert',
@@ -1332,6 +1332,15 @@ const EN = {
   'Istraži': 'Research',
   'Istraži temu': 'Research topic',
   'research_desc': 'The agent will autonomously search the legal database from multiple angles and compile a comprehensive report.',
+  'doc_desc': 'Add laws, comments, legal practice and other documents. AI learns from everything you add.',
+  'tpl_desc': 'Upload a filled legal document and AI will create a template with smart fields. Fill templates for new clients and export as PDF.',
+  'tpl_howto_title': 'How does it work?',
+  'tpl_step1': '<strong>Upload</strong> a filled document (lawsuit, contract, appeal...)',
+  'tpl_step2': '<strong>AI analyzes</strong> the structure and creates a template with smart fields',
+  'tpl_step3': '<strong>Fill</strong> fields manually or with AI help ("Smart fill")',
+  'tpl_step4': '<strong>Export</strong> the filled document as PDF or DOCX',
+  'tpl_modal_desc': 'Upload a filled document or enter text. AI will analyze the structure and create a template with smart fields.',
+  'tpl_or_text': 'or enter text directly:',
   'Tema istraživanja': 'Research topic',
   'Pokreni istraživanje': 'Start research',
   'Unesite temu': 'Enter a topic',
@@ -2667,14 +2676,18 @@ async function loadEngineInfo() {
     // Show current loaded model
     loadCurrentModel();
 
-    // BM25 status
+    // BM25 status (reuse element to avoid duplicates)
     try {
       const bm25 = await apiFetch('/api/admin/bm25-status');
-      const bm25El = document.createElement('div');
-      bm25El.style.cssText = 'margin-top:10px;padding:8px 12px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;font-size:13px;';
+      let bm25El = document.getElementById('bm25StatusBar');
+      if (!bm25El) {
+        bm25El = document.createElement('div');
+        bm25El.id = 'bm25StatusBar';
+        bm25El.style.cssText = 'margin-top:10px;padding:8px 12px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;font-size:13px;';
+        document.getElementById('engineInfo').parentElement.appendChild(bm25El);
+      }
       bm25El.innerHTML = `<span style="color:var(--text-muted);">BM25 Index:</span> <strong>${bm25.ready ? '\u2705 ' + (bm25.doc_count || 0) + ' docs' : '\u274C Not built'}</strong>` +
         (bm25.ready ? '' : ` <button class="btn btn-sm" onclick="rebuildBM25()" style="margin-left:8px;">${t('Rebuild')}</button>`);
-      document.getElementById('engineInfo').parentElement.appendChild(bm25El);
     } catch(e) { /* BM25 endpoint may not exist yet */ }
   } catch (e) {
     document.getElementById('engineInfo').innerHTML = `<dt>${t('Status')}</dt><dd style="color:var(--danger);">Offline</dd>`;
@@ -2966,7 +2979,13 @@ async function openMatter(id) {
         <div>
           <h3 class="mb-8"><i class="fa-solid fa-link" style="color:var(--accent);"></i> ${t('Povezano')}</h3>
           <p class="text-sm text-muted mb-4">${(m.chat_ids || []).length} ${t('razgovora')}, ${(m.doc_ids || []).length} ${t('dokumenata')}</p>
-          <p class="text-sm text-muted">${escHtml(m.description || '')}</p>
+          <p class="text-sm text-muted mb-8">${escHtml(m.description || '')}</p>
+          <div class="flex gap-8 mb-8">
+            <button class="btn btn-sm" onclick="linkChatToMatter(${id})"><i class="fa-solid fa-comments"></i> ${t('Poveži razgovor')}</button>
+            <button class="btn btn-sm" onclick="linkDocToMatter(${id})"><i class="fa-solid fa-file"></i> ${t('Poveži dokument')}</button>
+          </div>
+          ${(m.chat_ids || []).length ? '<p class="text-sm text-dim mb-4"><i class="fa-solid fa-comments"></i> ' + t('Razgovori') + ': ' + m.chat_ids.map(cid => '#' + cid).join(', ') + '</p>' : ''}
+          ${(m.doc_ids || []).length ? '<p class="text-sm text-dim"><i class="fa-solid fa-file"></i> ' + t('Dokumenti') + ': ' + m.doc_ids.join(', ') + '</p>' : ''}
         </div>
       </div>
     `;
@@ -2995,6 +3014,31 @@ async function deleteMatter(id) {
   try {
     await apiFetch(`/api/matters/${id}`, {method:'DELETE'});
     loadMatters();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function linkChatToMatter(matterId) {
+  const chats = S.chats || [];
+  if (!chats.length) { toast(t('Nema razgovora za povezivanje'), 'warning'); return; }
+  const opts = chats.map(c => `${c.id}: ${c.title}`).join('\n');
+  const choice = prompt(t('Unesite ID razgovora za povezivanje:') + '\n\n' + opts);
+  if (!choice) return;
+  const chatId = parseInt(choice);
+  if (!chatId) return;
+  try {
+    await apiFetch(`/api/matters/${matterId}/link-chat`, {method:'POST', body: JSON.stringify({chat_id: chatId})});
+    toast(t('Razgovor povezan!'), 'success');
+    openMatter(matterId);
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function linkDocToMatter(matterId) {
+  const choice = prompt(t('Unesite ID dokumenta za povezivanje:'));
+  if (!choice) return;
+  try {
+    await apiFetch(`/api/matters/${matterId}/link-doc`, {method:'POST', body: JSON.stringify({doc_id: choice.trim()})});
+    toast(t('Dokument povezan!'), 'success');
+    openMatter(matterId);
   } catch(e) { toast(e.message, 'error'); }
 }
 
