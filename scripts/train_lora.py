@@ -19,32 +19,54 @@ import os
 import sys
 from pathlib import Path
 
-# Suppress warnings
+# Suppress warnings and disable memory-hungry fused losses
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
+os.environ["UNSLOTH_DISABLE_FUSED_CE"] = "1"
+
+
+def _patch_fused_ce():
+    """Monkey-patch Unsloth fused CE loss to avoid OOM on 24GB GPUs with large models."""
+    try:
+        import unsloth_zoo.fused_losses.cross_entropy_loss as ce_mod
+        original_get_chunk = ce_mod._get_chunk_multiplier
+        def _patched_get_chunk(vocab_size, target_gb=1.0):
+            try:
+                return original_get_chunk(vocab_size, target_gb)
+            except RuntimeError:
+                # Fallback: use minimal chunks
+                return max(1, vocab_size // 8192)
+        ce_mod._get_chunk_multiplier = _patched_get_chunk
+    except Exception:
+        pass
+
+_patch_fused_ce()
 
 
 def main():
     parser = argparse.ArgumentParser(description="Fine-tune Qwen 3.5 for LexArdor")
     parser.add_argument("--model", choices=["9b", "27b"], default="9b", help="Model size to fine-tune")
     parser.add_argument("--epochs", type=int, default=3, help="Number of training epochs")
-    parser.add_argument("--batch-size", type=int, default=2, help="Per-device batch size")
+    parser.add_argument("--batch-size", type=int, default=1, help="Per-device batch size")
     parser.add_argument("--lr", type=float, default=2e-4, help="Learning rate")
-    parser.add_argument("--lora-r", type=int, default=16, help="LoRA rank")
-    parser.add_argument("--max-seq-len", type=int, default=2048, help="Max sequence length")
+    parser.add_argument("--lora-r", type=int, default=None, help="LoRA rank (default: 16 for 9b, 8 for 27b)")
+    parser.add_argument("--max-seq-len", type=int, default=1024, help="Max sequence length")
     parser.add_argument("--export-gguf", action="store_true", help="Export to GGUF after training")
     parser.add_argument("--output-dir", type=str, default=None, help="Output directory for adapter")
-    parser.add_argument("--dataset", type=str, default="data/training/lexardor_legal_qa.jsonl", help="Training data path")
+    parser.add_argument("--dataset", type=str, default="data/training/lexardor_final_training.jsonl", help="Training data path")
     args = parser.parse_args()
 
     # ── Model selection ──────────────────────────────────────────────────────
     if args.model == "9b":
         model_name = "unsloth/Qwen3.5-9B"
-        load_in_16bit = True  # Recommended for Qwen3.5
-        load_in_4bit = False
+        load_in_16bit = False
+        load_in_4bit = True   # 4-bit to fit training in 24GB (16-bit OOMs)
     else:
         model_name = "unsloth/Qwen3.5-27B"
         load_in_16bit = False
         load_in_4bit = True  # 27B needs 4-bit to fit in 24GB
+
+    if args.lora_r is None:
+        args.lora_r = 8 if args.model == "27b" else 16
 
     output_dir = args.output_dir or f"data/training/lexardor-qwen3.5-{args.model}-lora"
 
@@ -123,11 +145,12 @@ def main():
         args=TrainingArguments(
             output_dir=output_dir,
             per_device_train_batch_size=args.batch_size,
-            gradient_accumulation_steps=4,
+            gradient_accumulation_steps=8,
+            gradient_checkpointing=True,
             num_train_epochs=args.epochs,
             learning_rate=args.lr,
-            fp16=not load_in_16bit,
-            bf16=load_in_16bit,
+            fp16=False,
+            bf16=True,
             logging_steps=10,
             save_strategy="epoch",
             warmup_steps=50,
