@@ -41,6 +41,13 @@ MODELS = {
         "ctx_size": 16384,
         "description": "Brzi model za klasifikaciju i jednostavna pitanja",
     },
+    "fast_legal": {
+        "name": "LexArdor Qwen 3.5 9B Legal Q8",
+        "path": str(Path.home() / "models/lexardor/LexArdor-Qwen3.5-9B-Legal-Q8.gguf"),
+        "role": "fast",
+        "ctx_size": 16384,
+        "description": "Treniran na 3419 srpskih pravnih primera (thinking mode — zahteva reasoning parser)",
+    },
     "deepseek": {
         "name": "DeepSeek-R1-Distill-Qwen-32B Q4",
         "path": settings.model_reasoning_deepseek,

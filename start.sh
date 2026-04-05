@@ -23,6 +23,7 @@ LLAMA_SERVER="$HOME/.local/bin/llama-server-cuda"
 export LD_LIBRARY_PATH="$HOME/.local/lib/llama:$LD_LIBRARY_PATH"
 
 # ── Model paths ──────────────────────────────────────────────────────────────
+# Base model (fine-tuned model available as fast_legal but needs reasoning parser)
 MODEL_FAST="$HOME/models/lexardor/Qwen3.5-9B.Q8_0.gguf"
 MODEL_DEEPSEEK="$HOME/models/lexardor/DeepSeek-R1-Distill-Qwen-32B-Q4_K_M.gguf"
 MODEL_QWEN27B="$HOME/models/lexardor/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled.i1-Q4_K_M.gguf"
