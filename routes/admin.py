@@ -61,7 +61,7 @@ def get_engine_config():
     active_verifier = get_active_verifier_model()
     return {
         "models": {
-            "fast": {"name": "LexArdor Qwen 3.5 9B Legal", "role": "Brzi odgovori"},
+            "fast": {"name": "Qwen 3.5 9B Q8", "role": "Brzi odgovori"},
             "reasoning": {"name": active_reasoning["name"], "key": active_reasoning["key"], "role": "Pravna analiza"},
             "verifier": {"name": active_verifier["name"], "key": active_verifier["key"], "role": "Verifikacija citata"},
             "reranker": "cross-encoder/ms-marco-MiniLM-L-6-v2",

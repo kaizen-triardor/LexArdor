@@ -34,19 +34,19 @@ LLAMA_PORT = 8081
 # ── Model Registry ───────────────────────────────────────────────────────────
 
 MODELS = {
-    "fast_legal": {
-        "name": "LexArdor Qwen 3.5 9B Legal Q8",
-        "path": str(Path.home() / "models/lexardor/LexArdor-Qwen3.5-9B-Legal-Q8.gguf"),
-        "role": "fast",
-        "ctx_size": 16384,
-        "description": "Treniran na 3419 srpskih pravnih primera — naš glavni model",
-    },
-    "fast_base": {
-        "name": "Qwen 3.5 9B Q8 (baza)",
+    "qwen9b": {
+        "name": "Qwen 3.5 9B Q8",
         "path": settings.model_fast,
         "role": "fast",
         "ctx_size": 16384,
-        "description": "Originalni Qwen model bez treninga",
+        "description": "Brzi model za klasifikaciju i jednostavna pitanja",
+    },
+    "qwen27b": {
+        "name": "Qwen 3.5 27B Opus Distilled Q4",
+        "path": settings.model_reasoning_qwen27b,
+        "role": "reasoning",
+        "ctx_size": 16384,
+        "description": "Claude Opus reasoning patterns — strukturirani odgovori",
     },
     "deepseek": {
         "name": "DeepSeek-R1-Distill-Qwen-32B Q4",
@@ -55,33 +55,26 @@ MODELS = {
         "ctx_size": 16384,
         "description": "Najjači reasoning model — chain-of-thought pravna analiza",
     },
-    "qwen27b": {
-        "name": "Qwen 3.5 27B Opus Distilled Q4",
-        "path": settings.model_reasoning_qwen27b,
-        "role": "reasoning",
-        "ctx_size": 16384,
-        "description": "Claude Opus reasoning patterns — dobar za strukturirane odgovore",
-    },
-    "gemma4_2b": {
-        "name": "Gemma 4 E2B Q8",
-        "path": settings.model_gemma4_2b,
-        "role": "verifier",
-        "ctx_size": 8192,
-        "description": "Gemma 4 najmanji — verifikacija citata i konzistentnosti",
-    },
-    "gemma4_4b": {
-        "name": "Gemma 4 E4B Q8",
-        "path": settings.model_gemma4_4b,
-        "role": "verifier",
-        "ctx_size": 16384,
-        "description": "Gemma 4 srednji — verifikacija i vizuelna analiza dokumenata",
-    },
     "gemma4_31b": {
         "name": "Gemma 4 31B Q4",
         "path": settings.model_gemma4_31b,
         "role": "reasoning",
         "ctx_size": 16384,
         "description": "Gemma 4 veliki — napredna pravna analiza i reasoning",
+    },
+    "gemma4_4b": {
+        "name": "Gemma 4 E4B Q8",
+        "path": settings.model_gemma4_4b,
+        "role": "verifier",
+        "ctx_size": 16384,
+        "description": "Gemma 4 srednji — verifikacija citata i dokumenata",
+    },
+    "gemma4_2b": {
+        "name": "Gemma 4 E2B Q8",
+        "path": settings.model_gemma4_2b,
+        "role": "verifier",
+        "ctx_size": 8192,
+        "description": "Gemma 4 najmanji — brza verifikacija konzistentnosti",
     },
 }
 
@@ -225,7 +218,7 @@ def detect_loaded_model() -> str | None:
 
     # Server is running — check env hint from start.sh, otherwise assume fast
     if _current_model_key is None:
-        hint = os.environ.get("LEXARDOR_INITIAL_MODEL", "fast")
+        hint = os.environ.get("LEXARDOR_INITIAL_MODEL", "qwen9b")
         _current_model_key = hint if hint in MODELS else "fast"
         log.info("Detected running model: %s", _current_model_key)
     return _current_model_key
@@ -274,11 +267,8 @@ def get_active_verifier_model() -> dict:
 def get_model_for_role(role: str) -> dict:
     """Get the best available model for a given role."""
     if role == "fast":
-        # Prefer trained legal model, fallback to base
-        for key in ["fast_legal", "fast_base"]:
-            if key in MODELS and Path(MODELS[key]["path"]).exists():
-                return {"key": key, **MODELS[key]}
-        # Last resort: first available fast model
+        if "qwen9b" in MODELS and Path(MODELS["qwen9b"]["path"]).exists():
+            return {"key": "qwen9b", **MODELS["qwen9b"]}
         for key, info in MODELS.items():
             if info["role"] == "fast" and Path(info["path"]).exists():
                 return {"key": key, **info}
