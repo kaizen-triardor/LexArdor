@@ -2804,6 +2804,7 @@ function renderDraftEditor() {
         <button class="btn" onclick="analyzeRisk()"><i class="fa-solid fa-shield-halved"></i> ${t('Analiza rizika')}</button>
         <button class="btn" onclick="checkCompleteness()"><i class="fa-solid fa-list-check"></i> ${t('Provera kompletnosti')}</button>
         <button class="btn" onclick="findLegalBasis()"><i class="fa-solid fa-scale-balanced"></i> ${t('Pravni osnov')}</button>
+        <button class="btn" onclick="explainClause()"><i class="fa-solid fa-comment-dots"></i> ${t('Objasni klauzulu')}</button>
       </div>
       <div id="draftValidation" class="mt-16 hidden"></div>
       <div id="draftPreview" class="mt-16 hidden"></div>
@@ -3382,6 +3383,24 @@ async function findLegalBasis() {
           ${(s.articles || []).map(a => `<div class="text-sm" style="margin-left:12px;">&bull; ${escHtml(a.law || '')} Čl. ${escHtml(a.article || '')}</div>`).join('')}
         </div>
       `).join('');
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function explainClause() {
+  const clause = prompt(t('Unesite klauzulu koju želite da objasnite:'));
+  if (!clause) return;
+  const action = prompt(t('Šta želite? (objasni / pojednostavi / formalizuj)'), 'objasni');
+  if (!action) return;
+  toast(t('AI analizira klauzulu...'), 'info');
+  try {
+    const r = await apiFetch('/api/drafts/explain-clause', {method:'POST', body: JSON.stringify({clause, action: action.toLowerCase()})});
+    const el = document.getElementById('draftAnalysis');
+    el.classList.remove('hidden');
+    el.innerHTML = `<h4><i class="fa-solid fa-comment-dots" style="color:var(--accent);"></i> ${t('Objašnjenje klauzule')}</h4>
+      <div style="padding:12px;background:var(--bg-card);border-radius:var(--radius);margin-top:8px;">
+        <p class="text-sm text-muted mb-4"><strong>${t('Akcija')}:</strong> ${escHtml(action)}</p>
+        <div style="font-family:'Lora',serif;line-height:1.7;">${renderMarkdown(r.result || r.explanation || JSON.stringify(r))}</div>
+      </div>`;
   } catch(e) { toast(e.message, 'error'); }
 }
 
