@@ -44,7 +44,13 @@ class OllamaClient:
             timeout=180,
         )
         r.raise_for_status()
-        return r.json()["choices"][0]["message"]["content"]
+        msg = r.json()["choices"][0]["message"]
+        content = msg.get("content", "")
+        # Qwen 3.5 thinking mode: actual answer may be in content after reasoning
+        # If content is empty, check reasoning_content
+        if not content.strip() and msg.get("reasoning_content"):
+            content = msg["reasoning_content"]
+        return content
 
     def generate_stream(self, prompt: str, system: str = None,
                         temperature: float = 0.3, max_tokens: int = 2048):
@@ -74,7 +80,7 @@ class OllamaClient:
                 try:
                     data = json.loads(payload)
                     delta = data["choices"][0].get("delta", {})
-                    content = delta.get("content", "")
+                    content = delta.get("content", "") or delta.get("reasoning_content", "")
                     if content:
                         yield content
                 except (json.JSONDecodeError, KeyError, IndexError):
