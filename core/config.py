@@ -33,17 +33,14 @@ class Settings(BaseSettings):
     model_fast: str = str(Path.home() / "models/lexardor/Qwen3.5-9B.Q8_0.gguf")
     model_reasoning_deepseek: str = str(Path.home() / "models/lexardor/DeepSeek-R1-Distill-Qwen-32B-Q4_K_M.gguf")
     model_reasoning_qwen27b: str = str(Path.home() / "models/lexardor/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled.i1-Q4_K_M.gguf")
-    model_verifier_saul: str = str(Path.home() / "models/lexardor/Saul-7B-Instruct-v1.i1-Q4_K_M.gguf")
-    model_verifier_gemma: str = str(Path.home() / "models/lexardor/gemma-3-12b-it.Q4_K_M.gguf")
+    # Removed: model_verifier_saul, model_verifier_gemma, model_fast_q4
     model_gemma4_2b: str = str(Path.home() / "models/lexardor/gemma-4-e2b-it-Q8_0.gguf")
     model_gemma4_4b: str = str(Path.home() / "models/lexardor/gemma-4-E4B-it-Q8_0.gguf")
     model_gemma4_31b: str = str(Path.home() / "models/lexardor/gemma-4-31B-it-Q4_K_M.gguf")
 
-    model_fast_q4: str = str(Path.home() / "models/lexardor/Qwen3.5-9B-Q4_K_M.gguf")
-
     # Active model selection (changeable via settings)
     active_reasoning_model: str = "deepseek"  # deepseek | qwen27b | gemma4_31b
-    active_verifier_model: str = "gemma"       # gemma | saul | gemma4_4b
+    active_verifier_model: str = "gemma4_4b"  # gemma4_4b | gemma4_2b
     agent_model: str = "gemma4_2b"             # model for AI agent (runs concurrently on separate port)
 
     # Hardware tier (auto-detected or manual)
@@ -64,13 +61,13 @@ HARDWARE_TIERS = {
         "min_vram_gb": 16,
         "fast": "fast",           # Qwen 9B Q8 (8.9 GB)
         "reasoning": "deepseek",  # DeepSeek 32B Q4 (18.5 GB)
-        "verifier": "gemma",      # Gemma 12B Q4 (6.8 GB)
+        "verifier": "gemma4_4b",  # Gemma 4 E4B Q8 (7.6 GB)
     },
     "mid": {
         "label": "Mid-Range (8 GB VRAM)",
         "min_vram_gb": 6,
-        "fast": "fast_q4",        # Qwen 9B Q4 (5.3 GB)
-        "reasoning": "gemma4_4b", # Gemma 4 E4B Q8 (7.6 GB)
+        "fast": "gemma4_4b",      # Gemma 4 E4B Q8 (7.6 GB)
+        "reasoning": "gemma4_4b", # Same
         "verifier": "gemma4_2b",  # Gemma 4 E2B Q8 (4.6 GB)
     },
     "low": {

@@ -55,27 +55,7 @@ MODELS = {
         "ctx_size": 16384,
         "description": "Claude Opus reasoning patterns — dobar za strukturirane odgovore",
     },
-    "saul": {
-        "name": "SaulLM 7B Instruct",
-        "path": settings.model_verifier_saul,
-        "role": "verifier",
-        "ctx_size": 16384,
-        "description": "Specijalizovan za pravo — 30B tokena pravnog teksta",
-    },
-    "gemma": {
-        "name": "Gemma 3 12B IT Q4",
-        "path": settings.model_verifier_gemma,
-        "role": "verifier",
-        "ctx_size": 8192,
-        "description": "Google generalist — dobar za proveru konzistentnosti",
-    },
-    "fast_q4": {
-        "name": "Qwen 3.5 9B Q4",
-        "path": settings.model_fast_q4,
-        "role": "fast",
-        "ctx_size": 16384,
-        "description": "Brzi model za uređaje sa 8 GB VRAM (Q4 kvantizacija)",
-    },
+    # Removed: saul (SaulLM 7B), gemma (Gemma 3 12B), fast_q4 (Qwen 9B Q4)
     "gemma4_2b": {
         "name": "Gemma 4 E2B Q8",
         "path": settings.model_gemma4_2b,
@@ -276,10 +256,10 @@ def get_active_verifier_model() -> dict:
     key = settings.active_verifier_model
     if key in MODELS and Path(MODELS[key]["path"]).exists():
         return {"key": key, **MODELS[key]}
-    if Path(MODELS["saul"]["path"]).exists():
-        return {"key": "saul", **MODELS["saul"]}
-    if Path(MODELS["gemma"]["path"]).exists():
-        return {"key": "gemma", **MODELS["gemma"]}
+    if "gemma4_4b" in MODELS and Path(MODELS["gemma4_4b"]["path"]).exists():
+        return {"key": "gemma4_4b", **MODELS["gemma4_4b"]}
+    if "gemma4_2b" in MODELS and Path(MODELS["gemma4_2b"]["path"]).exists():
+        return {"key": "gemma4_2b", **MODELS["gemma4_2b"]}
     return {"key": "fast", **MODELS["fast"]}
 
 
