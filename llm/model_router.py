@@ -34,19 +34,19 @@ LLAMA_PORT = 8081
 # ── Model Registry ───────────────────────────────────────────────────────────
 
 MODELS = {
-    "fast": {
-        "name": "Qwen 3.5 9B Q8",
-        "path": settings.model_fast,
-        "role": "fast",
-        "ctx_size": 16384,
-        "description": "Brzi model za klasifikaciju i jednostavna pitanja",
-    },
     "fast_legal": {
         "name": "LexArdor Qwen 3.5 9B Legal Q8",
         "path": str(Path.home() / "models/lexardor/LexArdor-Qwen3.5-9B-Legal-Q8.gguf"),
         "role": "fast",
         "ctx_size": 16384,
-        "description": "Treniran na 3419 srpskih pravnih primera (thinking mode — zahteva reasoning parser)",
+        "description": "Treniran na 3419 srpskih pravnih primera — naš glavni model",
+    },
+    "fast_base": {
+        "name": "Qwen 3.5 9B Q8 (baza)",
+        "path": settings.model_fast,
+        "role": "fast",
+        "ctx_size": 16384,
+        "description": "Originalni Qwen model bez treninga",
     },
     "deepseek": {
         "name": "DeepSeek-R1-Distill-Qwen-32B Q4",
@@ -62,27 +62,26 @@ MODELS = {
         "ctx_size": 16384,
         "description": "Claude Opus reasoning patterns — dobar za strukturirane odgovore",
     },
-    # Removed: saul (SaulLM 7B), gemma (Gemma 3 12B), fast_q4 (Qwen 9B Q4)
     "gemma4_2b": {
         "name": "Gemma 4 E2B Q8",
         "path": settings.model_gemma4_2b,
-        "role": "agent",
+        "role": "verifier",
         "ctx_size": 8192,
-        "description": "Gemma 4 najmanji — AI agent, može raditi paralelno sa glavnim modelom",
+        "description": "Gemma 4 najmanji — verifikacija citata i konzistentnosti",
     },
     "gemma4_4b": {
         "name": "Gemma 4 E4B Q8",
         "path": settings.model_gemma4_4b,
-        "role": "fast",
+        "role": "verifier",
         "ctx_size": 16384,
-        "description": "Gemma 4 mali model — brz, za klasifikaciju i jednostavna pitanja",
+        "description": "Gemma 4 srednji — verifikacija i vizuelna analiza dokumenata",
     },
     "gemma4_31b": {
         "name": "Gemma 4 31B Q4",
         "path": settings.model_gemma4_31b,
         "role": "reasoning",
         "ctx_size": 16384,
-        "description": "Gemma 4 veliki model — napredna pravna analiza i reasoning",
+        "description": "Gemma 4 veliki — napredna pravna analiza i reasoning",
     },
 }
 
@@ -253,9 +252,11 @@ def get_active_reasoning_model() -> dict:
     key = settings.active_reasoning_model
     if key in MODELS and Path(MODELS[key]["path"]).exists():
         return {"key": key, **MODELS[key]}
-    if Path(MODELS["qwen27b"]["path"]).exists():
-        return {"key": "qwen27b", **MODELS["qwen27b"]}
-    return {"key": "fast", **MODELS["fast"]}
+    # Fallback chain
+    for fallback in ["qwen27b", "deepseek", "gemma4_31b"]:
+        if fallback in MODELS and Path(MODELS[fallback]["path"]).exists():
+            return {"key": fallback, **MODELS[fallback]}
+    return get_model_for_role("fast")
 
 
 def get_active_verifier_model() -> dict:
@@ -273,7 +274,14 @@ def get_active_verifier_model() -> dict:
 def get_model_for_role(role: str) -> dict:
     """Get the best available model for a given role."""
     if role == "fast":
-        return {"key": "fast", **MODELS["fast"]}
+        # Prefer trained legal model, fallback to base
+        for key in ["fast_legal", "fast_base"]:
+            if key in MODELS and Path(MODELS[key]["path"]).exists():
+                return {"key": key, **MODELS[key]}
+        # Last resort: first available fast model
+        for key, info in MODELS.items():
+            if info["role"] == "fast" and Path(info["path"]).exists():
+                return {"key": key, **info}
     elif role == "reasoning":
         return get_active_reasoning_model()
     elif role == "verifier":
