@@ -2,10 +2,12 @@
 """Full RAG pipeline: classify -> retrieve -> rerank -> reason -> verify."""
 import logging
 import re
+from concurrent.futures import ThreadPoolExecutor
 from rag.store import search, search_with_filters
 from rag.reranker import rerank
 from rag.graph import expand_with_cross_refs, fetch_articles_by_chroma_ids
 from rag.reasoning import classify_query, get_system_prompt, verify_citations
+from rag.web_search import search_web, format_web_context
 from llm.ollama import OllamaClient
 from llm.model_router import (
     get_current_model, get_model_for_role, get_active_reasoning_model,
@@ -18,6 +20,7 @@ log = logging.getLogger("lexardor.pipeline")
 
 
 SYSTEM_PROMPT_DETAILED = """Ti si LexArdor, AI pravni asistent za srpsko pravo.
+UVEK odgovaraj ISKLJUČIVO na SRPSKOM jeziku (latinica). NE prikazuj razmišljanje ili thought process.
 
 Odgovaraj na osnovu priloženih izvora. Citiraj članove inline (npr. "prema Članu 187 Zakona o radu").
 Počni sa direktnim odgovorom u 1-2 rečenice, pa obrazloži.
@@ -25,7 +28,8 @@ NE ponavljaj informacije. NE pravi prazne sekcije. Budi precizan i koncizan.
 Ako izvori ne pokrivaju pitanje — reci to kratko.
 Maksimalno 1000 karaktera."""
 
-SYSTEM_PROMPT_SHORT = """Ti si LexArdor. Odgovori u 2-3 rečenice sa ključnim članom zakona.
+SYSTEM_PROMPT_SHORT = """Ti si LexArdor. UVEK odgovaraj na SRPSKOM jeziku. NE prikazuj razmišljanje.
+Odgovori u 2-3 rečenice sa ključnim članom zakona.
 Ako nemaš informacije — reci to. Ne izmišljaj."""
 
 
@@ -221,7 +225,8 @@ def build_context(hits: list[dict]) -> str:
 def _retrieve_and_rerank(search_query: str, top_k: int = 5,
                          reference_date: str | None = None,
                          doc_types: list[str] | None = None,
-                         min_authority: int | None = None) -> tuple[list[dict], dict]:
+                         min_authority: int | None = None,
+                         legal_domains: list[str] | None = None) -> tuple[list[dict], dict]:
     """Enhanced retrieval: search → expand cross-refs → rerank.
 
     Returns (reranked_hits, diagnostics).
@@ -230,7 +235,8 @@ def _retrieve_and_rerank(search_query: str, top_k: int = 5,
     candidates = search_with_filters(search_query, top_k=top_k, fetch_k=40,
                                      reference_date=reference_date,
                                      doc_types=doc_types,
-                                     min_authority=min_authority)
+                                     min_authority=min_authority,
+                                     legal_domains=legal_domains)
 
     # Step 2: Expand with cross-referenced articles
     top_ids = [c["id"] for c in candidates[:10]]
@@ -270,13 +276,38 @@ def query(user_query: str, top_k: int = 5, use_heavy_model: bool = False,
     if min_authority:
         diagnostics_extra["authority_filter"] = min_authority
 
-    # Stage 2+3: Retrieve and rerank
-    hits, diagnostics = _retrieve_and_rerank(search_query, top_k=top_k,
-                                             reference_date=reference_date,
-                                             doc_types=doc_types,
-                                             min_authority=min_authority)
+    # Stage 2+3: Retrieve and rerank + web search (in parallel)
+    detected_domains = query_class.get("legal_domains", [])
+
+    web_results = []
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        # Local RAG retrieval
+        rag_future = executor.submit(
+            _retrieve_and_rerank, search_query, top_k, reference_date,
+            doc_types, min_authority, detected_domains
+        )
+        # Web search (runs in parallel, hidden from user)
+        # Google creds from server-side config (never in URL)
+        g_key = settings.google_api_key
+        g_cx = settings.google_cx
+        g_enabled = bool(g_key and g_cx)
+        web_future = executor.submit(
+            search_web, search_query, g_key, g_cx, g_enabled
+        )
+
+        hits, diagnostics = rag_future.result()
+        try:
+            web_results = web_future.result()
+        except Exception as e:
+            log.warning("Web search failed (non-blocking): %s", e)
+
     diagnostics.update(diagnostics_extra)
+    if web_results:
+        diagnostics["web_sources"] = len(web_results)
+        diagnostics["web_providers"] = list({r["source"] for r in web_results})
+
     context = build_context(hits)
+    web_context = format_web_context(web_results)
 
     # Stage 4: Choose system prompt based on answer mode
     system = get_system_prompt(answer_mode, short_answer)
@@ -293,11 +324,13 @@ def query(user_query: str, top_k: int = 5, use_heavy_model: bool = False,
 
     user_prompt = f"""PRAVNI IZVORI:
 {context}
+{web_context}
 {history_context}
 PITANJE KORISNIKA:
 {user_query}
 
-Odgovori na osnovu priloženih pravnih izvora. Navedi relevantne članove zakona."""
+Odgovori na osnovu priloženih pravnih izvora. Ako postoje online izvori, koristi ih za dopunu i proveru.
+Navedi relevantne članove zakona."""
 
     # Stage 4b: Select model via router
     if use_heavy_model:
@@ -366,10 +399,31 @@ def query_stream(user_query: str, top_k: int = 5, use_heavy_model: bool = False,
                  doc_types: list[str] | None = None):
     """Streaming version with reranked retrieval and citation verification."""
     search_query = to_latin(user_query) if detect_script(user_query) == "cyrillic" else user_query
-    hits, diagnostics = _retrieve_and_rerank(search_query, top_k=top_k,
-                                             reference_date=reference_date,
-                                             doc_types=doc_types)
+    query_class = classify_query(user_query)
+    detected_domains = query_class.get("legal_domains", [])
+
+    web_results = []
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        rag_future = executor.submit(
+            _retrieve_and_rerank, search_query, top_k, reference_date,
+            doc_types, None, detected_domains
+        )
+        g_key = settings.google_api_key
+        g_cx = settings.google_cx
+        g_enabled = bool(g_key and g_cx)
+        web_future = executor.submit(
+            search_web, search_query, g_key, g_cx, g_enabled
+        )
+        hits, diagnostics = rag_future.result()
+        try:
+            web_results = web_future.result()
+        except Exception:
+            pass
+
     context = build_context(hits)
+    web_context = format_web_context(web_results)
+    if web_results:
+        diagnostics["web_sources"] = len(web_results)
 
     system = get_system_prompt(answer_mode, short_answer)
 
@@ -384,11 +438,13 @@ def query_stream(user_query: str, top_k: int = 5, use_heavy_model: bool = False,
 
     user_prompt = f"""PRAVNI IZVORI:
 {context}
+{web_context}
 {history_context}
 PITANJE KORISNIKA:
 {user_query}
 
-Odgovori na osnovu priloženih pravnih izvora. Navedi relevantne članove zakona."""
+Odgovori na osnovu priloženih pravnih izvora. Ako postoje online izvori, koristi ih za dopunu i proveru.
+Navedi relevantne članove zakona."""
 
     # Select model via router
     if use_heavy_model:

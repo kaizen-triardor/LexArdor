@@ -1,8 +1,11 @@
 """Query endpoints (RAG)."""
 import json
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
+
+logger = logging.getLogger(__name__)
 
 from core.config import settings
 from db.models import (
@@ -29,18 +32,28 @@ def query_endpoint(req: QueryRequest, user: dict = Depends(get_current_user)):
     # Get chat history for conversation context
     chat_history = get_chat_messages(chat_id)[:-1]
     # Run RAG — use multi-stage pipeline for deep analysis
-    if req.deep_analysis:
-        from rag.multi_stage import query_deep
-        result = query_deep(req.query, top_k=max(req.top_k, 8),
-                            chat_history=chat_history, answer_mode=req.answer_mode,
-                            reference_date=req.reference_date)
-    else:
-        result = rag_query(req.query, top_k=req.top_k, use_heavy_model=req.heavy_model,
-                           short_answer=req.short_answer, chat_history=chat_history,
-                           answer_mode=req.answer_mode,
-                           reference_date=req.reference_date,
-                           doc_types=req.doc_types,
-                           min_authority=req.min_authority)
+    try:
+        if req.deep_analysis:
+            from rag.multi_stage import query_deep
+            result = query_deep(req.query, top_k=max(req.top_k, 8),
+                                chat_history=chat_history, answer_mode=req.answer_mode,
+                                reference_date=req.reference_date)
+        else:
+            result = rag_query(req.query, top_k=req.top_k, use_heavy_model=req.heavy_model,
+                               short_answer=req.short_answer, chat_history=chat_history,
+                               answer_mode=req.answer_mode,
+                               reference_date=req.reference_date,
+                               doc_types=req.doc_types,
+                               min_authority=req.min_authority)
+    except Exception as e:
+        logger.error("RAG pipeline failed: %s", e)
+        result = {
+            "answer": "AI model je trenutno nedostupan. Pokušajte ponovo za nekoliko sekundi.",
+            "sources": [], "confidence": {"level": "low", "reasons": ["AI nedostupan"], "red_flags": ["Model nije odgovorio"]},
+            "model_used": "", "answer_mode": req.answer_mode,
+            "citations": {"citation_count": 0, "verified_count": 0, "flagged_count": 0},
+            "diagnostics": {"error": str(e)},
+        }
     # Save assistant message
     add_message(chat_id, "assistant", result["answer"],
                 sources=result["sources"], confidence=result["confidence"])
@@ -67,8 +80,8 @@ def query_endpoint(req: QueryRequest, user: dict = Depends(get_current_user)):
             response_time_ms=elapsed_ms,
             multi_stage=req.deep_analysis,
         )
-    except Exception:
-        pass  # Logging should never break the query
+    except Exception as e:
+        logger.warning("Failed to log query diagnostics: %s", e)
 
     return {
         "answer": result["answer"],
@@ -137,8 +150,8 @@ def query_stream_endpoint(
                 log_query(query=q, answer_mode=mode, confidence=conf.get("level","") if isinstance(conf, dict) else str(conf),
                           source_count=len(result.get("sources") or []), citation_verified=0, citation_flagged=0,
                           model_used=result.get("model_used",""), bm25_used=False, response_time_ms=elapsed, multi_stage=True)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning("Failed to log deep query diagnostics: %s", e)
 
         return StreamingResponse(deep_generator(), media_type="text/event-stream")
 
@@ -183,8 +196,8 @@ def query_stream_endpoint(
                 response_time_ms=elapsed_ms,
                 multi_stage=False,
             )
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning("Failed to log stream query diagnostics: %s", e)
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 

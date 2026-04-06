@@ -34,6 +34,21 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         import logging
         logging.getLogger("lexardor").warning("BM25 init skipped: %s", e)
+    # Pre-warm embedding model and cross-encoder so first query is fast
+    try:
+        import logging
+        _log = logging.getLogger("lexardor")
+        _log.info("Pre-warming embedding model...")
+        from rag.store import embed_query
+        embed_query("test warmup query")
+        _log.info("Embedding model ready")
+        _log.info("Pre-warming cross-encoder reranker...")
+        from rag.reranker import rerank
+        rerank("test", [{"text": "test", "metadata": {}, "score": 0.5, "id": "0"}], top_k=1)
+        _log.info("Cross-encoder ready")
+    except Exception as e:
+        import logging
+        logging.getLogger("lexardor").warning("Model pre-warm failed (non-critical): %s", e)
     yield
 
 

@@ -1,6 +1,9 @@
 """LexArdor configuration via pydantic-settings."""
+import logging
 from pydantic_settings import BaseSettings
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).parent.parent
 
@@ -31,6 +34,8 @@ class Settings(BaseSettings):
     # ── Model Registry ──────────────────────────────────────────
     # Paths to GGUF model files
     model_fast: str = str(Path.home() / "models/lexardor/Qwen3.5-9B.Q8_0.gguf")
+    model_fast_opus: str = str(Path.home() / "models/lexardor/Qwen3.5-9B-Claude-Opus-Reasoning-Distilled.Q8_0.gguf")
+    model_lexardor_opus: str = str(Path.home() / "models/lexardor/LexArdor-Opus-9B-Legal-Q8_0.gguf")
     model_reasoning_deepseek: str = str(Path.home() / "models/lexardor/DeepSeek-R1-Distill-Qwen-32B-Q4_K_M.gguf")
     model_reasoning_qwen27b: str = str(Path.home() / "models/lexardor/Qwen3.5-27B-Claude-4.6-Opus-Reasoning-Distilled.i1-Q4_K_M.gguf")
     # Removed: model_verifier_saul, model_verifier_gemma, model_fast_q4
@@ -46,11 +51,36 @@ class Settings(BaseSettings):
     # Hardware tier (auto-detected or manual)
     hardware_tier: str = "auto"  # auto | high | mid | low
 
+    # ── Web Search (background augmentation) ────────────────────
+    # DuckDuckGo runs automatically in background (free, no API key needed)
+    google_api_key: str = ""  # Google Custom Search API key (user-controlled via Settings)
+    google_cx: str = ""  # Google Custom Search Engine ID
+
     class Config:
         env_file = str(BASE_DIR / ".env")
 
 
 settings = Settings()
+
+
+# ── Auto-generate secret_key on first boot ──────────────────────────────────
+
+def _ensure_unique_secret():
+    """Generate a unique secret_key if still using the default placeholder."""
+    if settings.secret_key in ("lexardor-local-2026-change-me", "lexardor-stoic-fire-2026-change-me"):
+        import secrets
+        new_key = f"lexardor-{secrets.token_hex(24)}"
+        settings.secret_key = new_key
+        # Persist to .env
+        env_path = BASE_DIR / ".env"
+        if env_path.exists():
+            content = env_path.read_text()
+            import re
+            content = re.sub(r'SECRET_KEY=.*', f'SECRET_KEY={new_key}', content)
+            env_path.write_text(content)
+            logger.info("Generated unique SECRET_KEY for this installation")
+
+_ensure_unique_secret()
 
 
 # ── Hardware tier detection ──────────────────────────────────────────────────
@@ -91,8 +121,8 @@ def detect_gpu_vram() -> int:
         if result.returncode == 0:
             vram_mb = int(result.stdout.strip().split("\n")[0])
             return vram_mb // 1024
-    except Exception:
-        pass
+    except Exception as e:
+        logger.warning("GPU VRAM detection failed: %s", e)
     return 0
 
 

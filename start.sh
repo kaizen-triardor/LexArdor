@@ -32,10 +32,11 @@ MODEL_GEMMA4_2B="$HOME/models/lexardor/gemma-4-e2b-it-Q8_0.gguf"
 MODEL_GEMMA4_4B="$HOME/models/lexardor/gemma-4-E4B-it-Q8_0.gguf"
 MODEL_GEMMA4_31B="$HOME/models/lexardor/gemma-4-31B-it-Q4_K_M.gguf"
 
-# KV cache — FP16 (quantized cache requires Flash Attention which
-# isn't supported for Qwen3.5 hybrid attention layers on this GPU)
-KV_CACHE_K="f16"
-KV_CACHE_V="f16"
+# KV cache — Q8_0 quantization saves 2-4 GB VRAM vs f16
+# Flash Attention enabled (auto) — llama.cpp build 8652+ supports it
+KV_CACHE_K="q8_0"
+KV_CACHE_V="q8_0"
+FLASH_ATTN="on"
 CTX_SIZE=16384
 
 # ── Parse arguments ──────────────────────────────────────────────────────────
@@ -126,6 +127,7 @@ if [ "$API_ONLY" = false ]; then
         --ctx-size "$CTX_SIZE" \
         --cache-type-k "$KV_CACHE_K" \
         --cache-type-v "$KV_CACHE_V" \
+        --flash-attn "$FLASH_ATTN" \
         --threads $(( $(nproc) / 2 )) \
         2>/tmp/lexardor-llama.log &
     LLAMA_PID=$!

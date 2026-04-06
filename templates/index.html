@@ -90,6 +90,8 @@ a:hover { text-decoration: underline; }
   transition: box-shadow 0.3s var(--ease), transform 0.15s var(--ease);
 }
 [data-theme="dark"] .btn-new-chat { color: #090B14; }
+[data-theme="dark"] #btnOnlineVerify { color: #090B14 !important; }
+[data-theme="dark"] .msg-body [style*="background:var(--accent)"] { color: #090B14 !important; }
 .btn-new-chat:hover { box-shadow: 0 0 16px var(--accent-glow); transform: translateY(-1px); }
 
 .chat-history { flex: 0 1 auto; max-height: 35vh; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; padding: 4px 0; }
@@ -279,6 +281,89 @@ a:hover { text-decoration: underline; }
 }
 .modal h3 { font-family: 'Playfair Display', Georgia, serif; margin-bottom: 16px; }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
+/* ── Onboarding Wizard ───────────────────────────── */
+.wizard-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  z-index: 300; align-items: center; justify-content: center;
+  animation: fadeIn 0.3s var(--ease);
+}
+.wizard-overlay.open { display: flex; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.wizard {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 0; width: 92%; max-width: 620px;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+.wizard-header {
+  padding: 24px 28px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.wizard-header h2 {
+  font-family: 'Playfair Display', Georgia, serif; font-size: 20px;
+  color: var(--accent); margin: 0;
+}
+.wizard-steps {
+  display: flex; gap: 6px; padding: 0 28px 16px;
+}
+.wizard-step-dot {
+  width: 32px; height: 4px; border-radius: 2px;
+  background: var(--border); transition: background 0.3s var(--ease);
+}
+.wizard-step-dot.active { background: var(--accent); }
+.wizard-step-dot.done { background: var(--success); }
+
+.wizard-body { padding: 24px 28px; min-height: 260px; }
+.wizard-body h3 {
+  font-family: 'Playfair Display', Georgia, serif; font-size: 18px;
+  margin-bottom: 12px; color: var(--text);
+}
+.wizard-body p { color: var(--text-muted); font-size: 14px; line-height: 1.7; margin-bottom: 10px; }
+.wizard-body .wizard-icon {
+  font-size: 36px; color: var(--accent); margin-bottom: 12px; display: block;
+}
+.wizard-feature-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;
+}
+.wizard-feature {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
+  background: var(--accent-glow); border-radius: var(--radius);
+}
+.wizard-feature i { color: var(--accent); font-size: 16px; margin-top: 2px; flex-shrink: 0; }
+.wizard-feature span { font-size: 13px; color: var(--text); line-height: 1.5; }
+
+.wizard-footer {
+  padding: 16px 28px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.wizard-footer .wizard-skip {
+  background: none; border: none; color: var(--text-muted); cursor: pointer;
+  font-size: 13px; font-family: inherit; padding: 6px 12px;
+}
+.wizard-footer .wizard-skip:hover { color: var(--text); }
+.wizard-footer .wizard-nav { display: flex; gap: 8px; }
+.wizard-footer .btn-wiz {
+  padding: 8px 20px; border-radius: var(--radius); border: 1px solid var(--border);
+  background: var(--bg-card); color: var(--text); cursor: pointer;
+  font-size: 13px; font-family: inherit; font-weight: 500;
+  transition: all 0.2s var(--ease);
+}
+.wizard-footer .btn-wiz:hover { border-color: var(--accent); color: var(--accent); }
+.wizard-footer .btn-wiz-primary {
+  background: var(--accent); color: #fff; border-color: var(--accent);
+}
+[data-theme="dark"] .wizard-footer .btn-wiz-primary { color: #090B14; }
+.wizard-footer .btn-wiz-primary:hover { box-shadow: 0 0 16px var(--accent-glow); }
+
+@media (max-width: 600px) {
+  .wizard { width: 96%; max-width: none; }
+  .wizard-feature-grid { grid-template-columns: 1fr; }
+  .wizard-body { padding: 16px 20px; }
+  .wizard-header, .wizard-footer { padding-left: 20px; padding-right: 20px; }
+  .wizard-steps { padding-left: 20px; padding-right: 20px; }
+}
 
 /* ── Chat page ────────────────────────────────────── */
 .chat-area { flex: 1; overflow-y: auto; padding: 16px 24px; display: flex; flex-direction: column; }
@@ -519,6 +604,31 @@ a:hover { text-decoration: underline; }
 .mb-4 { margin-bottom: 4px; }
 .mb-8 { margin-bottom: 8px; }
 .mt-4 { margin-top: 4px; }
+/* Matter tabs */
+.matter-tab { padding: 8px 16px; font-size: 13px; font-weight: 600; background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -2px; color: var(--text-muted); cursor: pointer; transition: .2s; display: flex; align-items: center; gap: 6px; }
+.matter-tab:hover { color: var(--text); }
+.matter-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.matter-tab-content { min-height: 200px; }
+.priority-urgent { background: var(--danger); color: white; }
+.priority-high { background: #d97706; color: white; }
+.priority-normal { background: var(--accent); color: white; }
+.priority-low { background: var(--text-muted); color: white; }
+.event-card { padding: 12px 14px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 8px; display: flex; align-items: flex-start; gap: 12px; }
+.event-urgent { border-left: 3px solid var(--danger); }
+.event-soon { border-left: 3px solid #d97706; }
+.event-normal { border-left: 3px solid var(--border); }
+.event-done { opacity: 0.5; border-left: 3px solid var(--success); }
+.file-card { padding: 10px 14px; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+.file-card:hover { background: var(--bg-alt); }
+.drop-zone { border: 2px dashed var(--border); border-radius: var(--radius); padding: 24px; text-align: center; color: var(--text-muted); cursor: pointer; transition: .2s; }
+.drop-zone.dragover { border-color: var(--accent); background: rgba(217,119,6,0.05); }
+/* Toggle switch */
+.toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; cursor: pointer; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--border); border-radius: 24px; transition: .3s; }
+.toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .3s; }
+.toggle-switch input:checked + .toggle-slider { background: var(--accent); }
+.toggle-switch input:checked + .toggle-slider:before { transform: translateX(20px); }
 </style>
 </head>
 <body>
@@ -653,7 +763,7 @@ a:hover { text-decoration: underline; }
         <input type="date" id="refDatePicker" class="input" style="padding:2px 6px;font-size:11px;width:130px;">
       </div>
       <button class="btn btn-sm" onclick="openResearchModal()" title="Istraži temu"><i class="fa-solid fa-microscope"></i> <span data-i18n="Istraži">Istraži</span></button>
-      <button class="btn btn-sm" id="btnOnlineVerify" onclick="onlineAIVerify()" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;padding:4px 12px;font-size:11px;border-radius:6px;" title="Proveri odgovor sa spoljnim AI">
+      <button class="btn btn-sm" id="btnOnlineVerify" onclick="onlineAIVerify()" style="background:var(--accent);color:#fff;border:none;padding:4px 12px;font-size:11px;border-radius:6px;" title="Proveri odgovor sa spoljnim AI">
         <i class="fa-solid fa-globe"></i> <span data-i18n="Online AI Provera">Online AI Provera</span>
       </button>
     </div>
@@ -868,12 +978,12 @@ a:hover { text-decoration: underline; }
       </div>
       <div id="modelSelectors" style="margin-top:12px;display:none">
         <div style="margin-bottom:10px">
-          <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px" data-i18n="Reasoning model">Reasoning model</label>
+          <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px" data-i18n="Model za pravnu analizu">Model za pravnu analizu</label>
           <select class="select" id="reasoningModelSelect" onchange="onModelSelectorChange()" style="width:100%;padding:6px 10px;font-size:13px;"></select>
-          <p class="text-sm text-muted" style="margin-top:2px;font-size:11px;" data-i18n="Koristi se za složena pravna pitanja i chain-of-thought analizu.">Koristi se za složena pravna pitanja i chain-of-thought analizu.</p>
+          <p class="text-sm text-muted" style="margin-top:2px;font-size:11px;" data-i18n="Koristi se za složena pravna pitanja i detaljnu analizu.">Koristi se za složena pravna pitanja i detaljnu analizu.</p>
         </div>
         <div style="margin-bottom:10px">
-          <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px" data-i18n="Verifikator model">Verifikator model</label>
+          <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px" data-i18n="Model za verifikaciju">Model za verifikaciju</label>
           <select class="select" id="verifierModelSelect" onchange="onModelSelectorChange()" style="width:100%;padding:6px 10px;font-size:13px;"></select>
           <p class="text-sm text-muted" style="margin-top:2px;font-size:11px;" data-i18n="Proverava tačnost citata i konzistentnost odgovora.">Proverava tačnost citata i konzistentnost odgovora.</p>
         </div>
@@ -898,6 +1008,57 @@ a:hover { text-decoration: underline; }
       <div id="diagnosticsPanel"></div>
       <button class="btn btn-sm mt-8" onclick="loadDiagnostics()" data-i18n="Učitaj statistiku">Učitaj statistiku</button>
     </div>
+    <!-- ── Advanced Search (Web Search Augmentation) ── -->
+    <div class="settings-section">
+      <h3><i class="fa-solid fa-globe" style="color:var(--accent);margin-right:4px;"></i> <span data-i18n="Napredno pretraživanje">Napredno pretraživanje</span></h3>
+      <div style="background:var(--bg-alt);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-weight:700;font-size:14px;" data-i18n="Google pretraživanje">Google pretraživanje</div>
+            <div class="text-sm text-muted" style="margin-top:2px;" data-i18n="adv_search_desc">Obogatite AI odgovore proverom na internetu u realnom vremenu</div>
+          </div>
+          <label class="toggle-switch" style="flex-shrink:0;">
+            <input type="checkbox" id="googleSearchToggle" onchange="toggleGoogleSearch(this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <!-- Google credentials (shown when toggle is ON) -->
+        <div id="googleSearchConfig" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+          <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;">
+            <p class="text-sm" style="margin:0;line-height:1.6;">
+              <i class="fa-solid fa-shield-halved" style="color:var(--accent);"></i>
+              <strong data-i18n="Kako ovo radi?">Kako ovo radi?</strong><br>
+              <span data-i18n="adv_search_explain">Kada postavite pitanje, LexArdor u pozadini proverava odgovor na internetu koristeći vaš Google nalog. Ovo poboljšava tačnost jer AI može da uporedi svoje znanje sa najnovijim online izvorima. Vaši podaci su anonimizovani — pitanje se preformulira kao opšte pravno pitanje pre slanja na pretragu. Nijedan lični podatak se ne deli.</span>
+            </p>
+          </div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px;" data-i18n="Google API ključ">Google API ključ</label>
+            <input type="password" class="input" id="googleApiKey" placeholder="AIzaSy..." style="width:100%;font-size:13px;" onchange="saveGoogleCredentials()">
+            <p class="text-sm text-muted" style="margin-top:2px;">
+              <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color:var(--accent);">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> <span data-i18n="Kreirajte besplatno">Kreirajte besplatno na Google Cloud Console</span>
+              </a>
+            </p>
+          </div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px;" data-i18n="Search Engine ID">Search Engine ID (CX)</label>
+            <input type="text" class="input" id="googleCx" placeholder="a1b2c3d4e5f6..." style="width:100%;font-size:13px;" onchange="saveGoogleCredentials()">
+            <p class="text-sm text-muted" style="margin-top:2px;">
+              <a href="https://programmablesearchengine.google.com/" target="_blank" style="color:var(--accent);">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> <span data-i18n="Napravite Search Engine">Napravite besplatan Custom Search Engine</span>
+              </a>
+            </p>
+          </div>
+          <div id="googleSearchStatus" style="display:none;padding:8px 12px;border-radius:var(--radius);font-size:12px;margin-top:8px;"></div>
+        </div>
+      </div>
+      <!-- Status indicator -->
+      <div id="advSearchStatus" style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);">
+        <span id="advSearchDot" style="width:8px;height:8px;border-radius:50%;background:var(--text-muted);display:inline-block;"></span>
+        <span id="advSearchLabel" data-i18n="Napredna pretraga isključena">Napredna pretraga isključena</span>
+      </div>
+    </div>
+
     <div class="settings-section">
       <h3><i class="fa-solid fa-trash-can" style="color:var(--danger);margin-right:4px;"></i> <span data-i18n="Čišćenje podataka">Čišćenje podataka</span></h3>
       <div style="background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;">
@@ -973,6 +1134,9 @@ a:hover { text-decoration: underline; }
           <p class="text-sm text-muted" data-i18n="help_privacy">LexArdor radi 100% lokalno na vašem računaru. Nijedan podatak ne napušta vaš uređaj osim ako eksplicitno ne koristite funkciju Spoljni AI. AI modeli se izvršavaju lokalno.</p>
         </div>
       </div>
+      <button class="btn btn-sm mt-8" onclick="showWizard()" style="gap:6px;display:inline-flex;align-items:center;">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="Prikaži vodič ponovo">Prikaži vodič ponovo</span>
+      </button>
     </div>
 
     <!-- FAQ -->
@@ -1005,11 +1169,27 @@ a:hover { text-decoration: underline; }
         </div>
         <div class="faq-item">
           <div class="faq-q" onclick="toggleFaq(this)" data-i18n="faq_q7">Koji AI modeli se koriste?</div>
-          <div class="faq-a" data-i18n="faq_a7">LexArdor koristi lokalne AI modele: Qwen 9B (brzi odgovori), DeepSeek-R1 32B (dublja analiza), SaulLM 7B (pravna verifikacija), i Gemma 12B (opšta verifikacija). Svi modeli rade na vašem računaru — nije potreban internet.</div>
+          <div class="faq-a" data-i18n="faq_a7">LexArdor koristi lokalne AI modele: Qwen 3.5 9B (brzi odgovori), DeepSeek-R1 32B i Qwen 27B (dublja analiza), Gemma 4 (verifikacija i agentski zadaci). Svi modeli rade na vašem računaru — nije potreban internet.</div>
         </div>
         <div class="faq-item">
           <div class="faq-q" onclick="toggleFaq(this)" data-i18n="faq_q8">Koliko su odgovori pouzdani?</div>
           <div class="faq-a" data-i18n="faq_a8">LexArdor daje odgovore zasnovane na propisima iz baze, ali AI može pogrešno protumačiti ili neprecizno navesti izvor. Uvek proverite navedene članove zakona. Ovo je alat za istraživanje — ne zamenjuje pravni savet kvalifikovanog advokata.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)" data-i18n="faq_q9">Kako funkcioniše Radni prostor?</div>
+          <div class="faq-a" data-i18n="faq_a9">Radni prostor služi za organizaciju rada po predmetima (eng. Matters). Kreirajte predmet za svakog klijenta ili slučaj, i sve konverzacije i dokumenti vezani za taj predmet biće na jednom mestu. Možete dodati opis, status i beleške.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)" data-i18n="faq_q10">Koja je razlika između Baze propisa i Mojih dokumenata?</div>
+          <div class="faq-a" data-i18n="faq_a10"><strong>Baza propisa</strong> sadrži kompletno srpsko zakonodavstvo (zakoni, uredbe, pravilnici) — to je ugrađena referentna biblioteka. <strong>Moji dokumenti</strong> su vaši lični fajlovi — komentari zakona, advokatska praksa, beleške — koji proširuju znanje AI-a sa vašom specifičnom ekspertizom.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)" data-i18n="faq_q11">Kako funkcioniše Spoljni AI sa anonimizacijom?</div>
+          <div class="faq-a" data-i18n="faq_a11">Funkcija Spoljni AI vam omogućava da pošaljete upit eksternim servisima (ChatGPT, Claude, Gemini). Pre slanja, možete uključiti <strong>automatsku anonimizaciju</strong> — AI zamenjuje lična imena, adrese i druge podatke generalnim oznakama, tako da provajder ne prima stvarne podatke vaših klijenata.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)" data-i18n="faq_q12">Da li je potreban internet za rad?</div>
+          <div class="faq-a" data-i18n="faq_a12">Ne. LexArdor radi potpuno offline — AI modeli, baza propisa i sve funkcije rade lokalno. Internet je potreban samo ako koristite funkciju Spoljni AI za slanje upita eksternim provajderima (ChatGPT, Claude, Gemini).</div>
         </div>
       </div>
     </div>
@@ -1064,15 +1244,164 @@ a:hover { text-decoration: underline; }
 <div class="page" id="page-workspace">
   <h1 class="page-header" data-i18n="Radni prostor">Radni prostor</h1>
   <div class="page-content">
-    <p class="text-sm text-muted mb-12" data-i18n="workspace_desc">Organizujte predmete, beleške i dokumente po klijentima ili slučajevima.</p>
-    <div class="flex gap-8 mb-16">
-      <button class="btn btn-primary btn-sm" onclick="createMatter()"><i class="fa-solid fa-folder-plus"></i> <span data-i18n="Novi predmet">Novi predmet</span></button>
+    <!-- List View -->
+    <div id="matterListView">
+      <div class="flex gap-8 mb-12" style="align-items:center;justify-content:space-between;">
+        <p class="text-sm text-muted" style="margin:0;" data-i18n="workspace_desc">Organizujte predmete, beleške i dokumente po klijentima ili slučajevima.</p>
+        <button class="btn btn-primary btn-sm" onclick="openCreateMatterModal()"><i class="fa-solid fa-folder-plus"></i> <span data-i18n="Novi predmet">Novi predmet</span></button>
+      </div>
+      <!-- Upcoming events banner -->
+      <div id="upcomingEventsBanner" class="hidden" style="background:linear-gradient(135deg,rgba(234,179,8,0.1),rgba(220,38,38,0.05));border:1px solid rgba(234,179,8,0.3);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;">
+        <div style="font-weight:700;font-size:13px;margin-bottom:6px;"><i class="fa-solid fa-bell" style="color:#d97706;"></i> <span data-i18n="Predstojeći rokovi">Predstojeći rokovi</span></div>
+        <div id="upcomingEventsContent" style="font-size:12px;"></div>
+      </div>
+      <div id="matterList" class="grid-2"></div>
+      <div id="matterEmpty" class="empty-state hidden">
+        <i class="fa-solid fa-briefcase" style="font-size:48px;color:var(--accent-dim);margin-bottom:12px;"></i>
+        <p data-i18n="matter_empty">Nemate predmeta. Kreirajte prvi za organizaciju rada.</p>
+      </div>
     </div>
-    <div id="matterList" class="grid-2"></div>
-    <div id="matterDetail" class="hidden"></div>
-    <div id="matterEmpty" class="empty-state hidden">
-      <i class="fa-solid fa-briefcase" style="font-size:48px;color:var(--accent-dim);margin-bottom:12px;"></i>
-      <p data-i18n="matter_empty">Nemate predmeta. Kreirajte prvi za organizaciju rada.</p>
+    <!-- Detail View (tabbed) -->
+    <div id="matterDetail" class="hidden">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <button class="btn btn-sm" onclick="closeMatterDetail()"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="Nazad">Nazad</span></button>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <h2 id="matterDetailName" style="margin:0;font-size:18px;font-family:'Playfair Display',serif;"></h2>
+            <span id="matterDetailPriority" class="badge" style="font-size:10px;"></span>
+            <span id="matterDetailStatus" class="badge" style="font-size:10px;"></span>
+          </div>
+          <div id="matterDetailMeta" class="text-sm text-muted" style="margin-top:2px;"></div>
+        </div>
+        <button class="btn btn-sm" onclick="openEditMatterModal()" title="Izmeni predmet"><i class="fa-solid fa-pen"></i></button>
+      </div>
+      <!-- Tabs -->
+      <div class="matter-tabs" style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:16px;">
+        <button class="matter-tab active" data-tab="info" onclick="switchMatterTab('info')"><i class="fa-solid fa-circle-info"></i> <span data-i18n="Info">Info</span></button>
+        <button class="matter-tab" data-tab="files" onclick="switchMatterTab('files')"><i class="fa-solid fa-folder-open"></i> <span data-i18n="Dokumenti">Dokumenti</span></button>
+        <button class="matter-tab" data-tab="timeline" onclick="switchMatterTab('timeline')"><i class="fa-solid fa-calendar-days"></i> <span data-i18n="Vremenska linija">Vremenska linija</span></button>
+        <button class="matter-tab" data-tab="notes" onclick="switchMatterTab('notes')"><i class="fa-solid fa-sticky-note"></i> <span data-i18n="Beleške">Beleške</span></button>
+        <button class="matter-tab" data-tab="ai" onclick="switchMatterTab('ai')"><i class="fa-solid fa-robot"></i> <span data-i18n="AI Asistent">AI</span></button>
+      </div>
+      <!-- Tab content panels -->
+      <div id="matterTabInfo" class="matter-tab-content"></div>
+      <div id="matterTabFiles" class="matter-tab-content hidden"></div>
+      <div id="matterTabTimeline" class="matter-tab-content hidden"></div>
+      <div id="matterTabNotes" class="matter-tab-content hidden"></div>
+      <div id="matterTabAi" class="matter-tab-content hidden"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Matter Modal -->
+<div class="modal-overlay hidden" id="modalCreateMatter">
+  <div class="modal" style="max-width:520px;">
+    <h3><i class="fa-solid fa-folder-plus" style="color:var(--accent);"></i> <span data-i18n="Novi predmet">Novi predmet</span></h3>
+    <div class="field-group mb-8">
+      <label data-i18n="Naziv predmeta">Naziv predmeta *</label>
+      <input class="input" id="newMatterName" placeholder="npr. Petrović vs. Kompanija ABC">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div class="field-group mb-8">
+        <label data-i18n="Broj predmeta">Broj predmeta</label>
+        <input class="input" id="newMatterCaseNumber" placeholder="P1-234/2025">
+      </div>
+      <div class="field-group mb-8">
+        <label data-i18n="Vrsta predmeta">Vrsta predmeta</label>
+        <select class="select" id="newMatterCaseType" style="width:100%;">
+          <option value="radno">Radno pravo</option>
+          <option value="krivicno">Krivično pravo</option>
+          <option value="porodicno">Porodično pravo</option>
+          <option value="obligaciono">Obligaciono pravo</option>
+          <option value="privredno">Privredno pravo</option>
+          <option value="upravno">Upravno pravo</option>
+          <option value="ustavno">Ustavno pravo</option>
+          <option value="ostalo" selected>Ostalo</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div class="field-group mb-8">
+        <label data-i18n="Klijent">Klijent</label>
+        <input class="input" id="newMatterClient" placeholder="Ime klijenta">
+      </div>
+      <div class="field-group mb-8">
+        <label data-i18n="Suprotna strana">Suprotna strana</label>
+        <input class="input" id="newMatterOpposing" placeholder="Ime suprotne strane">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:8px;">
+      <div class="field-group mb-8">
+        <label data-i18n="Sud">Sud</label>
+        <input class="input" id="newMatterCourt" placeholder="npr. Osnovni sud u Beogradu">
+      </div>
+      <div class="field-group mb-8">
+        <label data-i18n="Prioritet">Prioritet</label>
+        <select class="select" id="newMatterPriority" style="width:100%;">
+          <option value="urgent">Hitno</option>
+          <option value="high">Visok</option>
+          <option value="normal" selected>Normalan</option>
+          <option value="low">Nizak</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-group mb-12">
+      <label data-i18n="Opis">Opis (opciono)</label>
+      <textarea class="input" id="newMatterDesc" rows="2" placeholder="Kratki opis predmeta..."></textarea>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-sm" onclick="closeModal('modalCreateMatter')" data-i18n="Otkaži">Otkaži</button>
+      <button class="btn btn-primary btn-sm" onclick="submitCreateMatter()"><i class="fa-solid fa-check"></i> <span data-i18n="Kreiraj">Kreiraj</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Event Modal -->
+<div class="modal-overlay hidden" id="modalAddEvent">
+  <div class="modal" style="max-width:460px;">
+    <h3><i class="fa-solid fa-calendar-plus" style="color:var(--accent);"></i> <span data-i18n="Novi događaj">Novi događaj</span></h3>
+    <div class="field-group mb-8">
+      <label data-i18n="Naziv">Naziv *</label>
+      <input class="input" id="newEventTitle" placeholder="npr. Ročište, Rok za podnesak...">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div class="field-group mb-8">
+        <label data-i18n="Datum">Datum *</label>
+        <input type="date" class="input" id="newEventDate">
+      </div>
+      <div class="field-group mb-8">
+        <label data-i18n="Vreme">Vreme</label>
+        <input type="time" class="input" id="newEventTime">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div class="field-group mb-8">
+        <label data-i18n="Vrsta">Vrsta</label>
+        <select class="select" id="newEventType" style="width:100%;">
+          <option value="rociste">Ročište</option>
+          <option value="rok">Rok / Deadline</option>
+          <option value="sastanak">Sastanak</option>
+          <option value="podnesak">Podnesak</option>
+          <option value="zastarelost">Zastarelost</option>
+          <option value="ostalo" selected>Ostalo</option>
+        </select>
+      </div>
+      <div class="field-group mb-8">
+        <label data-i18n="Podsetnik">Podsetnik (dana pre)</label>
+        <input type="number" class="input" id="newEventReminder" value="3" min="0" max="90">
+      </div>
+    </div>
+    <div class="field-group mb-8">
+      <label data-i18n="Lokacija">Lokacija</label>
+      <input class="input" id="newEventLocation" placeholder="npr. Sala 3, Osnovni sud">
+    </div>
+    <div class="field-group mb-12">
+      <label data-i18n="Opis">Opis</label>
+      <textarea class="input" id="newEventDesc" rows="2"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-sm" onclick="closeModal('modalAddEvent')" data-i18n="Otkaži">Otkaži</button>
+      <button class="btn btn-primary btn-sm" onclick="submitAddEvent()"><i class="fa-solid fa-check"></i> <span data-i18n="Dodaj">Dodaj</span></button>
     </div>
   </div>
 </div>
@@ -1262,6 +1591,31 @@ a:hover { text-decoration: underline; }
   </div>
 </div>
 
+<!-- ═══ Onboarding Wizard ═════════════════════════════ -->
+<div class="wizard-overlay" id="wizardOverlay">
+  <div class="wizard">
+    <div class="wizard-header">
+      <h2 data-i18n="Dobrodošli u LexArdor">Dobrodošli u LexArdor</h2>
+      <button class="wizard-footer wizard-skip" onclick="closeWizard()" style="padding:4px 8px;font-size:18px;color:var(--text-muted);" title="Zatvori">&times;</button>
+    </div>
+    <div class="wizard-steps" id="wizardSteps">
+      <div class="wizard-step-dot active"></div>
+      <div class="wizard-step-dot"></div>
+      <div class="wizard-step-dot"></div>
+      <div class="wizard-step-dot"></div>
+      <div class="wizard-step-dot"></div>
+    </div>
+    <div class="wizard-body" id="wizardBody"></div>
+    <div class="wizard-footer">
+      <button class="wizard-skip" onclick="closeWizard()" data-i18n="Preskoči">Preskoči</button>
+      <div class="wizard-nav">
+        <button class="btn-wiz" id="wizBtnPrev" onclick="wizardPrev()" data-i18n="Nazad" style="display:none;">Nazad</button>
+        <button class="btn-wiz btn-wiz-primary" id="wizBtnNext" onclick="wizardNext()" data-i18n="Dalje">Dalje</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="toast-container"></div>
 
 <script>
@@ -1294,6 +1648,11 @@ const EN = {
   'Podešavanja': 'Settings',
   'Pomoć i podrška': 'Help & Support',
   'Dobrodošli u LexArdor': 'Welcome to LexArdor',
+  'Preskoči': 'Skip',
+  'Nazad': 'Back',
+  'Dalje': 'Next',
+  'Započni': 'Get Started',
+  'Prikaži vodič ponovo': 'Show guide again',
   'Postavite pitanje o srpskom zakonodavstvu. Pretražujem bazu od preko 72.000 članaka zakona, uredbi i pravilnika, i 73.000 sudskih odluka.': 'Ask a question about Serbian legislation. I search a database of over 72,000 articles from laws, decrees and regulations, plus 73,000 court decisions.',
   'Balansiran': 'Balanced',
   'Za građane': 'For citizens',
@@ -1334,6 +1693,22 @@ const EN = {
   'faq_a3': 'Yes, on the My Documents page you can upload laws in JSON format. They will be indexed and available in searches.',
   'faq_q4': 'Is my data secure?',
   'faq_a4': 'LexArdor runs locally on your computer. Data is not sent to external servers unless you explicitly use the External AI feature.',
+  'faq_q5': 'What do the ✅ and ⚠️ markers on answers mean?',
+  'faq_a5': '✅ (verified) means the cited article was found in the search results. ⚠️ (unconfirmed) means the AI cites an article not in search results — it may still be correct but requires additional verification.',
+  'faq_q6': 'How do I create a document template?',
+  'faq_a6': 'Open Templates and click "New template". Upload a filled legal document (e.g., a completed lawsuit) or enter text. AI will analyze it and create a template with smart fields that you can fill in for new clients.',
+  'faq_q7': 'Which AI models are used?',
+  'faq_a7': 'LexArdor uses local AI models: Qwen 3.5 9B (fast answers), DeepSeek-R1 32B and Qwen 27B (deep analysis), Gemma 4 (verification and agent tasks). All models run on your computer — no internet needed.',
+  'faq_q8': 'How reliable are the answers?',
+  'faq_a8': 'LexArdor provides answers based on regulations from its database, but AI may misinterpret or imprecisely cite sources. Always verify cited law articles. This is a research tool — it does not replace legal advice from a qualified attorney.',
+  'faq_q9': 'How does the Workspace work?',
+  'faq_a9': 'Workspace organizes work by matters. Create a matter for each client or case, and all related conversations and documents will be in one place. You can add description, status, and notes.',
+  'faq_q10': 'What is the difference between Corpus and My Documents?',
+  'faq_a10': 'The Corpus contains the complete Serbian legislation (laws, decrees, regulations) — a built-in reference library. My Documents are your personal files — law commentaries, legal practice, notes — that extend AI knowledge with your specific expertise.',
+  'faq_q11': 'How does External AI with anonymization work?',
+  'faq_a11': 'External AI lets you send queries to external services (ChatGPT, Claude, Gemini). Before sending, you can enable automatic anonymization — AI replaces personal names, addresses, and other data with generic labels so the provider does not receive your clients\' actual data.',
+  'faq_q12': 'Is internet required?',
+  'faq_a12': 'No. LexArdor works fully offline — AI models, the legislation database, and all features run locally. Internet is only needed if you use External AI to send queries to external providers.',
   'Prijavi problem': 'Report a problem',
   'Tip problema': 'Problem type',
   'Greška': 'Bug',
@@ -1533,7 +1908,20 @@ const EN = {
   'Niska pouzdanost': 'Low confidence',
   'Verifikovani citati': 'Verified citations',
   'BM25 korišćen': 'BM25 used',
-  'Nema podataka': 'No data'
+  'Nema podataka': 'No data',
+  'Napredno pretraživanje': 'Advanced Search',
+  'Google pretraživanje': 'Google Search',
+  'adv_search_desc': 'Enrich AI answers with real-time internet verification',
+  'adv_search_explain': 'When you ask a question, LexArdor verifies its answer online using your Google account. This improves accuracy by cross-referencing with the latest online sources. Your data is anonymized — queries are rephrased as general legal questions before being sent. No personal data is shared.',
+  'Kako ovo radi?': 'How does this work?',
+  'Google API ključ': 'Google API Key',
+  'Search Engine ID': 'Search Engine ID (CX)',
+  'Kreirajte besplatno': 'Create for free at Google Cloud Console',
+  'Napravite Search Engine': 'Create a free Custom Search Engine',
+  'Google pretraga konfigurisana i spremna za upotrebu': 'Google Search configured and ready to use',
+  'Potreban je i API ključ i Search Engine ID': 'Both API Key and Search Engine ID are required',
+  'Napredna pretraga isključena': 'Advanced search disabled',
+  'Napredna pretraga uključena': 'Advanced search enabled'
 };
 
 const CYR_MAP = {
@@ -1942,6 +2330,7 @@ async function sendMessage() {
   const docTypeFilter = document.getElementById('chatDocTypeFilter').value;
   if (docTypeFilter) params.set('doc_types', docTypeFilter);
   if (S.currentChatId) params.set('chat_id', S.currentChatId);
+  // Web search runs server-side (Google creds stored on server, Brave always active)
 
   const msgDiv = appendMessage('assistant', '');
   const body = msgDiv.querySelector('.msg-body');
@@ -2074,9 +2463,13 @@ async function verifyConversation() {
 
   const btn = document.getElementById('btnVerify');
   btn.disabled = true;
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ' + t('Verifikujem...');
+  btn.innerHTML = '<i class="fa-solid fa-brain fa-spin"></i> ' + t('Lokalni AI analizira...');
 
   try {
+    // Brief delay so user sees the "local AI analyzing" state
+    await new Promise(r => setTimeout(r, 300));
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ' + t('Šaljem eksternom AI...');
+
     const result = await apiFetch('/api/verify-conversation', {
       method: 'POST',
       body: JSON.stringify({
@@ -2087,19 +2480,23 @@ async function verifyConversation() {
       }),
     });
 
-    // Render verification response as a special message
+    // Build status badges
     const msgEl = document.createElement('div');
     msgEl.className = 'msg msg-assistant';
     const providerLabel = provider.toUpperCase();
     const anonBadge = result.anonymized ? `<span class="badge badge-success" style="font-size:10px"><i class="fa-solid fa-shield"></i> ${t('Anonimizovano')}</span>` : '';
+    const entityBadge = result.entities_detected > 0
+      ? `<span class="badge" style="font-size:10px;background:var(--info,#3b82f6);color:#fff;"><i class="fa-solid fa-user-shield"></i> ${result.entities_detected} ${t('otkrivenih lica')}</span>`
+      : '';
     msgEl.innerHTML = `
       <div class="msg-body" style="border-left:3px solid var(--accent);font-family:'Lora',serif;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-family:'Inter',sans-serif;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;font-family:'Inter',sans-serif;">
           <span class="badge" style="background:var(--accent);color:var(--bg);font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700">
             <i class="fa-solid fa-shield-halved"></i> ${providerLabel}
           </span>
           <span style="font-size:12px;color:var(--text-muted);font-weight:600">${t('Nezavisna verifikacija')}</span>
           ${anonBadge}
+          ${entityBadge}
         </div>
         ${renderMarkdown(result.answer)}
       </div>
@@ -2108,7 +2505,7 @@ async function verifyConversation() {
     scrollChat();
 
     toast(t('Verifikacija završena'), 'success');
-    toggleVerifyBar(); // Hide verify bar after success
+    toggleVerifyBar();
   } catch (e) {
     toast(e.message || t('Greška pri verifikaciji'), 'error');
   } finally {
@@ -2129,8 +2526,12 @@ async function onlineAIVerify() {
     const btn = document.getElementById('btnOnlineVerify');
     const origHTML = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ' + t('Proveravam...');
+    btn.innerHTML = '<i class="fa-solid fa-brain fa-spin"></i> ' + t('Lokalni AI analizira...');
     try {
+      // Brief delay so user sees analysis state
+      await new Promise(r => setTimeout(r, 300));
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ' + t('Proveravam...');
+
       const result = await apiFetch('/api/verify-conversation', {
         method: 'POST',
         body: JSON.stringify({
@@ -2141,16 +2542,20 @@ async function onlineAIVerify() {
         }),
       });
       const provName = (S.extProviders[lastProvider] || {}).name || lastProvider.toUpperCase();
+      const entityBadge = result.entities_detected > 0
+        ? `<span class="badge" style="font-size:10px;background:var(--info,#3b82f6);color:#fff;"><i class="fa-solid fa-user-shield"></i> ${result.entities_detected} ${t('otkrivenih lica')}</span>`
+        : '';
       const msgEl = document.createElement('div');
       msgEl.className = 'msg msg-assistant';
       msgEl.innerHTML = `
-        <div class="msg-body" style="border-left:3px solid #8b5cf6;font-family:'Lora',serif;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-family:'Inter',sans-serif;">
-            <span style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700;display:inline-flex;align-items:center;gap:4px;">
+        <div class="msg-body" style="border-left:3px solid var(--accent);font-family:'Lora',serif;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;font-family:'Inter',sans-serif;">
+            <span style="background:var(--accent);color:#fff;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700;display:inline-flex;align-items:center;gap:4px;">
               <i class="fa-solid fa-globe"></i> ${escHtml(provName)}
             </span>
             <span style="font-size:12px;color:var(--text-muted);font-weight:600">${t('Online AI Provera')}</span>
             <span class="badge badge-success" style="font-size:10px"><i class="fa-solid fa-shield"></i> ${t('Anonimizovano')}</span>
+            ${entityBadge}
           </div>
           ${renderMarkdown(result.answer)}
         </div>`;
@@ -3017,6 +3422,89 @@ async function loadSettings() {
   loadCorpusSummary();
   loadAppInfo();
   loadCleanupCounts();
+  loadGoogleSearchState();
+}
+
+// ── Advanced Search (Google + hidden Brave) ─────────────────────
+function loadGoogleSearchState() {
+  const enabled = localStorage.getItem('lexardor_google_search') === 'true';
+  const toggle = document.getElementById('googleSearchToggle');
+  const config = document.getElementById('googleSearchConfig');
+  const dot = document.getElementById('advSearchDot');
+  const label = document.getElementById('advSearchLabel');
+  if (toggle) toggle.checked = enabled;
+  if (config) config.style.display = enabled ? 'block' : 'none';
+  if (enabled) {
+    dot.style.background = 'var(--success)';
+    label.textContent = t('Napredna pretraga uključena');
+    // Load saved credentials
+    const key = localStorage.getItem('lexardor_google_api_key') || '';
+    const cx = localStorage.getItem('lexardor_google_cx') || '';
+    document.getElementById('googleApiKey').value = key;
+    document.getElementById('googleCx').value = cx;
+    updateGoogleStatus(key, cx);
+  } else {
+    dot.style.background = 'var(--text-muted)';
+    label.textContent = t('Napredna pretraga isključena');
+  }
+}
+
+function toggleGoogleSearch(enabled) {
+  localStorage.setItem('lexardor_google_search', enabled ? 'true' : 'false');
+  const config = document.getElementById('googleSearchConfig');
+  const dot = document.getElementById('advSearchDot');
+  const label = document.getElementById('advSearchLabel');
+  config.style.display = enabled ? 'block' : 'none';
+  if (enabled) {
+    dot.style.background = 'var(--success)';
+    label.textContent = t('Napredna pretraga uključena');
+  } else {
+    dot.style.background = 'var(--text-muted)';
+    label.textContent = t('Napredna pretraga isključena');
+  }
+}
+
+async function saveGoogleCredentials() {
+  const key = document.getElementById('googleApiKey').value.trim();
+  const cx = document.getElementById('googleCx').value.trim();
+  // Save to server (never sent via URL)
+  try {
+    await apiFetch('/api/admin/web-search-settings', {
+      method: 'POST',
+      body: JSON.stringify({ google_api_key: key, google_cx: cx }),
+    });
+  } catch (e) { console.warn('Failed to save web search settings:', e); }
+  localStorage.setItem('lexardor_google_api_key', key);
+  localStorage.setItem('lexardor_google_cx', cx);
+  updateGoogleStatus(key, cx);
+}
+
+function updateGoogleStatus(key, cx) {
+  const el = document.getElementById('googleSearchStatus');
+  if (key && cx) {
+    el.style.display = 'block';
+    el.style.background = 'rgba(34,197,94,0.1)';
+    el.style.color = 'var(--success)';
+    el.innerHTML = '<i class="fa-solid fa-check-circle"></i> ' + t('Google pretraga konfigurisana i spremna za upotrebu');
+  } else if (key || cx) {
+    el.style.display = 'block';
+    el.style.background = 'rgba(234,179,8,0.1)';
+    el.style.color = '#d97706';
+    el.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i> ' + t('Potreban je i API ključ i Search Engine ID');
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function getGoogleSearchParams() {
+  // Returns params to add to query requests
+  const enabled = localStorage.getItem('lexardor_google_search') === 'true';
+  if (!enabled) return {};
+  return {
+    google_api_key: localStorage.getItem('lexardor_google_api_key') || '',
+    google_cx: localStorage.getItem('lexardor_google_cx') || '',
+    google_enabled: true,
+  };
 }
 
 async function loadEngineInfo() {
@@ -3027,8 +3515,8 @@ async function loadEngineInfo() {
     el.innerHTML = `
       <dt>${t('Status')}</dt><dd style="color:var(--success);">Online</dd>
       <dt>${t('Brzi model')}</dt><dd>${escHtml(m.fast?.name || '-')}</dd>
-      <dt>${t('Reasoning')}</dt><dd>${escHtml(m.reasoning?.name || '-')}</dd>
-      <dt>${t('Verifikator')}</dt><dd>${escHtml(m.verifier?.name || '-')}</dd>
+      <dt>${t('Model za analizu')}</dt><dd>${escHtml(m.reasoning?.name || '-')}</dd>
+      <dt>${t('Model za verifikaciju')}</dt><dd>${escHtml(m.verifier?.name || '-')}</dd>
       <dt>Reranker</dt><dd>${escHtml(m.reranker || '-')}</dd>
     `;
 
@@ -3037,27 +3525,31 @@ async function loadEngineInfo() {
     const selectors = document.getElementById('modelSelectors');
     selectors.style.display = '';
 
-    // Reasoning models
+    // Model za pravnu analizu — all available models, recommended hint for reasoning role
     const rSelect = document.getElementById('reasoningModelSelect');
     rSelect.innerHTML = '';
     for (const [key, info] of Object.entries(available)) {
-      if (info.role === 'reasoning' && info.available) {
+      if (info.available) {
         const opt = document.createElement('option');
         opt.value = key;
-        opt.textContent = info.name + (key === m.reasoning?.key ? ' ✓' : '');
+        const hint = info.role === 'reasoning' ? ' \u2605' : '';
+        const loaded = info.loaded ? ' [\u0443\u0447\u0438\u0442\u0430\u043D]' : '';
+        opt.textContent = info.name + ` (${info.size_gb}GB)` + loaded + hint;
         opt.selected = key === m.reasoning?.key;
         rSelect.appendChild(opt);
       }
     }
 
-    // Verifier models
+    // Model za verifikaciju — all available models, recommended hint for verifier role
     const vSelect = document.getElementById('verifierModelSelect');
     vSelect.innerHTML = '';
     for (const [key, info] of Object.entries(available)) {
-      if (info.role === 'verifier' && info.available) {
+      if (info.available) {
         const opt = document.createElement('option');
         opt.value = key;
-        opt.textContent = info.name + (key === m.verifier?.key ? ' ✓' : '');
+        const hint = info.role === 'verifier' ? ' \u2605' : '';
+        const loaded = info.loaded ? ' [\u0443\u0447\u0438\u0442\u0430\u043D]' : '';
+        opt.textContent = info.name + ` (${info.size_gb}GB)` + loaded + hint;
         opt.selected = key === m.verifier?.key;
         vSelect.appendChild(opt);
       }
@@ -3418,38 +3910,81 @@ function _getDraftText() {
 }
 
 // ── Matters (Research Workspace) ────────────────
+// ── Enhanced Radni Prostor ──────────────────────────────────────────────────
+let _currentMatter = null;
+const PRIORITY_LABELS = {urgent:'Hitno',high:'Visok',normal:'Normalan',low:'Nizak'};
+const PRIORITY_CLASSES = {urgent:'priority-urgent',high:'priority-high',normal:'priority-normal',low:'priority-low'};
+const TYPE_LABELS = {radno:'Radno',krivicno:'Krivično',porodicno:'Porodično',obligaciono:'Obligaciono',privredno:'Privredno',upravno:'Upravno',ustavno:'Ustavno',ostalo:'Ostalo'};
+const EVENT_ICONS = {rociste:'fa-gavel',rok:'fa-clock',sastanak:'fa-handshake',podnesak:'fa-file-import',zastarelost:'fa-hourglass-end',ostalo:'fa-calendar'};
+
 async function loadMatters() {
   try {
     const matters = await apiFetch('/api/matters');
     const el = document.getElementById('matterList');
     const empty = document.getElementById('matterEmpty');
     document.getElementById('matterDetail').classList.add('hidden');
-    el.classList.remove('hidden');
+    document.getElementById('matterListView').classList.remove('hidden');
     if (!matters.length) { el.innerHTML = ''; empty.classList.remove('hidden'); return; }
     empty.classList.add('hidden');
-    el.innerHTML = matters.map(m => `
-      <div class="doc-card" onclick="openMatter(${m.id})">
-        <h4 style="font-size:14px;margin-bottom:4px;">${escHtml(m.name)}</h4>
-        <p class="text-sm text-muted" style="max-height:36px;overflow:hidden;">${escHtml(m.description || '')}</p>
-        <div class="flex gap-8 mt-8 text-sm text-dim">
-          <span><i class="fa-solid fa-comments"></i> ${m.chat_count || 0}</span>
-          <span><i class="fa-solid fa-file"></i> ${m.doc_count || 0}</span>
-          <span><i class="fa-solid fa-note-sticky"></i> ${m.note_count || 0}</span>
+    el.innerHTML = matters.map(m => {
+      const pClass = PRIORITY_CLASSES[m.priority||'normal'] || 'priority-normal';
+      const pLabel = t(PRIORITY_LABELS[m.priority||'normal'] || 'Normalan');
+      const typeLabel = t(TYPE_LABELS[m.case_type||'ostalo'] || 'Ostalo');
+      const nextEvt = m.next_event;
+      const evtHtml = nextEvt ? `<div class="text-sm" style="margin-top:6px;color:#d97706;"><i class="fa-solid fa-clock"></i> ${nextEvt.event_date} — ${escHtml(nextEvt.title)}</div>` : '';
+      return `<div class="doc-card" onclick="openMatter(${m.id})" style="cursor:pointer;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div><span class="badge ${pClass}" style="font-size:10px;">${pLabel}</span> <span class="badge" style="font-size:10px;background:var(--bg-alt);color:var(--text-muted);">${typeLabel}</span></div>
+          <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteMatter(${m.id})" style="padding:2px 6px;"><i class="fa-solid fa-trash"></i></button>
         </div>
-        <div class="flex items-center justify-between mt-8">
-          <span class="badge ${m.status==='active'?'badge-green':'badge-amber'}">${escHtml(m.status || 'active')}</span>
-          <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteMatter(${m.id})"><i class="fa-solid fa-trash"></i></button>
+        <h4 style="font-size:14px;margin:6px 0 2px;">${escHtml(m.client_name && m.opposing_party ? m.client_name+' vs. '+m.opposing_party : m.name)}</h4>
+        ${m.case_number ? '<div class="text-sm text-dim">Br: '+escHtml(m.case_number)+'</div>' : ''}
+        <div class="flex gap-8 mt-6 text-sm text-dim">
+          <span><i class="fa-solid fa-file"></i> ${m.doc_count||0}</span>
+          <span><i class="fa-solid fa-comments"></i> ${m.chat_count||0}</span>
+          <span><i class="fa-solid fa-note-sticky"></i> ${m.note_count||0}</span>
         </div>
-      </div>
-    `).join('');
+        ${evtHtml}
+        ${m.court ? '<div class="text-sm text-dim mt-4"><i class="fa-solid fa-building-columns"></i> '+escHtml(m.court)+'</div>' : ''}
+        <div class="mt-6"><span class="badge ${m.status==='active'?'badge-green':'badge-amber'}" style="font-size:10px;">${escHtml(m.status||'active')}</span></div>
+      </div>`;
+    }).join('');
+    // Load upcoming events banner
+    loadUpcomingBanner();
   } catch(e) { toast(e.message || 'Greška', 'error'); }
 }
 
-async function createMatter() {
-  const name = prompt(t('Naziv predmeta:'));
-  if (!name) return;
+async function loadUpcomingBanner() {
   try {
-    await apiFetch('/api/matters', {method:'POST', body: JSON.stringify({name, description: ''})});
+    const events = await apiFetch('/api/matters/upcoming-events?days=14');
+    const banner = document.getElementById('upcomingEventsBanner');
+    if (!events.length) { banner.classList.add('hidden'); return; }
+    banner.classList.remove('hidden');
+    document.getElementById('upcomingEventsContent').innerHTML = events.slice(0,5).map(e =>
+      `<div style="margin-bottom:3px;"><strong>${e.event_date}</strong> — ${escHtml(e.title)} <span class="text-dim">(${escHtml(e.matter_name)})</span></div>`
+    ).join('');
+  } catch(e) {}
+}
+
+function openCreateMatterModal() { document.getElementById('modalCreateMatter').classList.remove('hidden'); }
+
+async function submitCreateMatter() {
+  const name = document.getElementById('newMatterName').value.trim();
+  if (!name) { toast(t('Unesite naziv predmeta'), 'warning'); return; }
+  try {
+    await apiFetch('/api/matters', {method:'POST', body: JSON.stringify({
+      name,
+      case_number: document.getElementById('newMatterCaseNumber').value.trim(),
+      case_type: document.getElementById('newMatterCaseType').value,
+      client_name: document.getElementById('newMatterClient').value.trim(),
+      opposing_party: document.getElementById('newMatterOpposing').value.trim(),
+      court: document.getElementById('newMatterCourt').value.trim(),
+      priority: document.getElementById('newMatterPriority').value,
+      description: document.getElementById('newMatterDesc').value.trim(),
+    })});
+    closeModal('modalCreateMatter');
+    // Reset form
+    ['newMatterName','newMatterCaseNumber','newMatterClient','newMatterOpposing','newMatterCourt','newMatterDesc'].forEach(id => document.getElementById(id).value = '');
     toast(t('Predmet kreiran!'), 'success');
     loadMatters();
   } catch(e) { toast(e.message, 'error'); }
@@ -3457,101 +3992,330 @@ async function createMatter() {
 
 async function openMatter(id) {
   try {
-    const m = await apiFetch(`/api/matters/${id}`);
-    document.getElementById('matterList').classList.add('hidden');
-    document.getElementById('matterEmpty').classList.add('hidden');
-    const el = document.getElementById('matterDetail');
-    el.classList.remove('hidden');
-    el.innerHTML = `
-      <div class="breadcrumb mb-16">
-        <a onclick="loadMatters()" data-i18n="Radni prostor">Radni prostor</a>
-        <i class="fa-solid fa-chevron-right" style="font-size:10px;"></i>
-        <span>${escHtml(m.name)}</span>
-      </div>
-      <div class="grid-2">
-        <div>
-          <h3 class="mb-8"><i class="fa-solid fa-note-sticky" style="color:var(--accent);"></i> ${t('Beleške')}</h3>
-          <div class="field-group mb-8">
-            <textarea class="textarea" id="matterNewNote" rows="2" placeholder="${t('Nova beleška...')}"></textarea>
-            <button class="btn btn-sm mt-4" onclick="addMatterNote(${id})"><i class="fa-solid fa-plus"></i> ${t('Dodaj')}</button>
-          </div>
-          <div id="matterNotes">
-            ${(m.notes || []).map(n => `
-              <div class="card-static mb-8" style="padding:10px;">
-                <p class="text-sm">${escHtml(n.content)}</p>
-                <div class="flex items-center justify-between mt-4">
-                  <span class="text-sm text-dim">${n.created_at || ''}</span>
-                  <button class="btn btn-danger btn-sm" onclick="deleteMatterNote(${n.id},${id})"><i class="fa-solid fa-trash"></i></button>
-                </div>
-              </div>
-            `).join('') || '<p class="text-sm text-muted">' + t('Nema beleški') + '</p>'}
-          </div>
-        </div>
-        <div>
-          <h3 class="mb-8"><i class="fa-solid fa-link" style="color:var(--accent);"></i> ${t('Povezano')}</h3>
-          <p class="text-sm text-muted mb-4">${(m.chat_ids || []).length} ${t('razgovora')}, ${(m.doc_ids || []).length} ${t('dokumenata')}</p>
-          <p class="text-sm text-muted mb-8">${escHtml(m.description || '')}</p>
-          <div class="flex gap-8 mb-8">
-            <button class="btn btn-sm" onclick="linkChatToMatter(${id})"><i class="fa-solid fa-comments"></i> ${t('Poveži razgovor')}</button>
-            <button class="btn btn-sm" onclick="linkDocToMatter(${id})"><i class="fa-solid fa-file"></i> ${t('Poveži dokument')}</button>
-          </div>
-          ${(m.chat_ids || []).length ? '<p class="text-sm text-dim mb-4"><i class="fa-solid fa-comments"></i> ' + t('Razgovori') + ': ' + m.chat_ids.map(cid => '#' + cid).join(', ') + '</p>' : ''}
-          ${(m.doc_ids || []).length ? '<p class="text-sm text-dim"><i class="fa-solid fa-file"></i> ' + t('Dokumenti') + ': ' + m.doc_ids.join(', ') + '</p>' : ''}
-        </div>
-      </div>
-    `;
+    _currentMatter = await apiFetch(`/api/matters/${id}`);
+    document.getElementById('matterListView').classList.add('hidden');
+    document.getElementById('matterDetail').classList.remove('hidden');
+    // Header
+    document.getElementById('matterDetailName').textContent = _currentMatter.name;
+    const p = _currentMatter.priority || 'normal';
+    document.getElementById('matterDetailPriority').className = `badge ${PRIORITY_CLASSES[p]||''}`;
+    document.getElementById('matterDetailPriority').textContent = t(PRIORITY_LABELS[p]||'');
+    document.getElementById('matterDetailStatus').className = `badge ${_currentMatter.status==='active'?'badge-green':'badge-amber'}`;
+    document.getElementById('matterDetailStatus').textContent = _currentMatter.status || 'active';
+    const meta = [_currentMatter.case_number, TYPE_LABELS[_currentMatter.case_type], _currentMatter.court].filter(Boolean).join(' • ');
+    document.getElementById('matterDetailMeta').textContent = meta;
+    // Render first tab
+    switchMatterTab('info');
   } catch(e) { toast(e.message, 'error'); }
 }
+
+function closeMatterDetail() { loadMatters(); }
+
+function switchMatterTab(tab) {
+  document.querySelectorAll('.matter-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.matter-tab-content').forEach(c => c.classList.add('hidden'));
+  const panel = document.getElementById('matterTab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+  if (panel) { panel.classList.remove('hidden'); }
+  const m = _currentMatter;
+  if (!m) return;
+  if (tab === 'info') renderInfoTab(m);
+  else if (tab === 'files') renderFilesTab(m);
+  else if (tab === 'timeline') renderTimelineTab(m);
+  else if (tab === 'notes') renderNotesTab(m);
+  else if (tab === 'ai') renderAiTab(m);
+}
+
+function renderInfoTab(m) {
+  document.getElementById('matterTabInfo').innerHTML = `
+    <div class="grid-2">
+      <div>
+        <h4 class="mb-8" style="font-size:14px;"><i class="fa-solid fa-circle-info" style="color:var(--accent);"></i> ${t('Detalji predmeta')}</h4>
+        <dl class="info-grid">
+          <dt>${t('Klijent')}</dt><dd>${escHtml(m.client_name||'—')}</dd>
+          <dt>${t('Suprotna strana')}</dt><dd>${escHtml(m.opposing_party||'—')}</dd>
+          <dt>${t('Broj predmeta')}</dt><dd>${escHtml(m.case_number||'—')}</dd>
+          <dt>${t('Sud')}</dt><dd>${escHtml(m.court||'—')}</dd>
+          <dt>${t('Sudija')}</dt><dd>${escHtml(m.judge||'—')}</dd>
+          <dt>${t('Vrsta')}</dt><dd>${t(TYPE_LABELS[m.case_type]||'Ostalo')}</dd>
+        </dl>
+        ${m.description ? '<p class="text-sm text-muted mt-8">'+escHtml(m.description)+'</p>' : ''}
+      </div>
+      <div>
+        <h4 class="mb-8" style="font-size:14px;"><i class="fa-solid fa-users" style="color:var(--accent);"></i> ${t('Stranke')}</h4>
+        <div id="partiesList">
+          ${(m.parties||[]).map(p => `
+            <div class="file-card">
+              <div style="flex:1;">
+                <strong>${escHtml(p.name)}</strong> <span class="badge" style="font-size:10px;">${escHtml(p.role)}</span>
+                ${p.contact ? '<div class="text-sm text-dim">'+escHtml(p.contact)+'</div>' : ''}
+              </div>
+              <button class="btn btn-danger btn-sm" onclick="deleteParty(${p.id})"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          `).join('') || '<p class="text-sm text-muted">'+t('Nema stranaka')+'</p>'}
+        </div>
+        <div class="mt-8" style="display:flex;gap:6px;">
+          <input class="input" id="newPartyName" placeholder="${t('Ime stranke')}" style="flex:1;font-size:12px;">
+          <select class="select" id="newPartyRole" style="font-size:12px;width:auto;">
+            <option value="tuzilac">${t('Tužilac')}</option>
+            <option value="tuzeni">${t('Tuženi')}</option>
+            <option value="svedok">${t('Svedok')}</option>
+            <option value="vestak">${t('Veštak')}</option>
+            <option value="advokat">${t('Advokat')}</option>
+            <option value="ostalo" selected>${t('Ostalo')}</option>
+          </select>
+          <button class="btn btn-sm" onclick="addParty(${m.id})"><i class="fa-solid fa-plus"></i></button>
+        </div>
+        <h4 class="mt-16 mb-8" style="font-size:14px;"><i class="fa-solid fa-link" style="color:var(--accent);"></i> ${t('Povezani razgovori')}</h4>
+        ${(m.chat_ids||[]).map(cid => `
+          <span class="badge mb-4 mr-4" style="cursor:pointer;" onclick="showPage('chat');loadChat(${cid})">#${cid}</span>
+          <button class="btn btn-danger" style="font-size:10px;padding:1px 4px;" onclick="unlinkChat(${m.id},${cid})">×</button>
+        `).join('') || '<p class="text-sm text-muted">'+t('Nema povezanih razgovora')+'</p>'}
+        <div class="mt-4"><button class="btn btn-sm" onclick="linkChatToMatter(${m.id})"><i class="fa-solid fa-plus"></i> ${t('Poveži razgovor')}</button></div>
+      </div>
+    </div>`;
+}
+
+function renderFilesTab(m) {
+  document.getElementById('matterTabFiles').innerHTML = `
+    <div class="drop-zone" id="fileDropZone" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleFileDrop(event,${m.id})">
+      <i class="fa-solid fa-cloud-arrow-up" style="font-size:24px;margin-bottom:8px;"></i><br>
+      <span data-i18n="Prevucite fajlove ovde">${t('Prevucite fajlove ovde ili')}</span>
+      <label style="color:var(--accent);cursor:pointer;font-weight:600;">
+        <input type="file" id="matterFileInput" multiple style="display:none;" onchange="handleFileSelect(event,${m.id})">
+        ${t('izaberite sa diska')}
+      </label>
+    </div>
+    <div id="matterFilesList" class="mt-12">
+      ${(m.files||[]).map(f => `
+        <div class="file-card">
+          <i class="fa-solid ${f.file_type==='pdf'?'fa-file-pdf':f.file_type==='docx'?'fa-file-word':'fa-file'}" style="font-size:20px;color:var(--accent);"></i>
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:13px;">${escHtml(f.filename)}</div>
+            <div class="text-sm text-dim">${escHtml(f.category)} • ${(f.file_size/1024).toFixed(0)} KB • ${f.indexed ? '✅ AI indeksiran' : '⏳ Čeka indeksiranje'}</div>
+          </div>
+          <button class="btn btn-sm" onclick="downloadMatterFile(${m.id},${f.id})" title="${t('Preuzmi')}"><i class="fa-solid fa-download"></i></button>
+          <button class="btn btn-danger btn-sm" onclick="deleteMatterFile(${f.id},${m.id})"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      `).join('') || '<p class="text-sm text-muted mt-8">'+t('Nema otpremljenih dokumenata')+'</p>'}
+    </div>`;
+}
+
+function renderTimelineTab(m) {
+  const events = m.events || [];
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('matterTabTimeline').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <button class="btn btn-primary btn-sm" onclick="openAddEventModal(${m.id})"><i class="fa-solid fa-calendar-plus"></i> ${t('Dodaj događaj')}</button>
+      <a href="/api/matters/${m.id}/events.ics" class="btn btn-sm" download><i class="fa-solid fa-download"></i> ${t('Izvezi ICS')}</a>
+    </div>
+    ${events.length ? events.map(e => {
+      const daysUntil = Math.ceil((new Date(e.event_date) - new Date()) / 86400000);
+      const urgency = e.completed ? 'event-done' : daysUntil <= 7 ? 'event-urgent' : daysUntil <= 30 ? 'event-soon' : 'event-normal';
+      const icon = EVENT_ICONS[e.event_type] || 'fa-calendar';
+      const daysLabel = e.completed ? '✅ '+t('Završeno') : daysUntil === 0 ? '🔴 '+t('DANAS') : daysUntil === 1 ? '🔴 '+t('SUTRA') : daysUntil < 0 ? '⚫ '+t('Prošlo') : daysUntil <= 7 ? '🔴 za '+daysUntil+' dana' : '🟡 za '+daysUntil+' dana';
+      return `<div class="event-card ${urgency}">
+        <i class="fa-solid ${icon}" style="font-size:18px;color:var(--accent);margin-top:2px;"></i>
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:13px;">${e.event_date} ${e.event_time||''} — ${escHtml(e.title)}</div>
+          ${e.location ? '<div class="text-sm text-dim"><i class="fa-solid fa-location-dot"></i> '+escHtml(e.location)+'</div>' : ''}
+          ${e.description ? '<div class="text-sm text-muted mt-2">'+escHtml(e.description)+'</div>' : ''}
+        </div>
+        <div style="text-align:right;white-space:nowrap;">
+          <div class="text-sm" style="font-weight:600;">${daysLabel}</div>
+          <div class="mt-4" style="display:flex;gap:4px;">
+            ${!e.completed ? '<button class="btn btn-sm" onclick="completeEvent('+e.id+','+m.id+')" title="Završi"><i class="fa-solid fa-check"></i></button>' : ''}
+            <button class="btn btn-danger btn-sm" onclick="deleteEvent(${e.id},${m.id})"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+      </div>`;
+    }).join('') : '<p class="text-sm text-muted">'+t('Nema zakazanih događaja')+'</p>'}`;
+}
+
+function renderNotesTab(m) {
+  document.getElementById('matterTabNotes').innerHTML = `
+    <div class="field-group mb-12">
+      <textarea class="input" id="matterNewNote" rows="3" placeholder="${t('Nova beleška...')}" style="font-size:13px;"></textarea>
+      <button class="btn btn-sm mt-4" onclick="addMatterNote(${m.id})"><i class="fa-solid fa-plus"></i> ${t('Dodaj belešku')}</button>
+    </div>
+    ${(m.notes||[]).map(n => `
+      <div class="card-static mb-8" style="padding:10px;${n.pinned?'border-left:3px solid var(--accent);':''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <p class="text-sm" style="flex:1;white-space:pre-wrap;">${escHtml(n.content)}</p>
+          <div style="display:flex;gap:4px;flex-shrink:0;margin-left:8px;">
+            <button class="btn btn-sm" onclick="pinNote(${n.id},${m.id})" title="${n.pinned?t('Otkači'):t('Zakači')}"><i class="fa-solid fa-thumbtack" style="${n.pinned?'color:var(--accent);':''}"></i></button>
+            <button class="btn btn-danger btn-sm" onclick="deleteMatterNote(${n.id},${m.id})"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+        <span class="text-sm text-dim">${n.created_at||''}</span>
+      </div>
+    `).join('') || '<p class="text-sm text-muted">'+t('Nema beleški')+'</p>'}`;
+}
+
+function renderAiTab(m) {
+  document.getElementById('matterTabAi').innerHTML = `
+    <div style="background:var(--bg-alt);border-radius:var(--radius);padding:14px;margin-bottom:12px;">
+      <p class="text-sm"><i class="fa-solid fa-info-circle" style="color:var(--accent);"></i>
+        ${t('AI koristi dokumenta iz ovog predmeta kao dodatni kontekst za odgovore.')}
+        ${(m.files||[]).filter(f=>f.indexed).length} ${t('dokumenata indeksirano.')}
+      </p>
+    </div>
+    <div class="flex gap-8 mb-12">
+      <button class="btn btn-primary btn-sm" onclick="askMatterAI(${m.id},'Sumiraj ovaj predmet na osnovu dostupnih dokumenata i beleški.')">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> ${t('Sumiraj predmet')}
+      </button>
+      <button class="btn btn-sm" onclick="askMatterAI(${m.id},'Na osnovu ovog predmeta, preporuči sledeće pravne korake.')">
+        <i class="fa-solid fa-lightbulb"></i> ${t('Preporuči korake')}
+      </button>
+    </div>
+    <div class="field-group mb-8">
+      <textarea class="input" id="matterAiQuestion" rows="2" placeholder="${t('Postavi pitanje o ovom predmetu...')}" style="font-size:13px;"></textarea>
+      <button class="btn btn-primary btn-sm mt-4" onclick="askMatterAI(${m.id})"><i class="fa-solid fa-paper-plane"></i> ${t('Pitaj AI')}</button>
+    </div>
+    <div id="matterAiAnswer" style="min-height:60px;"></div>`;
+}
+
+// ── Matter Actions ──────────────────────────────────────────────────────────
 
 async function addMatterNote(matterId) {
   const content = document.getElementById('matterNewNote').value.trim();
   if (!content) return;
-  try {
-    await apiFetch(`/api/matters/${matterId}/notes`, {method:'POST', body: JSON.stringify({content})});
-    openMatter(matterId);
-  } catch(e) { toast(e.message, 'error'); }
+  await apiFetch(`/api/matters/${matterId}/notes`, {method:'POST', body: JSON.stringify({content})});
+  openMatter(matterId);
 }
-
 async function deleteMatterNote(noteId, matterId) {
   if (!confirm(t('Da li ste sigurni?'))) return;
-  try {
-    await apiFetch(`/api/matters/notes/${noteId}`, {method:'DELETE'});
-    openMatter(matterId);
-  } catch(e) { toast(e.message, 'error'); }
+  await apiFetch(`/api/matters/notes/${noteId}`, {method:'DELETE'});
+  openMatter(matterId);
 }
-
+async function pinNote(noteId, matterId) {
+  await apiFetch(`/api/matters/notes/${noteId}/pin`, {method:'POST'});
+  openMatter(matterId);
+}
 async function deleteMatter(id) {
-  if (!confirm(t('Obrisati predmet i sve beleške?'))) return;
-  try {
-    await apiFetch(`/api/matters/${id}`, {method:'DELETE'});
-    loadMatters();
-  } catch(e) { toast(e.message, 'error'); }
+  if (!confirm(t('Obrisati predmet i sve podatke?'))) return;
+  await apiFetch(`/api/matters/${id}`, {method:'DELETE'});
+  loadMatters();
 }
-
+async function addParty(matterId) {
+  const name = document.getElementById('newPartyName').value.trim();
+  if (!name) return;
+  const role = document.getElementById('newPartyRole').value;
+  await apiFetch(`/api/matters/${matterId}/parties`, {method:'POST', body: JSON.stringify({name, role})});
+  document.getElementById('newPartyName').value = '';
+  openMatter(matterId);
+}
+async function deleteParty(partyId) {
+  await apiFetch(`/api/matters/parties/${partyId}`, {method:'DELETE'});
+  openMatter(_currentMatter.id);
+}
+async function unlinkChat(matterId, chatId) {
+  await apiFetch(`/api/matters/${matterId}/unlink-chat/${chatId}`, {method:'DELETE'});
+  openMatter(matterId);
+}
 async function linkChatToMatter(matterId) {
   const chats = S.chats || [];
-  if (!chats.length) { toast(t('Nema razgovora za povezivanje'), 'warning'); return; }
-  const opts = chats.map(c => `${c.id}: ${c.title}`).join('\n');
-  const choice = prompt(t('Unesite ID razgovora za povezivanje:') + '\n\n' + opts);
+  if (!chats.length) { toast(t('Nema razgovora'), 'warning'); return; }
+  const choice = prompt(t('ID razgovora:') + '\n' + chats.map(c=>`${c.id}: ${c.title}`).join('\n'));
   if (!choice) return;
-  const chatId = parseInt(choice);
-  if (!chatId) return;
-  try {
-    await apiFetch(`/api/matters/${matterId}/link-chat`, {method:'POST', body: JSON.stringify({item_id: chatId})});
-    toast(t('Razgovor povezan!'), 'success');
-    openMatter(matterId);
-  } catch(e) { toast(e.message, 'error'); }
+  await apiFetch(`/api/matters/${matterId}/link-chat`, {method:'POST', body: JSON.stringify({item_id: parseInt(choice)})});
+  openMatter(matterId);
 }
 
-async function linkDocToMatter(matterId) {
-  const choice = prompt(t('Unesite ID dokumenta za povezivanje:'));
-  if (!choice) return;
-  try {
-    await apiFetch(`/api/matters/${matterId}/link-doc`, {method:'POST', body: JSON.stringify({item_id: choice.trim()})});
-    toast(t('Dokument povezan!'), 'success');
-    openMatter(matterId);
-  } catch(e) { toast(e.message, 'error'); }
+// ── File Upload ─────────────────────────────────────────────────────────────
+
+async function handleFileDrop(event, matterId) {
+  event.preventDefault();
+  event.currentTarget.classList.remove('dragover');
+  for (const file of event.dataTransfer.files) { await uploadMatterFile(matterId, file); }
+  openMatter(matterId);
 }
+async function handleFileSelect(event, matterId) {
+  for (const file of event.target.files) { await uploadMatterFile(matterId, file); }
+  openMatter(matterId);
+}
+async function uploadMatterFile(matterId, file) {
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('category', 'ostalo');
+  const r = await fetch(`/api/matters/${matterId}/files`, {method:'POST', body: fd});
+  if (!r.ok) throw new Error('Upload failed');
+  toast(`${file.name} ${t('otpremljen')}`, 'success');
+}
+function downloadMatterFile(matterId, fileId) { window.open(`/api/matters/${matterId}/files/${fileId}/download`); }
+async function deleteMatterFile(fileId, matterId) {
+  if (!confirm(t('Obrisati fajl?'))) return;
+  await apiFetch(`/api/matters/files/${fileId}`, {method:'DELETE'});
+  openMatter(matterId);
+}
+
+// ── Events / Timeline ───────────────────────────────────────────────────────
+
+function openAddEventModal(matterId) {
+  document.getElementById('modalAddEvent').classList.remove('hidden');
+  document.getElementById('modalAddEvent').dataset.matterId = matterId;
+}
+async function submitAddEvent() {
+  const matterId = document.getElementById('modalAddEvent').dataset.matterId;
+  const title = document.getElementById('newEventTitle').value.trim();
+  const eventDate = document.getElementById('newEventDate').value;
+  if (!title || !eventDate) { toast(t('Unesite naziv i datum'), 'warning'); return; }
+  await apiFetch(`/api/matters/${matterId}/events`, {method:'POST', body: JSON.stringify({
+    title, event_date: eventDate,
+    event_time: document.getElementById('newEventTime').value,
+    event_type: document.getElementById('newEventType').value,
+    location: document.getElementById('newEventLocation').value.trim(),
+    description: document.getElementById('newEventDesc').value.trim(),
+    reminder_days: parseInt(document.getElementById('newEventReminder').value) || 3,
+  })});
+  closeModal('modalAddEvent');
+  ['newEventTitle','newEventDate','newEventTime','newEventLocation','newEventDesc'].forEach(id => document.getElementById(id).value = '');
+  openMatter(parseInt(matterId));
+}
+async function completeEvent(eventId, matterId) {
+  await apiFetch(`/api/matters/events/${eventId}`, {method:'PUT', body: JSON.stringify({completed: true})});
+  openMatter(matterId);
+}
+async function deleteEvent(eventId, matterId) {
+  if (!confirm(t('Obrisati događaj?'))) return;
+  await apiFetch(`/api/matters/events/${eventId}`, {method:'DELETE'});
+  openMatter(matterId);
+}
+
+// ── In-Matter AI Chat ───────────────────────────────────────────────────────
+
+async function askMatterAI(matterId, presetQuestion) {
+  const q = presetQuestion || document.getElementById('matterAiQuestion').value.trim();
+  if (!q) return;
+  const el = document.getElementById('matterAiAnswer');
+  el.innerHTML = '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+  try {
+    // Build enriched query with matter context
+    const m = _currentMatter;
+    const ctx = `KONTEKST PREDMETA: ${m.name}, Klijent: ${m.client_name||'N/A'}, Suprotna strana: ${m.opposing_party||'N/A'}, Sud: ${m.court||'N/A'}, Vrsta: ${m.case_type||'N/A'}`;
+    const enrichedQuery = ctx + '\n\nPITANJE: ' + q;
+    const result = await apiFetch('/api/query', {method:'POST', body: JSON.stringify({
+      query: enrichedQuery, top_k: 5, answer_mode: 'balanced',
+    })});
+    el.innerHTML = `
+      <div style="background:var(--bg-alt);border-radius:var(--radius);padding:14px;border-left:3px solid var(--accent);">
+        <div class="text-sm" style="white-space:pre-wrap;">${escHtml(result.answer)}</div>
+        ${result.sources?.length ? '<div class="text-sm text-dim mt-8"><strong>'+t('Izvori')+':</strong> '+result.sources.slice(0,3).map(s=>escHtml(s.law||'')).join(', ')+'</div>' : ''}
+      </div>`;
+  } catch(e) {
+    el.innerHTML = `<p class="text-sm" style="color:var(--danger);">${t('AI nije dostupan')}: ${escHtml(e.message)}</p>`;
+  }
+}
+
+function openEditMatterModal() {
+  // Quick inline edit via prompt for now — full modal can be added later
+  const m = _currentMatter;
+  const newName = prompt(t('Naziv predmeta:'), m.name);
+  if (newName && newName !== m.name) {
+    apiFetch(`/api/matters/${m.id}`, {method:'PUT', body: JSON.stringify({name: newName})}).then(() => openMatter(m.id));
+  }
+}
+
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
 // ── BM25 Status & Rebuild ───────────────────────
 async function rebuildBM25() {
@@ -3858,6 +4622,112 @@ async function checkHealth() {
   }
 }
 
+// ── Onboarding Wizard ────────────────────────────────
+const WIZARD_STEPS = [
+  {
+    icon: 'fa-solid fa-scale-balanced',
+    title: 'Vaš AI pravni asistent',
+    body: `<p>LexArdor je lokalni AI asistent specijalizovan za srpsko pravo. U bazi se nalazi <strong>85.000+ članaka</strong> iz zakona, uredbi i pravilnika Republike Srbije, kao i <strong>73.000+ sudskih odluka</strong>.</p>
+    <p>Sve radi <strong>100% lokalno</strong> na vašem računaru — nijedan podatak ne napušta vaš uređaj.</p>`
+  },
+  {
+    icon: 'fa-solid fa-comments',
+    title: 'Postavljanje pitanja',
+    body: `<p>Na stranici <strong>Razgovor</strong> postavite pitanje prirodnim jezikom — kao da pitate kolegu.</p>
+    <div class="wizard-feature-grid">
+      <div class="wizard-feature"><i class="fa-solid fa-bolt"></i><span><strong>Brza analiza</strong> — odgovor za ~10s, za jednostavna pitanja</span></div>
+      <div class="wizard-feature"><i class="fa-solid fa-magnifying-glass"></i><span><strong>Dublja analiza</strong> — chain-of-thought, ~30-60s</span></div>
+      <div class="wizard-feature"><i class="fa-solid fa-brain"></i><span><strong>Temeljita analiza</strong> — 4-fazni pipeline, 1-2 min</span></div>
+      <div class="wizard-feature"><i class="fa-solid fa-shield-halved"></i><span><strong>Verifikacija</strong> — svaki citirani član se proverava</span></div>
+    </div>`
+  },
+  {
+    icon: 'fa-solid fa-folder-open',
+    title: 'Vaši dokumenti i šabloni',
+    body: `<p>Dodajte <strong>vlastite dokumente</strong> (PDF, DOCX, TXT) — AI uči iz svega što dodate i koristi te informacije u odgovorima.</p>
+    <p>Na stranici <strong>Šabloni</strong> otpremite popunjen pravni dokument (tužbu, ugovor, žalbu) i AI će kreirati šablon sa pametnim poljima koje možete popunjavati za nove klijente.</p>
+    <div class="wizard-feature-grid">
+      <div class="wizard-feature"><i class="fa-solid fa-file-import"></i><span>Otpremite dokument ili unesite tekst ručno</span></div>
+      <div class="wizard-feature"><i class="fa-solid fa-file-export"></i><span>Izvezite popunjen šablon kao PDF</span></div>
+    </div>`
+  },
+  {
+    icon: 'fa-solid fa-briefcase',
+    title: 'Radni prostor i predmeti',
+    body: `<p>Na stranici <strong>Radni prostor</strong> organizujte rad po predmetima — svaki predmet ima svoje konverzacije, dokumente i beleške.</p>
+    <p>Koristite <strong>Bazu propisa</strong> za direktno pretraživanje zakona, navigaciju po člancima i praćenje unakrsnih referenci između propisa.</p>
+    <div class="wizard-feature-grid">
+      <div class="wizard-feature"><i class="fa-solid fa-database"></i><span>Pretraga po zakonu, broju člana ili ključnim rečima</span></div>
+      <div class="wizard-feature"><i class="fa-solid fa-diagram-project"></i><span>Vizualizacija veza između propisa</span></div>
+    </div>`
+  },
+  {
+    icon: 'fa-solid fa-rocket',
+    title: 'Spremni ste!',
+    body: `<p>LexArdor je alat za istraživanje — uvek proverite navedene članove zakona. AI može pogrešno protumačiti ili neprecizno navesti izvor.</p>
+    <div class="wizard-feature-grid">
+      <div class="wizard-feature"><i class="fa-solid fa-sun"></i><span><strong>Tema:</strong> Svetla (Pergament) ili Tamna (Obsidian & Zlato)</span></div>
+      <div class="wizard-feature"><i class="fa-solid fa-language"></i><span><strong>Jezici:</strong> Latinica, Ćirilica, English</span></div>
+      <div class="wizard-feature"><i class="fa-solid fa-circle-question"></i><span><strong>Pomoć:</strong> Stranica sa vodičem i čestim pitanjima</span></div>
+      <div class="wizard-feature"><i class="fa-solid fa-envelope"></i><span><strong>Podrška:</strong> triardor.studio@gmail.com</span></div>
+    </div>
+    <p style="margin-top:12px;color:var(--accent);font-weight:600;">Kliknite "Započni" da krenete sa radom!</p>`
+  }
+];
+
+let wizardStep = 0;
+
+function renderWizardStep() {
+  const step = WIZARD_STEPS[wizardStep];
+  const body = document.getElementById('wizardBody');
+  body.innerHTML = `<i class="${step.icon} wizard-icon"></i><h3>${step.title}</h3>${step.body}`;
+
+  // Update dots
+  document.querySelectorAll('.wizard-step-dot').forEach((dot, i) => {
+    dot.className = 'wizard-step-dot';
+    if (i < wizardStep) dot.classList.add('done');
+    else if (i === wizardStep) dot.classList.add('active');
+  });
+
+  // Update buttons
+  document.getElementById('wizBtnPrev').style.display = wizardStep > 0 ? '' : 'none';
+  const nextBtn = document.getElementById('wizBtnNext');
+  if (wizardStep === WIZARD_STEPS.length - 1) {
+    nextBtn.innerHTML = '<i class="fa-solid fa-check"></i> Započni';
+    nextBtn.setAttribute('data-i18n', 'Započni');
+  } else {
+    nextBtn.textContent = t('Dalje');
+    nextBtn.setAttribute('data-i18n', 'Dalje');
+  }
+}
+
+function wizardNext() {
+  if (wizardStep < WIZARD_STEPS.length - 1) {
+    wizardStep++;
+    renderWizardStep();
+  } else {
+    closeWizard();
+  }
+}
+
+function wizardPrev() {
+  if (wizardStep > 0) {
+    wizardStep--;
+    renderWizardStep();
+  }
+}
+
+function closeWizard() {
+  document.getElementById('wizardOverlay').classList.remove('open');
+  localStorage.setItem('lexardor_onboarded', '1');
+}
+
+function showWizard() {
+  wizardStep = 0;
+  renderWizardStep();
+  document.getElementById('wizardOverlay').classList.add('open');
+}
+
 // ── Init ─────────────────────────────────────────────
 (function init() {
   applyTheme();
@@ -3866,6 +4736,10 @@ async function checkHealth() {
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === S.lang));
   checkHealth();
   loadChats();
+  // Show onboarding wizard on first visit
+  if (!localStorage.getItem('lexardor_onboarded')) {
+    setTimeout(showWizard, 600);
+  }
 })();
 </script>
 </body>

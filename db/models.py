@@ -110,7 +110,79 @@ def init_db():
             multi_stage BOOLEAN DEFAULT 0,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP
         );
+        -- Enhanced Radni Prostor tables (2026-04-06)
+        CREATE TABLE IF NOT EXISTS matter_parties (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            matter_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            role TEXT NOT NULL DEFAULT 'ostalo',
+            contact TEXT DEFAULT '',
+            notes TEXT DEFAULT '',
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (matter_id) REFERENCES matters(id)
+        );
+        CREATE TABLE IF NOT EXISTS matter_files (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            matter_id INTEGER NOT NULL,
+            filename TEXT NOT NULL,
+            file_type TEXT DEFAULT '',
+            file_size INTEGER DEFAULT 0,
+            file_path TEXT NOT NULL,
+            description TEXT DEFAULT '',
+            category TEXT DEFAULT 'ostalo',
+            uploaded_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            indexed BOOLEAN DEFAULT 0,
+            FOREIGN KEY (matter_id) REFERENCES matters(id)
+        );
+        CREATE TABLE IF NOT EXISTS matter_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            matter_id INTEGER NOT NULL,
+            title TEXT NOT NULL,
+            description TEXT DEFAULT '',
+            event_type TEXT NOT NULL DEFAULT 'ostalo',
+            event_date TEXT NOT NULL,
+            event_time TEXT DEFAULT '',
+            location TEXT DEFAULT '',
+            reminder_days INTEGER DEFAULT 3,
+            completed BOOLEAN DEFAULT 0,
+            google_event_id TEXT DEFAULT '',
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (matter_id) REFERENCES matters(id)
+        );
+        CREATE TABLE IF NOT EXISTS google_calendar_auth (
+            id INTEGER PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            access_token TEXT NOT NULL,
+            refresh_token TEXT NOT NULL,
+            token_expiry TEXT NOT NULL,
+            calendar_id TEXT DEFAULT 'primary',
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        );
     """)
+    # Add new columns to matters table (safe migration — ignore if already exist)
+    new_matter_cols = [
+        ("case_number", "TEXT DEFAULT ''"),
+        ("case_type", "TEXT DEFAULT 'ostalo'"),
+        ("court", "TEXT DEFAULT ''"),
+        ("judge", "TEXT DEFAULT ''"),
+        ("opposing_party", "TEXT DEFAULT ''"),
+        ("client_name", "TEXT DEFAULT ''"),
+        ("priority", "TEXT DEFAULT 'normal'"),
+        ("archived_at", "TEXT DEFAULT NULL"),
+        ("tags", "TEXT DEFAULT '[]'"),
+    ]
+    for col_name, col_def in new_matter_cols:
+        try:
+            conn.execute(f"ALTER TABLE matters ADD COLUMN {col_name} {col_def}")
+        except Exception:
+            pass  # Column already exists
+    # Add pinned column to matter_notes
+    try:
+        conn.execute("ALTER TABLE matter_notes ADD COLUMN pinned BOOLEAN DEFAULT 0")
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 
@@ -359,6 +431,7 @@ def update_template(template_id: int, **kwargs):
             continue
         if k in ("fields", "example_values"):
             v = json.dumps(v, ensure_ascii=False)
+        assert k.isidentifier(), f"Invalid column name: {k}"
         sets.append(f"{k} = ?")
         vals.append(v)
     if not sets:
@@ -430,6 +503,7 @@ def update_draft(draft_id: int, **kwargs):
             continue
         if k == "field_values":
             v = json.dumps(v, ensure_ascii=False)
+        assert k.isidentifier(), f"Invalid column name: {k}"
         sets.append(f"{k} = ?")
         vals.append(v)
     if not sets:
@@ -490,7 +564,7 @@ def get_matter(matter_id: int) -> dict | None:
         return None
     m = dict(row)
     m["notes"] = [dict(r) for r in conn.execute(
-        "SELECT * FROM matter_notes WHERE matter_id=? ORDER BY created_at DESC",
+        "SELECT * FROM matter_notes WHERE matter_id=? ORDER BY pinned DESC, created_at DESC",
         (matter_id,)).fetchall()]
     m["chat_ids"] = [r[0] for r in conn.execute(
         "SELECT chat_id FROM matter_chats WHERE matter_id=?",
@@ -498,16 +572,40 @@ def get_matter(matter_id: int) -> dict | None:
     m["doc_ids"] = [r[0] for r in conn.execute(
         "SELECT doc_id FROM matter_documents WHERE matter_id=?",
         (matter_id,)).fetchall()]
+    m["parties"] = [dict(r) for r in conn.execute(
+        "SELECT * FROM matter_parties WHERE matter_id=? ORDER BY created_at",
+        (matter_id,)).fetchall()]
+    m["files"] = [dict(r) for r in conn.execute(
+        "SELECT * FROM matter_files WHERE matter_id=? ORDER BY uploaded_at DESC",
+        (matter_id,)).fetchall()]
+    m["events"] = [dict(r) for r in conn.execute(
+        "SELECT * FROM matter_events WHERE matter_id=? ORDER BY event_date ASC",
+        (matter_id,)).fetchall()]
+    # Parse tags JSON
+    if m.get("tags"):
+        try:
+            m["tags"] = json.loads(m["tags"]) if isinstance(m["tags"], str) else m["tags"]
+        except (json.JSONDecodeError, TypeError):
+            m["tags"] = []
+    else:
+        m["tags"] = []
     conn.close()
     return m
 
 
 def update_matter(matter_id: int, **kwargs):
+    allowed = {"name", "description", "status", "case_number", "case_type",
+               "court", "judge", "opposing_party", "client_name", "priority",
+               "archived_at", "tags"}
     sets, vals = [], []
     for k, v in kwargs.items():
-        if v is not None and k in ("name", "description", "status"):
-            sets.append(f"{k} = ?")
-            vals.append(v)
+        if k not in allowed:
+            continue
+        if k == "tags" and isinstance(v, list):
+            v = json.dumps(v, ensure_ascii=False)
+        assert k.isidentifier(), f"Invalid column name: {k}"
+        sets.append(f"{k} = ?")
+        vals.append(v)
     if not sets:
         return
     sets.append("updated_at = CURRENT_TIMESTAMP")
@@ -523,6 +621,9 @@ def delete_matter(matter_id: int):
     conn.execute("DELETE FROM matter_notes WHERE matter_id = ?", (matter_id,))
     conn.execute("DELETE FROM matter_chats WHERE matter_id = ?", (matter_id,))
     conn.execute("DELETE FROM matter_documents WHERE matter_id = ?", (matter_id,))
+    conn.execute("DELETE FROM matter_parties WHERE matter_id = ?", (matter_id,))
+    conn.execute("DELETE FROM matter_files WHERE matter_id = ?", (matter_id,))
+    conn.execute("DELETE FROM matter_events WHERE matter_id = ?", (matter_id,))
     conn.execute("DELETE FROM matters WHERE id = ?", (matter_id,))
     conn.commit()
     conn.close()
@@ -563,6 +664,155 @@ def link_doc_to_matter(matter_id: int, doc_id: str):
     conn.execute("UPDATE matters SET updated_at = CURRENT_TIMESTAMP WHERE id = ?", (matter_id,))
     conn.commit()
     conn.close()
+
+
+def unlink_chat_from_matter(matter_id: int, chat_id: int):
+    conn = get_db()
+    conn.execute("DELETE FROM matter_chats WHERE matter_id = ? AND chat_id = ?",
+                 (matter_id, chat_id))
+    conn.commit()
+    conn.close()
+
+
+def unlink_doc_from_matter(matter_id: int, doc_id: str):
+    conn = get_db()
+    conn.execute("DELETE FROM matter_documents WHERE matter_id = ? AND doc_id = ?",
+                 (matter_id, doc_id))
+    conn.commit()
+    conn.close()
+
+
+def update_matter_note(note_id: int, content: str):
+    conn = get_db()
+    conn.execute("UPDATE matter_notes SET content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+                 (content, note_id))
+    conn.commit()
+    conn.close()
+
+
+def toggle_note_pin(note_id: int):
+    conn = get_db()
+    conn.execute("UPDATE matter_notes SET pinned = NOT pinned WHERE id = ?", (note_id,))
+    conn.commit()
+    conn.close()
+
+
+# ── Matter Parties ──────���───────────────────────────────────────────────────
+
+def add_matter_party(matter_id: int, name: str, role: str,
+                     contact: str = "", notes: str = "") -> int:
+    conn = get_db()
+    cursor = conn.execute(
+        "INSERT INTO matter_parties (matter_id, name, role, contact, notes) VALUES (?, ?, ?, ?, ?)",
+        (matter_id, name, role, contact, notes))
+    pid = cursor.lastrowid
+    conn.execute("UPDATE matters SET updated_at = CURRENT_TIMESTAMP WHERE id = ?", (matter_id,))
+    conn.commit()
+    conn.close()
+    return pid
+
+
+def delete_matter_party(party_id: int):
+    conn = get_db()
+    conn.execute("DELETE FROM matter_parties WHERE id = ?", (party_id,))
+    conn.commit()
+    conn.close()
+
+
+# ── Matter Files ──────────────────────────────────────���─────────────────────
+
+def add_matter_file(matter_id: int, filename: str, file_type: str,
+                    file_size: int, file_path: str, description: str = "",
+                    category: str = "ostalo") -> int:
+    conn = get_db()
+    cursor = conn.execute(
+        """INSERT INTO matter_files
+           (matter_id, filename, file_type, file_size, file_path, description, category)
+           VALUES (?, ?, ?, ?, ?, ?, ?)""",
+        (matter_id, filename, file_type, file_size, file_path, description, category))
+    fid = cursor.lastrowid
+    conn.execute("UPDATE matters SET updated_at = CURRENT_TIMESTAMP WHERE id = ?", (matter_id,))
+    conn.commit()
+    conn.close()
+    return fid
+
+
+def mark_file_indexed(file_id: int):
+    conn = get_db()
+    conn.execute("UPDATE matter_files SET indexed = 1 WHERE id = ?", (file_id,))
+    conn.commit()
+    conn.close()
+
+
+def delete_matter_file(file_id: int) -> str | None:
+    """Delete file record and return file_path for cleanup."""
+    conn = get_db()
+    row = conn.execute("SELECT file_path FROM matter_files WHERE id = ?", (file_id,)).fetchone()
+    path = row[0] if row else None
+    conn.execute("DELETE FROM matter_files WHERE id = ?", (file_id,))
+    conn.commit()
+    conn.close()
+    return path
+
+
+# ── Matter Events ─────────────��─────────────────────────────────────────────
+
+def add_matter_event(matter_id: int, title: str, event_type: str, event_date: str,
+                     description: str = "", event_time: str = "", location: str = "",
+                     reminder_days: int = 3) -> int:
+    conn = get_db()
+    cursor = conn.execute(
+        """INSERT INTO matter_events
+           (matter_id, title, event_type, event_date, description, event_time, location, reminder_days)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+        (matter_id, title, event_type, event_date, description, event_time, location, reminder_days))
+    eid = cursor.lastrowid
+    conn.execute("UPDATE matters SET updated_at = CURRENT_TIMESTAMP WHERE id = ?", (matter_id,))
+    conn.commit()
+    conn.close()
+    return eid
+
+
+def update_matter_event(event_id: int, **kwargs):
+    allowed = {"title", "description", "event_type", "event_date", "event_time",
+               "location", "reminder_days", "completed", "google_event_id"}
+    sets, vals = [], []
+    for k, v in kwargs.items():
+        if k not in allowed:
+            continue
+        assert k.isidentifier(), f"Invalid column name: {k}"
+        sets.append(f"{k} = ?")
+        vals.append(v)
+    if not sets:
+        return
+    vals.append(event_id)
+    conn = get_db()
+    conn.execute(f"UPDATE matter_events SET {', '.join(sets)} WHERE id = ?", vals)
+    conn.commit()
+    conn.close()
+
+
+def delete_matter_event(event_id: int):
+    conn = get_db()
+    conn.execute("DELETE FROM matter_events WHERE id = ?", (event_id,))
+    conn.commit()
+    conn.close()
+
+
+def get_upcoming_events(user_id: int, days: int = 30) -> list[dict]:
+    """Get all upcoming events across all matters for a user."""
+    conn = get_db()
+    rows = conn.execute("""
+        SELECT e.*, m.name as matter_name, m.case_number
+        FROM matter_events e
+        JOIN matters m ON e.matter_id = m.id
+        WHERE m.user_id = ? AND e.completed = 0
+          AND e.event_date >= date('now')
+          AND e.event_date <= date('now', '+' || ? || ' days')
+        ORDER BY e.event_date ASC, e.event_time ASC
+    """, (user_id, days)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
 
 
 # ── Query Logs (Observability) ───────────────────────────────────────────────

@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "query": "Pre pet godina, dobio sam otkaz kao tehnoloski visak, radio tri godine na odredjeno. Nakon otkaza postavili su drugog na to mesto. Firmu sam tuzio i dobio u svom gradu. Oni su se zalili i preko veze su dobili na Apelacionom. Sada je predmet dalje otisao mojom zalbom. Sta mogu da ocekujem i da li posle ove odluke imam prava dalje zalbu?",
+    "domain": "radno_pravo",
+    "expected_laws": ["Zakon o radu"],
+    "notes": "Original problem query that returned trademark law sources"
+  },
+  {
+    "id": 2,
+    "query": "Kako se odredjuje alimentacija za dvoje dece ako otac ima platu od 80.000 dinara?",
+    "domain": "porodicno_pravo",
+    "expected_laws": ["Porodični zakon"],
+    "notes": "Family law - child support calculation"
+  },
+  {
+    "id": 3,
+    "query": "Da li mogu da osnujem doo ako imam neplacene poreze?",
+    "domain": "privredno_pravo",
+    "expected_laws": ["Zakon o privrednim društvima", "Zakon o poreskom postupku"],
+    "notes": "Business law - company registration with tax debt"
+  },
+  {
+    "id": 4,
+    "query": "Komsija mi je podigao ogradu koja zaklanja sunce mom dvorisu. Koji su moji pravni lekovi?",
+    "domain": "obligaciono_pravo",
+    "expected_laws": ["Zakon o obligacionim odnosima", "Zakon o osnovama svojinskopravnih odnosa"],
+    "notes": "Property/obligation law - neighbor dispute"
+  },
+  {
+    "id": 5,
+    "query": "Poslodavac mi ne placa prekovremeni rad vec 6 meseci. Sta mogu da uradim?",
+    "domain": "radno_pravo",
+    "expected_laws": ["Zakon o radu"],
+    "notes": "Labor law - unpaid overtime"
+  },
+  {
+    "id": 6,
+    "query": "Moj brat je umro bez testamenta. Ima suprugu i dvoje dece. Kako se deli nasledstvo?",
+    "domain": "porodicno_pravo",
+    "expected_laws": ["Zakon o nasleđivanju"],
+    "notes": "Inheritance law - intestate succession"
+  },
+  {
+    "id": 7,
+    "query": "Da li trudnica moze da dobije otkaz u Srbiji?",
+    "domain": "radno_pravo",
+    "expected_laws": ["Zakon o radu"],
+    "notes": "Labor law - pregnancy protection, tests query expansion"
+  },
+  {
+    "id": 8,
+    "query": "Koji je rok zastarelosti za naknadu stete iz saobracajne nezgode?",
+    "domain": "obligaciono_pravo",
+    "expected_laws": ["Zakon o obligacionim odnosima"],
+    "notes": "Obligation law - statute of limitations"
+  },
+  {
+    "id": 9,
+    "query": "Kupac mi ne placa fakturu vec godinu dana. Kako da pokrenem izvrsenje?",
+    "domain": "obligaciono_pravo",
+    "expected_laws": ["Zakon o izvršenju i obezbeđenju"],
+    "notes": "Enforcement law - debt collection"
+  },
+  {
+    "id": 10,
+    "query": "Sta je potrebno za upis prava svojine na nekretnini?",
+    "domain": "upravno_pravo",
+    "expected_laws": ["Zakon o državnom premeru i katastru"],
+    "notes": "Administrative/property law - real estate registration"
+  }
+]

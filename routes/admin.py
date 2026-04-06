@@ -1,7 +1,10 @@
 """Admin, health, models, and engine config endpoints."""
+import logging
 from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Query
+
+logger = logging.getLogger(__name__)
 
 from core.config import settings
 from llm.ollama import OllamaClient
@@ -14,7 +17,8 @@ def _get_bm25_status() -> dict:
     try:
         from rag.bm25 import get_bm25_index
         return get_bm25_index().status()
-    except Exception:
+    except Exception as e:
+        logger.warning("BM25 status check failed: %s", e)
         return {"ready": False, "doc_count": 0}
 
 
@@ -24,7 +28,8 @@ def health():
     ollama_ok = client.is_available()
     try:
         stats = corpus_stats()
-    except Exception:
+    except Exception as e:
+        logger.warning("Corpus stats unavailable in health check: %s", e)
         stats = {"total_articles": 0}
     return {
         "ok": True,
@@ -151,6 +156,49 @@ def bm25_status():
     from rag.bm25 import get_bm25_index
     idx = get_bm25_index()
     return idx.status()
+
+
+# ── Web Search Settings (server-side, not in URL) ────────────────────────────
+
+@router.get("/admin/web-search-settings")
+def get_web_search_settings():
+    """Return current web search configuration (keys redacted)."""
+    return {
+        "google_enabled": bool(settings.google_api_key and settings.google_cx),
+        "google_key_set": bool(settings.google_api_key),
+        "google_cx_set": bool(settings.google_cx),
+        "ddg_available": True,  # DuckDuckGo always available (free, no key)
+    }
+
+
+@router.post("/admin/web-search-settings")
+def save_web_search_settings(body: dict):
+    """Save Google Search credentials server-side. Never sent via URL."""
+    google_key = body.get("google_api_key", "").strip()
+    google_cx = body.get("google_cx", "").strip()
+    # Store in runtime settings
+    settings.google_api_key = google_key
+    settings.google_cx = google_cx
+    # Persist to .env
+    _update_env("GOOGLE_API_KEY", google_key)
+    _update_env("GOOGLE_CX", google_cx)
+    return {"ok": True, "google_enabled": bool(google_key and google_cx)}
+
+
+def _update_env(key: str, value: str):
+    """Update or add a key in the .env file."""
+    from pathlib import Path
+    env_path = Path(settings.Config.env_file) if hasattr(settings.Config, 'env_file') else Path(__file__).parent.parent / ".env"
+    lines = env_path.read_text().splitlines() if env_path.exists() else []
+    found = False
+    for i, line in enumerate(lines):
+        if line.startswith(f"{key}=") or line.startswith(f"# {key}="):
+            lines[i] = f"{key}={value}"
+            found = True
+            break
+    if not found:
+        lines.append(f"{key}={value}")
+    env_path.write_text("\n".join(lines) + "\n")
 
 
 @router.get("/admin/diagnostics")

@@ -27,7 +27,8 @@ log = logging.getLogger("lexardor.multi_stage")
 
 # ── Stage 1: Planner ────────────────────────────────────────────────────────
 
-PLANNER_SYSTEM = """Ti si pravni planer. Tvoj zadatak je da razložiš korisnikovo pitanje na potpitanja za pretragu pravne baze.
+PLANNER_SYSTEM = """Ti si pravni planer. Odgovaraj ISKLJUČIVO na srpskom jeziku.
+Tvoj zadatak je da razložiš korisnikovo pitanje na potpitanja za pretragu pravne baze.
 
 PRAVILA:
 1. Razloži pitanje na 2-4 potpitanja za pretragu
@@ -138,6 +139,7 @@ def _research(plan: dict, original_query: str, top_k: int = 5,
 # ── Stage 3: Synthesizer ────────────────────────────────────────────────────
 
 SYNTHESIZER_SYSTEM = """Ti si LexArdor, AI pravni ekspert za srpsko pravo. Ovo je temeljita 4-fazna analiza.
+UVEK odgovaraj ISKLJUČIVO na SRPSKOM jeziku (latinica). NE prikazuj razmišljanje ili thought process.
 
 Na osnovu svih priloženih izvora, napiši sveobuhvatan odgovor:
 1. Počni sa direktnim odgovorom (1-2 rečenice)
@@ -199,7 +201,8 @@ Odgovori sveobuhvatno koristeći SVE priložene pravne izvore. Navedi relevantne
 
 # ── Stage 4: Critic ──────────────────────────────────────────────────────────
 
-CRITIC_SYSTEM = """Ti si pravni recenzent. Pregledaj odgovor i identifikuj probleme.
+CRITIC_SYSTEM = """Ti si pravni recenzent. Odgovaraj ISKLJUČIVO na srpskom jeziku.
+Pregledaj odgovor i identifikuj probleme.
 
 Proveri:
 1. Da li su SVI navedeni članovi zakona zaista prisutni u izvorima?
@@ -333,11 +336,13 @@ def query_deep(user_query: str, top_k: int = 8, chat_history: list[dict] = None,
         },
     }
 
-    # Adjust confidence based on critique
+    # Adjust confidence based on critique (keep dict structure)
     if critique.get("quality") == "low":
-        confidence = "low"
-    elif critique.get("quality") == "medium" and confidence == "high":
-        confidence = "medium"
+        confidence["level"] = "low"
+        confidence["red_flags"].append("Recenzent ocenio kvalitet kao nizak")
+    elif critique.get("quality") == "medium" and confidence.get("level") == "high":
+        confidence["level"] = "medium"
+        confidence["reasons"].append("Recenzent snizio ocenu na umerenu")
 
     # Source span mapping
     from rag.span_mapper import map_answer_to_sources

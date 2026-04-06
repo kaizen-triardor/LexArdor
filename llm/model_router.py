@@ -41,6 +41,20 @@ MODELS = {
         "ctx_size": 16384,
         "description": "Brzi model za klasifikaciju i jednostavna pitanja",
     },
+    "qwen9b_opus": {
+        "name": "Qwen 3.5 9B Opus Distilled Q8",
+        "path": settings.model_fast_opus,
+        "role": "fast",
+        "ctx_size": 16384,
+        "description": "Claude Opus reasoning u malom formatu — brzi + pametni",
+    },
+    "lexardor_opus": {
+        "name": "LexArdor Opus 9B Legal Q8",
+        "path": settings.model_lexardor_opus,
+        "role": "fast",
+        "ctx_size": 16384,
+        "description": "Fine-tuned za srpsko pravo — Opus reasoning + pravni trening",
+    },
     "qwen27b": {
         "name": "Qwen 3.5 27B Opus Distilled Q4",
         "path": settings.model_reasoning_qwen27b,
@@ -83,6 +97,7 @@ MODELS = {
 
 _current_model_key: str | None = None
 _llama_process: subprocess.Popen | None = None
+_llama_log_file = None  # Track log file handle to prevent leaks
 
 
 def get_current_model_key() -> str | None:
@@ -119,8 +134,8 @@ def _kill_llama_server():
                 os.kill(int(pid_str), signal.SIGTERM)
             except (ProcessLookupError, ValueError):
                 pass
-    except Exception:
-        pass
+    except Exception as e:
+        log.warning("Failed to kill orphan llama-server processes: %s", e)
     time.sleep(1)
 
 
@@ -132,8 +147,8 @@ def _wait_for_health(timeout: int = 120) -> bool:
             r = httpx.get(f"http://localhost:{LLAMA_PORT}/health", timeout=3)
             if r.status_code == 200:
                 return True
-        except Exception:
-            pass
+        except Exception as e:
+            log.debug("Health check not ready yet: %s", e)
         time.sleep(2)
     return False
 
@@ -162,8 +177,8 @@ def swap_model(key: str) -> dict:
             if r.status_code == 200:
                 return {"ok": True, "model": key, "name": model_info["name"],
                         "message": "Model already loaded"}
-        except Exception:
-            pass  # Server died, need to restart
+        except Exception as e:
+            log.warning("Model health check failed, will restart: %s", e)
 
     log.info("Swapping model → %s (%s)", key, model_info["name"])
     _kill_llama_server()
@@ -183,15 +198,20 @@ def swap_model(key: str) -> dict:
         "--port", str(LLAMA_PORT),
         "--host", "0.0.0.0",
         "--ctx-size", str(ctx_size),
-        "--cache-type-k", "f16",
-        "--cache-type-v", "f16",
+        "--cache-type-k", "q8_0",
+        "--cache-type-v", "q8_0",
+        "--flash-attn", "on",
         "--threads", str(threads),
     ]
 
     log.info("Starting: %s", " ".join(cmd[:6]) + " ...")
+    global _llama_log_file
+    if _llama_log_file:
+        _llama_log_file.close()
+    _llama_log_file = open("/tmp/lexardor-llama.log", "w")
     _llama_process = subprocess.Popen(
         cmd, env=env,
-        stdout=open("/tmp/lexardor-llama.log", "w"),
+        stdout=_llama_log_file,
         stderr=subprocess.STDOUT,
     )
 
@@ -212,14 +232,15 @@ def detect_loaded_model() -> str | None:
         if r.status_code != 200:
             _current_model_key = None
             return None
-    except Exception:
+    except Exception as e:
+        log.warning("Failed to detect loaded model: %s", e)
         _current_model_key = None
         return None
 
     # Server is running — check env hint from start.sh, otherwise assume fast
     if _current_model_key is None:
         hint = os.environ.get("LEXARDOR_INITIAL_MODEL", "qwen9b")
-        _current_model_key = hint if hint in MODELS else "fast"
+        _current_model_key = hint if hint in MODELS else "qwen9b"
         log.info("Detected running model: %s", _current_model_key)
     return _current_model_key
 

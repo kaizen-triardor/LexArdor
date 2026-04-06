@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import logging
 import re
 import time
+
+log = logging.getLogger("lexardor.store")
 
 import chromadb
 
@@ -45,6 +48,48 @@ def get_client_collection() -> chromadb.Collection:
             metadata={"hnsw:space": "cosine"},
         )
     return _client_collection
+
+
+# Per-matter collections cache
+_matter_collections: dict[int, chromadb.Collection] = {}
+
+
+def get_or_create_matter_collection(matter_id: int) -> chromadb.Collection:
+    """Get or create a ChromaDB collection for a specific matter's documents."""
+    if matter_id not in _matter_collections:
+        client = _get_client()
+        _matter_collections[matter_id] = client.get_or_create_collection(
+            name=f"matter_{matter_id}",
+            metadata={"hnsw:space": "cosine"},
+        )
+    return _matter_collections[matter_id]
+
+
+def search_matter_collection(matter_id: int, query: str, top_k: int = 5) -> list[dict]:
+    """Search within a matter's document collection."""
+    try:
+        col = get_or_create_matter_collection(matter_id)
+        if col.count() == 0:
+            return []
+        query_embedding = embed_query(query)
+        results = col.query(
+            query_embeddings=[query_embedding],
+            n_results=min(top_k, col.count()),
+            include=["documents", "metadatas", "distances"],
+        )
+        hits = []
+        for i in range(len(results["ids"][0])):
+            hits.append({
+                "id": results["ids"][0][i],
+                "text": results["documents"][0][i],
+                "metadata": results["metadatas"][0][i],
+                "score": round(1.0 - results["distances"][0][i], 4),
+                "source_collection": f"matter_{matter_id}",
+            })
+        return hits
+    except Exception as e:
+        log.warning("Matter collection search failed: %s", e)
+        return []
 
 
 def ingest_law(law: dict) -> int:
@@ -245,8 +290,8 @@ def list_client_documents(include_preview: bool = False) -> list[dict]:
             try:
                 ts = int(did.rsplit("_", 1)[-1])
                 created_at = datetime.fromtimestamp(ts, tz=timezone.utc).isoformat()
-            except (ValueError, IndexError, OSError):
-                pass
+            except (ValueError, IndexError, OSError) as e:
+                log.warning("Failed to parse timestamp from doc_id '%s': %s", did, e)
 
             docs[did] = {
                 "doc_id": did,
@@ -278,6 +323,72 @@ def _keyword_boost(query: str, text: str) -> float:
     matches = sum(1 for w in query_words if w in text_lower)
     ratio = matches / len(query_words)
     return ratio * 0.25  # max 0.25 boost (increased from 0.15)
+
+
+# Map legal domains to slug patterns and keywords that identify relevant laws
+DOMAIN_LAW_PATTERNS = {
+    "radno_pravo": {
+        "slugs": ["zakon-o-radu", "zakon-o-zaposljavanju", "zakon-o-strajku",
+                   "zakon-o-bezbednosti-i-zdravlju-na-radu", "zakon-o-sprecavanju-zlostavljanja-na-radu"],
+        "keywords": ["rad", "radni", "zaposleni", "poslodavac", "otkaz", "plata", "zarada",
+                      "odmor", "ugovor o radu", "sindikat", "kolektivni ugovor"],
+    },
+    "krivicno_pravo": {
+        "slugs": ["krivicni-zakonik", "zakonik-o-krivicnom-postupku"],
+        "keywords": ["krivičn", "kazna", "zatvor", "krivično delo", "tužilac", "optuženi"],
+    },
+    "porodicno_pravo": {
+        "slugs": ["porodicni-zakon", "zakon-o-nasledjivanju"],
+        "keywords": ["brak", "razvod", "dete", "alimenta", "staratelj", "naslед", "testament"],
+    },
+    "obligaciono_pravo": {
+        "slugs": ["zakon-o-obligacionim-odnosima"],
+        "keywords": ["ugovor", "šteta", "naknada", "odgovornost", "obligaci", "raskid"],
+    },
+    "poresko_pravo": {
+        "slugs": ["zakon-o-porezu", "zakon-o-pdv", "zakon-o-porezima-na-imovinu"],
+        "keywords": ["porez", "pdv", "doprinos", "poresk"],
+    },
+    "privredno_pravo": {
+        "slugs": ["zakon-o-privrednim-drustvima", "zakon-o-stecaju", "zakon-o-registraciji"],
+        "keywords": ["privredno", "firma", "doo", "preduzeć", "stečaj", "likvidacija"],
+    },
+    "upravno_pravo": {
+        "slugs": ["zakon-o-opstem-upravnom-postupku"],
+        "keywords": ["upravni", "inspekcija", "dozvola", "rešenje"],
+    },
+    "ustavno_pravo": {
+        "slugs": ["ustav-republike-srbije"],
+        "keywords": ["ustav", "ustavni", "ljudska prava"],
+    },
+}
+
+
+def _domain_boost(metadata: dict, text: str, domains: list[str]) -> float:
+    """Boost results matching detected legal domains. Returns 0.0 to 0.3 boost."""
+    if not domains or domains == ["opšte"]:
+        return 0.0
+
+    slug = metadata.get("law_slug", "").lower()
+    law_title = metadata.get("law_title", "").lower()
+    text_lower = text.lower()
+    boost = 0.0
+
+    for domain in domains:
+        patterns = DOMAIN_LAW_PATTERNS.get(domain, {})
+        # Strong boost: slug matches a known law for this domain
+        for s in patterns.get("slugs", []):
+            if s in slug:
+                boost = max(boost, 0.3)
+                break
+        # Medium boost: domain keywords appear in text or title
+        kw_hits = sum(1 for kw in patterns.get("keywords", []) if kw in text_lower or kw in law_title)
+        if kw_hits >= 2:
+            boost = max(boost, 0.2)
+        elif kw_hits >= 1:
+            boost = max(boost, 0.1)
+
+    return boost
 
 
 def expand_query(query: str) -> str:
@@ -403,6 +514,7 @@ def search_with_filters(
     min_authority: int | None = None,
     include_client_docs: bool = True,
     reference_date: str | None = None,
+    legal_domains: list[str] | None = None,
 ) -> list[dict]:
     """Enhanced search with metadata filtering, authority weighting, and reranking.
 
@@ -448,7 +560,8 @@ def search_with_filters(
                 where=where,
                 include=["documents", "metadatas", "distances"],
             )
-        except Exception:
+        except Exception as e:
+            log.warning("ChromaDB filtered query failed, retrying without filter: %s", e)
             # Filter might fail if metadata fields don't exist yet; fallback
             core_results = core.query(
                 query_embeddings=[query_embedding],
@@ -462,7 +575,8 @@ def search_with_filters(
             vec_score = 1.0 - core_results["distances"][0][idx]
             kw_boost = _keyword_boost(query, text)
             auth_boost = _authority_weight(meta.get("authority_level", 5))
-            total = vec_score + kw_boost + auth_boost
+            dom_boost = _domain_boost(meta, text, legal_domains) if legal_domains else 0.0
+            total = vec_score + kw_boost + auth_boost + dom_boost
             results.append({
                 "id": core_results["ids"][0][idx],
                 "text": text,
@@ -472,6 +586,7 @@ def search_with_filters(
                 "vec_score": round(vec_score, 4),
                 "keyword_boost": round(kw_boost, 4),
                 "authority_boost": round(auth_boost, 4),
+                "domain_boost": round(dom_boost, 4),
                 "source_collection": "core_laws",
             })
 
@@ -562,8 +677,8 @@ def search_with_filters(
                                 "rrf_score": round(rrf, 6),
                                 "source_collection": "core_laws",
                             })
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        log.warning("Failed to fetch BM25-only result %s from ChromaDB: %s", doc_id, e)
 
             # Sort by RRF score
             results.sort(key=lambda x: x.get("rrf_score", x["score"]), reverse=True)
@@ -571,8 +686,7 @@ def search_with_filters(
             results.sort(key=lambda x: x["score"], reverse=True)
     except Exception as e:
         # BM25 not available — fall back to vector-only
-        import logging
-        logging.getLogger("lexardor.store").debug("BM25 unavailable: %s", e)
+        log.debug("BM25 unavailable: %s", e)
         results.sort(key=lambda x: x["score"], reverse=True)
 
     return results[:fetch_k]
